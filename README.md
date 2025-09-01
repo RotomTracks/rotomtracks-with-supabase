@@ -37,7 +37,7 @@
 ## Despliegue en Vercel
 
 ### Opción 1: Despliegue Directo
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tu-usuario/rotomtracks)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/RotomTracks/rotomtracks-with-supabase)
 
 ### Opción 2: Despliegue Manual
 
