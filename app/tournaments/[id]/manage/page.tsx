@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { TournamentManagement } from '@/components/tournaments/TournamentManagement';
 
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
+
 interface ManagePageProps {
   params: Promise<{
     id: string;

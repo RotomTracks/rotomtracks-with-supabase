@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ProfileForm } from "@/components/profile-form";

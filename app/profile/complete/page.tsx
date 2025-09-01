@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, getCurrentUserProfile } from "@/lib/auth/roles";
+
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
 import { ProfileForm } from "@/components/profile-form";
 import {
   Card,

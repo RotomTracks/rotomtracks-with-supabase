@@ -2,6 +2,9 @@
 import { TournamentList } from '@/components/tournaments/TournamentList';
 import { getCurrentUser } from '@/lib/auth/roles';
 
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
+
 interface TournamentsPageProps {
   searchParams: Promise<{
     q?: string;

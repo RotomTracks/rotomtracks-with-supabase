@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { TournamentDetails } from '@/components/tournaments/TournamentDetails';
+
+// Forzar renderizado dinámico
+export const dynamic = 'force-dynamic';
 import { Button } from '@/components/ui/button';
 import { Settings, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';

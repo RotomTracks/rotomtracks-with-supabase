@@ -13,11 +13,11 @@ const path = require('path');
 require('dotenv').config({ path: '.env.local' });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
-const supabaseServiceKey = process.env.DATABASE_SECRET_KEY;
+const supabaseServiceKey = process.env.SERVER_AUTH || process.env.DATABASE_SECRET_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Missing database environment variables');
-  console.error('Make sure NEXT_PUBLIC_DATABASE_URL and DATABASE_SECRET_KEY are set in .env.local');
+  console.error('Make sure NEXT_PUBLIC_DATABASE_URL and SERVER_AUTH are set in .env.local');
   process.exit(1);
 }
 
