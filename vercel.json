@@ -2,10 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "installCommand": "npm install",
-  "env": {
-    "NEXT_PUBLIC_DATABASE_URL": "@next_public_database_url",
-    "NEXT_PUBLIC_CLIENT_AUTH": "@next_public_client_auth",
-    "SERVER_AUTH": "@server_auth"
-  }
+  "installCommand": "npm install"
 }
