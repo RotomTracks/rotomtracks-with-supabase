@@ -157,11 +157,11 @@ FOR ALL USING (auth.uid() = organizer_id);
    - **Build Command**: `npm run build`
    - **Output Directory**: `.next`
 
-3. **Configura variables de entorno**:
+3. **Configura variables de entorno** (nombres seguros recomendados):
    ```
-   NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu_clave_anon
-   SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role
+   NEXT_PUBLIC_API_URL=https://tu-proyecto.supabase.co
+   NEXT_PUBLIC_API_TOKEN=tu_clave_anon
+   API_SECRET=tu_clave_service_role
    ```
 
 4. **Despliega**: Haz clic en "Deploy"
@@ -181,7 +181,14 @@ vercel
 
 ## 🔐 Variables de Entorno
 
-### Requeridas
+### Requeridas (Nombres Seguros)
+```env
+NEXT_PUBLIC_API_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_API_TOKEN=eyJ...
+API_SECRET=eyJ...
+```
+
+### Legacy (Aún Soportado)
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJ...

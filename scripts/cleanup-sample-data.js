@@ -12,12 +12,12 @@ const path = require('path');
 // Load environment variables
 require('dotenv').config({ path: '.env.local' });
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_DATABASE_URL;
+const supabaseServiceKey = process.env.DATABASE_SECRET_KEY;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Missing Supabase environment variables');
-  console.error('Make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local');
+  console.error('❌ Missing database environment variables');
+  console.error('Make sure NEXT_PUBLIC_DATABASE_URL and DATABASE_SECRET_KEY are set in .env.local');
   process.exit(1);
 }
 

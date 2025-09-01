@@ -47,11 +47,11 @@
    - Importa tu repositorio
    - Vercel detectará automáticamente que es un proyecto Next.js
 
-3. **Configura las variables de entorno** en Vercel:
+3. **Configura las variables de entorno** en Vercel (nombres seguros):
    ```
-   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu_clave_anon
-   SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role
+   NEXT_PUBLIC_API_URL=tu_url_de_supabase
+   NEXT_PUBLIC_API_TOKEN=tu_clave_anon
+   API_SECRET=tu_clave_service_role
    ```
 
 4. **Despliega**: Vercel construirá y desplegará automáticamente
@@ -85,11 +85,11 @@
    cp .env.example .env.local
    ```
    
-   Edita `.env.local` con tus credenciales de Supabase:
+   Edita `.env.local` con tus credenciales de Supabase (usa nombres seguros):
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu_clave_anon
-   SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role
+   NEXT_PUBLIC_API_URL=tu_url_de_supabase
+   NEXT_PUBLIC_API_TOKEN=tu_clave_anon
+   API_SECRET=tu_clave_service_role
    ```
 
 4. **Ejecuta el servidor de desarrollo**:
@@ -128,9 +128,9 @@ Para subida de archivos TDF y avatares:
 
 ### 4. Obtener Credenciales
 En Settings > API de tu proyecto Supabase:
-- `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-- `anon public` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`
-- `service_role` → `SUPABASE_SERVICE_ROLE_KEY`
+- `Project URL` → `NEXT_PUBLIC_API_URL` (o `NEXT_PUBLIC_DATABASE_URL` o `NEXT_PUBLIC_SUPABASE_URL`)
+- `anon public` → `NEXT_PUBLIC_API_TOKEN` (o `NEXT_PUBLIC_DATABASE_ANON_KEY` o `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`)
+- `service_role` → `API_SECRET` (o `DATABASE_SERVICE_KEY` o `SUPABASE_SERVICE_ROLE_KEY`)
 
 ## Contribuir
 

@@ -33,6 +33,18 @@ requiredFiles.forEach(file => {
 // Check environment variables
 console.log('\n🔐 Checking environment variables...');
 const requiredEnvVars = [
+  'NEXT_PUBLIC_API_URL',
+  'NEXT_PUBLIC_API_TOKEN',
+  'API_SECRET'
+];
+
+const legacyEnvVars = [
+  'NEXT_PUBLIC_DATABASE_URL',
+  'NEXT_PUBLIC_DATABASE_ANON_KEY',
+  'DATABASE_SERVICE_KEY'
+];
+
+const oldLegacyEnvVars = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY'
@@ -42,11 +54,19 @@ const requiredEnvVars = [
 if (fs.existsSync('.env.local')) {
   const envContent = fs.readFileSync('.env.local', 'utf8');
   
-  requiredEnvVars.forEach(envVar => {
-    if (envContent.includes(envVar)) {
-      console.log(`✅ ${envVar}`);
+  // Check for new, legacy, or old legacy environment variables
+  requiredEnvVars.forEach((envVar, index) => {
+    const legacyVar = legacyEnvVars[index];
+    const oldLegacyVar = oldLegacyEnvVars[index];
+    const hasNew = envContent.includes(envVar);
+    const hasLegacy = envContent.includes(legacyVar);
+    const hasOldLegacy = envContent.includes(oldLegacyVar);
+    
+    if (hasNew || hasLegacy || hasOldLegacy) {
+      const varName = hasNew ? envVar : (hasLegacy ? legacyVar : oldLegacyVar);
+      console.log(`✅ ${varName}`);
     } else {
-      console.log(`❌ ${envVar} - Missing in .env.local!`);
+      console.log(`❌ ${envVar} (or ${legacyVar} or ${oldLegacyVar}) - Missing in .env.local!`);
       hasErrors = true;
     }
   });

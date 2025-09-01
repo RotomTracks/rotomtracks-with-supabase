@@ -6,9 +6,15 @@ This guide explains how to set up the database schema for the Tournament Managem
 
 1. **Supabase Project**: You need a Supabase project with the following environment variables in your `.env.local`:
    ```
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   # New secure names (recommended)
+   NEXT_PUBLIC_API_URL=your_supabase_url
+   NEXT_PUBLIC_API_TOKEN=your_anon_key
+   API_SECRET=your_service_role_key
+   
+   # Legacy names (still supported)
+   # NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   # NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your_anon_key
+   # SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 
 2. **Node.js Dependencies**: Make sure you have installed all dependencies:

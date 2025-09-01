@@ -36,19 +36,21 @@ git push -u origin main
 En la sección "Environment Variables" de Vercel, añade:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_API_URL
 ```
 Valor: `https://szedaxhmjvpbjaiodnfg.supabase.co`
 
 ```
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY
+NEXT_PUBLIC_API_TOKEN
 ```
 Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6ZWRheGhtanZwYmphaW9kbmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNDIzMjQsImV4cCI6MjA3MTgxODMyNH0.NoGbXyIguTOPSLowmQRxK5Tv9yZ8b8Kdwfi6WE_Y9QQ`
 
 ```
-SUPABASE_SERVICE_ROLE_KEY
+API_SECRET
 ```
 Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6ZWRheGhtanZwYmphaW9kbmZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjI0MjMyNCwiZXhwIjoyMDcxODE4MzI0fQ.FBvvM9utu2ZNiMJZOrlUeL5ZWPKviye7_MIST89yYjA`
+
+> 🔒 **Seguridad**: Estos nombres genéricos no revelan el proveedor específico, siguiendo las mejores prácticas de Vercel.
 
 ### Paso 4: Deploy
 1. Haz clic en **"Deploy"**

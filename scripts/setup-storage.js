@@ -2,11 +2,11 @@ require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 
 // Configuración de Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_DATABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SERVER_AUTH || process.env.DATABASE_SERVICE_TOKEN || process.env.API_SECRET || process.env.DATABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_CLIENT_AUTH || process.env.NEXT_PUBLIC_DATABASE_TOKEN || process.env.NEXT_PUBLIC_API_TOKEN || process.env.NEXT_PUBLIC_DATABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY;
 
 console.log('Environment variables:');
-console.log('NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
+console.log('DATABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
 console.log('Using key:', supabaseKey ? 'Set' : 'Missing');
 
 if (!supabaseUrl || !supabaseKey) {
