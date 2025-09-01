@@ -1,105 +1,154 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+<div align="center">
+  <h1>🏆 RotomTracks</h1>
+  <p><strong>La plataforma definitiva para torneos de Pokémon</strong></p>
+  <p>Gestiona, descubre y participa en torneos de TCG, VGC y Pokémon GO</p>
+</div>
 
 <p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
-
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
+  <a href="#características"><strong>Características</strong></a> ·
+  <a href="#despliegue-en-vercel"><strong>Desplegar en Vercel</strong></a> ·
+  <a href="#desarrollo-local"><strong>Desarrollo Local</strong></a> ·
+  <a href="#configuración-de-supabase"><strong>Configuración</strong></a>
 </p>
 <br/>
 
-## Features
+## Características
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### 🎮 **Para Jugadores**
+- **Descubrimiento inteligente**: Encuentra torneos cerca de ti con detección automática de ubicación
+- **Búsqueda avanzada**: Filtra por formato (TCG, VGC, Pokémon GO), fecha, ubicación y más
+- **Perfil personalizado**: Gestiona tu información, IDs de entrenador y preferencias
+- **Historial completo**: Accede a tus participaciones y resultados pasados
 
-## Demo
+### 🏆 **Para Organizadores**
+- **Gestión completa**: Crea y administra torneos con herramientas profesionales
+- **Procesamiento TDF**: Importa archivos de Tournament Director automáticamente
+- **Reportes HTML**: Genera reportes profesionales con resultados detallados
+- **Dashboard avanzado**: Monitorea participantes, emparejamientos y estadísticas
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+### 🛠 **Tecnología**
+- **Next.js 15** con App Router y Server Components
+- **Supabase** para autenticación y base de datos
+- **TypeScript** para desarrollo type-safe
+- **Tailwind CSS** + **shadcn/ui** para diseño moderno
+- **Geolocalización** para descubrimiento de torneos locales
+- **Responsive design** optimizado para móvil y desktop
 
-## Deploy to Vercel
+## Despliegue en Vercel
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### Opción 1: Despliegue Directo
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tu-usuario/rotomtracks)
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### Opción 2: Despliegue Manual
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+1. **Fork o clona este repositorio**
+2. **Conecta con Vercel**:
+   - Ve a [vercel.com](https://vercel.com)
+   - Importa tu repositorio
+   - Vercel detectará automáticamente que es un proyecto Next.js
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+3. **Configura las variables de entorno** en Vercel:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu_clave_anon
+   SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role
+   ```
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+4. **Despliega**: Vercel construirá y desplegará automáticamente
 
-## Clone and run locally
+## Desarrollo Local
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### Prerrequisitos
+- Node.js 18+ 
+- npm, yarn o pnpm
+- Cuenta de Supabase
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### Configuración
 
+1. **Clona el repositorio**:
    ```bash
-   npx create-next-app --example with-supabase with-supabase-app
+   git clone https://github.com/tu-usuario/rotomtracks.git
+   cd rotomtracks
    ```
 
+2. **Instala dependencias**:
    ```bash
-   yarn create next-app --example with-supabase with-supabase-app
+   npm install
+   # o
+   yarn install
+   # o
+   pnpm install
    ```
 
+3. **Configura variables de entorno**:
    ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
+   cp .env.example .env.local
+   ```
+   
+   Edita `.env.local` con tus credenciales de Supabase:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=tu_clave_anon
+   SUPABASE_SERVICE_ROLE_KEY=tu_clave_service_role
    ```
 
-3. Use `cd` to change into the app's directory
-
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
-
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
+4. **Ejecuta el servidor de desarrollo**:
    ```bash
    npm run dev
    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+5. **Abre tu navegador** en [http://localhost:3000](http://localhost:3000)
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+### Scripts Disponibles
+- `npm run dev` - Servidor de desarrollo con Turbopack
+- `npm run build` - Build de producción
+- `npm run start` - Servidor de producción
+- `npm run lint` - Linting con ESLint
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+## Configuración de Supabase
 
-## Feedback and issues
+### 1. Crear Proyecto
+1. Ve a [supabase.com](https://supabase.com) y crea una cuenta
+2. Crea un nuevo proyecto
+3. Espera a que se complete la configuración
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+### 2. Configurar Base de Datos
+La aplicación creará automáticamente las tablas necesarias en el primer uso, incluyendo:
+- `user_profiles` - Perfiles de usuario
+- `tournaments` - Información de torneos
+- `tournament_participants` - Participantes
+- `tournament_matches` - Emparejamientos
+- `tournament_results` - Resultados
 
-## More Supabase examples
+### 3. Configurar Storage (Opcional)
+Para subida de archivos TDF y avatares:
+1. Ve a Storage en tu dashboard de Supabase
+2. Crea un bucket llamado `user-uploads`
+3. Configura las políticas de acceso según tus necesidades
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+### 4. Obtener Credenciales
+En Settings > API de tu proyecto Supabase:
+- `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
+- `anon public` → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`
+- `service_role` → `SUPABASE_SERVICE_ROLE_KEY`
+
+## Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## Soporte
+
+¿Necesitas ayuda? 
+- 📧 Email: soporte@rotomtracks.com
+- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/rotomtracks/issues)
+- 💬 Discord: [Servidor de la Comunidad](https://discord.gg/rotomtracks)

@@ -1,6 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
+import { 
+  requiresAuthentication, 
+  requiresOrganizerRole, 
+  requiresPlayerRole, 
+  isPublicRoute 
+} from "../auth/roles";
+import { UserRole } from "../types/tournament";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -46,16 +53,84 @@ export async function updateSession(request: NextRequest) {
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
+  const pathname = request.nextUrl.pathname;
 
+  // Check if route is public (doesn't require authentication)
+  if (isPublicRoute(pathname)) {
+    return supabaseResponse;
+  }
+
+  // Check if user is authenticated for protected routes
+  if (requiresAuthentication(pathname) && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("redirectTo", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // If user is authenticated, check role-based permissions
+  if (user) {
+    let userProfile = null;
+    
+    // Get user profile for role checking
+    try {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('user_role')
+        .eq('user_id', user.sub)
+        .single();
+      
+      userProfile = profile;
+    } catch (error) {
+      console.error('Error fetching user profile in middleware:', error);
+    }
+
+    // Check organizer-only routes
+    if (requiresOrganizerRole(pathname)) {
+      if (!userProfile || userProfile.user_role !== UserRole.ORGANIZER) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/auth/unauthorized";
+        url.searchParams.set("reason", "organizer_required");
+        url.searchParams.set("redirectTo", pathname);
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // Check player-only routes (if any)
+    if (requiresPlayerRole(pathname)) {
+      if (!userProfile || userProfile.user_role !== UserRole.PLAYER) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/auth/unauthorized";
+        url.searchParams.set("reason", "player_required");
+        url.searchParams.set("redirectTo", pathname);
+        return NextResponse.redirect(url);
+      }
+    }
+
+    // If user doesn't have a profile yet, redirect to profile completion
+    // (except for auth routes and profile creation)
+    if (!userProfile && 
+        !pathname.startsWith('/auth') && 
+        !pathname.startsWith('/profile') &&
+        pathname !== '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = "/profile/complete";
+      url.searchParams.set("redirectTo", pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Legacy authentication check for backward compatibility
   if (
-    request.nextUrl.pathname !== "/" &&
+    pathname !== "/" &&
     !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/auth")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
+    url.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(url);
   }
 

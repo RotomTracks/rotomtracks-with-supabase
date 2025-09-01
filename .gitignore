@@ -40,3 +40,32 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# RotomTracks specific
+# Tournament files and uploads
+/uploads/
+/temp/
+*.tdf
+*.csv
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+*.backup
+
+# Local database files
+*.sqlite
+*.db
