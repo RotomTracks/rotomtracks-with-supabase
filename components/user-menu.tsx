@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { ChevronDown, User, Trophy, LogOut, Building2 } from "lucide-react";
 import Link from "next/link";
+import { useTypedTranslation } from "@/lib/i18n";
 
 interface UserProfile {
   id: string;
@@ -30,8 +31,9 @@ export function UserMenu({ user }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const { signOut } = useAuth();
   const supabase = createClient();
+  const { tCommon, tAuth } = useTypedTranslation();
 
 
 
@@ -77,8 +79,7 @@ export function UserMenu({ user }: UserMenuProps) {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+    await signOut();
   };
 
   const firstLetter = user.email ? user.email.charAt(0).toUpperCase() : "U";
@@ -113,11 +114,11 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {userProfile?.first_name && userProfile?.last_name 
                 ? `${userProfile.first_name} ${userProfile.last_name}`
-                : "Usuario"
+                : tCommon("navigation.profile")
               }
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {userProfile?.player_id || "Sin Player ID"}
+              {userProfile?.player_id || tAuth("profile.noPlayerId")}
             </p>
             {userProfile?.user_role && (
               <div className="flex items-center gap-1 mt-1">
@@ -139,15 +140,19 @@ export function UserMenu({ user }: UserMenuProps) {
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
           >
             <User className="w-4 h-4" />
-            Ver Perfil
+            {tCommon("buttons.view")} {tCommon("navigation.profile")}
           </Link>
 
 
 
-          <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+          <Link 
+            href="/dashboard"
+            onClick={() => setIsOpen(false)}
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+          >
             <Trophy className="w-4 h-4" />
-            Mis Torneos
-          </button>
+            {tCommon("navigation.tournaments")}
+          </Link>
 
           <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
 
@@ -156,7 +161,7 @@ export function UserMenu({ user }: UserMenuProps) {
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            {tCommon("navigation.logout")}
           </button>
         </div>
       )}

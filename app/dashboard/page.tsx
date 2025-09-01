@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { DashboardContent } from '@/components/dashboard/DashboardContent';
+import { HomePageNavigation } from '@/components/navigation/PageNavigation';
+import { getNavigationConfig } from '@/lib/navigation/config';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
@@ -49,9 +51,18 @@ export default async function DashboardPage() {
     }
   ];
 
+  const navConfig = getNavigationConfig('dashboard');
+
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-7xl mx-auto">
+        <HomePageNavigation
+          title={navConfig.title}
+          description={navConfig.description}
+          currentPageLabel="Dashboard"
+          currentPageHref="/dashboard"
+        />
+        
         <DashboardContent
           user={user}
           profile={profile}

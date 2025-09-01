@@ -16,7 +16,18 @@ export async function GET(request: NextRequest) {
     })
 
     if (!error && data.user) {
-      // Check if user profile exists
+      // Handle password recovery flow specifically
+      if (type === 'recovery') {
+        // For password recovery, redirect directly to update password page
+        // The user now has an active session and can update their password
+        const updatePasswordUrl = next.startsWith('/auth/update-password') 
+          ? next 
+          : '/auth/update-password'
+        return NextResponse.redirect(new URL(updatePasswordUrl, request.url))
+      }
+
+      // Handle other confirmation types (signup, email change, etc.)
+      // Check if user profile exists for new signups
       const { data: existingProfile } = await supabase
         .from('user_profiles')
         .select('id')
@@ -50,6 +61,15 @@ export async function GET(request: NextRequest) {
       // Redirect to the next URL or protected page
       const redirectUrl = next.startsWith('/') ? next : '/protected'
       return NextResponse.redirect(new URL(redirectUrl, request.url))
+    } else {
+      // Handle specific error cases
+      if (type === 'recovery') {
+        // For recovery errors, redirect to forgot password with error message
+        const forgotPasswordUrl = new URL('/auth/forgot-password', request.url)
+        forgotPasswordUrl.searchParams.set('error', 'expired_token')
+        forgotPasswordUrl.searchParams.set('message', 'El enlace de recuperación ha expirado. Solicita uno nuevo.')
+        return NextResponse.redirect(forgotPasswordUrl)
+      }
     }
   }
 

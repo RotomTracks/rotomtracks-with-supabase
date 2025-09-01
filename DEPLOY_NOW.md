@@ -49,7 +49,7 @@ API_SECRET
 2. Selecciona tu proyecto `szedaxhmjvpbjaiodnfg`
 3. Ve a **Authentication > Settings**
 4. Actualiza **Site URL** con tu nueva URL de Vercel
-5. Añade a **Redirect URLs**: `https://tu-app.vercel.app/auth/callback`
+5. Añade a **Redirect URLs**: `https://tu-app.vercel.app/auth/confirm`
 
 ## 🧪 Verificar Funcionamiento
 

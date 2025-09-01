@@ -1,6 +1,8 @@
 
 import { TournamentList } from '@/components/tournaments/TournamentList';
 import { getCurrentUser } from '@/lib/auth/roles';
+import { HomePageNavigation } from '@/components/navigation/PageNavigation';
+import { getNavigationConfig } from '@/lib/navigation/config';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
@@ -183,17 +185,17 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
   const startIndex = (page - 1) * perPage;
   const paginatedTournaments = filteredTournaments.slice(startIndex, startIndex + perPage);
 
+  const navConfig = getNavigationConfig('tournaments');
+
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Torneos de Pokémon
-          </h1>
-          <p className="text-gray-600">
-            Descubre y participa en torneos de TCG, VGC y Pokémon GO
-          </p>
-        </div>
+        <HomePageNavigation
+          title={navConfig.title}
+          description={navConfig.description}
+          currentPageLabel="Torneos"
+          currentPageHref="/tournaments"
+        />
 
         <TournamentList
           tournaments={paginatedTournaments}

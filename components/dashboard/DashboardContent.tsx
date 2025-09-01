@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useTypedTranslation } from '@/lib/i18n';
 import { 
   Trophy, 
   Plus, 
@@ -53,6 +54,7 @@ export function DashboardContent({
   participatingTournaments,
   recentTournaments
 }: DashboardContentProps) {
+  const { tPages } = useTypedTranslation();
   const isOrganizer = profile?.user_role === 'organizer';
   
   const formatDate = (dateString: string) => {
@@ -75,9 +77,9 @@ export function DashboardContent({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'completed': return 'Completado';
-      case 'ongoing': return 'En Curso';
-      case 'upcoming': return 'Próximo';
+      case 'completed': return tPages('dashboard.stats.completed');
+      case 'ongoing': return tPages('dashboard.stats.ongoing');
+      case 'upcoming': return tPages('dashboard.stats.upcoming');
       case 'cancelled': return 'Cancelado';
       default: return status;
     }
@@ -97,12 +99,12 @@ export function DashboardContent({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            ¡Bienvenido, {profile?.full_name || user.email}!
+            {tPages('dashboard.welcome', { name: profile?.full_name || user.email })}
           </h1>
           <p className="text-gray-600 mt-2">
             {isOrganizer 
-              ? 'Gestiona tus torneos y revisa los resultados' 
-              : 'Descubre torneos y sigue tus participaciones'
+              ? tPages('dashboard.organizerSubtitle')
+              : tPages('dashboard.playerSubtitle')
             }
           </p>
         </div>
@@ -110,14 +112,14 @@ export function DashboardContent({
           <Link href="/tournaments">
             <Button variant="outline">
               <Search className="h-4 w-4 mr-2" />
-              Buscar Torneos
+              {tPages('dashboard.searchTournaments')}
             </Button>
           </Link>
           {isOrganizer && (
             <Link href="/tournaments/create">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Nuevo Torneo
+                {tPages('dashboard.newTournament')}
               </Button>
             </Link>
           )}
@@ -132,21 +134,21 @@ export function DashboardContent({
               <CardContent className="p-6 text-center">
                 <Trophy className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-blue-600">{stats.totalTournaments}</div>
-                <div className="text-sm text-gray-600">Torneos Organizados</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.organizedTournaments')}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <Clock className="h-8 w-8 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-green-600">{stats.activeTournaments}</div>
-                <div className="text-sm text-gray-600">En Curso</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.ongoing')}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <TrendingUp className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-purple-600">{stats.completedTournaments}</div>
-                <div className="text-sm text-gray-600">Completados</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.completed')}</div>
               </CardContent>
             </Card>
             <Card>
@@ -155,7 +157,7 @@ export function DashboardContent({
                 <div className="text-2xl font-bold text-orange-600">
                   {userTournaments.reduce((sum, t) => sum + t.current_players, 0)}
                 </div>
-                <div className="text-sm text-gray-600">Total Participantes</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.totalParticipants')}</div>
               </CardContent>
             </Card>
           </>
@@ -165,7 +167,7 @@ export function DashboardContent({
               <CardContent className="p-6 text-center">
                 <Star className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-blue-600">{stats.participations}</div>
-                <div className="text-sm text-gray-600">Participaciones</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.participations')}</div>
               </CardContent>
             </Card>
             <Card>
@@ -174,7 +176,7 @@ export function DashboardContent({
                 <div className="text-2xl font-bold text-green-600">
                   {participatingTournaments.filter(p => p.tournaments.status === 'ongoing').length}
                 </div>
-                <div className="text-sm text-gray-600">Torneos Activos</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.activeTournaments')}</div>
               </CardContent>
             </Card>
             <Card>
@@ -183,7 +185,7 @@ export function DashboardContent({
                 <div className="text-2xl font-bold text-purple-600">
                   {participatingTournaments.filter(p => p.tournaments.status === 'completed').length}
                 </div>
-                <div className="text-sm text-gray-600">Completados</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.completed')}</div>
               </CardContent>
             </Card>
             <Card>
@@ -192,7 +194,7 @@ export function DashboardContent({
                 <div className="text-2xl font-bold text-orange-600">
                   {participatingTournaments.filter(p => p.tournaments.status === 'upcoming').length}
                 </div>
-                <div className="text-sm text-gray-600">Próximos</div>
+                <div className="text-sm text-gray-600">{tPages('dashboard.stats.upcoming')}</div>
               </CardContent>
             </Card>
           </>
@@ -206,13 +208,13 @@ export function DashboardContent({
             <CardTitle className="flex items-center space-x-2">
               <Trophy className="h-5 w-5" />
               <span>
-                {isOrganizer ? 'Mis Torneos' : 'Mis Participaciones'}
+                {isOrganizer ? tPages('dashboard.sections.myTournaments') : tPages('dashboard.sections.myParticipations')}
               </span>
             </CardTitle>
             <CardDescription>
               {isOrganizer 
-                ? 'Torneos que has organizado recientemente'
-                : 'Torneos en los que has participado'
+                ? tPages('dashboard.sections.organizerDescription')
+                : tPages('dashboard.sections.playerDescription')
               }
             </CardDescription>
           </CardHeader>
@@ -251,14 +253,14 @@ export function DashboardContent({
                       <div className="flex items-center space-x-2">
                         <Link href={`/tournaments/${tournament.id}`}>
                           <Button size="sm" variant="outline">
-                            Ver
+                            {tPages('dashboard.actions.view')}
                           </Button>
                         </Link>
                         {isOrganizer && tournament.organizer_id === user.id && (
                           <Link href={`/tournaments/${tournament.id}/manage`}>
                             <Button size="sm">
                               <Settings className="h-4 w-4 mr-1" />
-                              Gestionar
+                              {tPages('dashboard.actions.manage')}
                             </Button>
                           </Link>
                         )}

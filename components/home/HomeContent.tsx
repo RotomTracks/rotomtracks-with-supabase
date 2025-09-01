@@ -5,6 +5,7 @@ import { TournamentSearch } from "@/components/tournaments/TournamentSearch";
 import { UpcomingTournaments } from "@/components/home/UpcomingTournaments";
 import { PopularTournaments } from "@/components/home/PopularTournaments";
 import { MyTournaments } from "@/components/home/MyTournaments";
+import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Trophy, Search, Users, MapPin, X } from "lucide-react";
@@ -21,6 +22,7 @@ interface GeolocationPosition {
 }
 
 export function HomeContent({ user }: HomeContentProps) {
+  const { tPages } = useTypedTranslation();
   const [userLocation, setUserLocation] = useState<string | undefined>(undefined);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showLocationNotification, setShowLocationNotification] = useState(false);
@@ -106,11 +108,10 @@ export function HomeContent({ user }: HomeContentProps) {
       <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
         <div className="max-w-7xl mx-auto px-5 text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Gestiona y Descubre Torneos de Pokémon
+            {tPages('home.hero.title')}
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            La plataforma completa para organizadores y jugadores. Busca torneos, 
-            gestiona participaciones y accede a resultados detallados.
+            {tPages('home.hero.subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -119,13 +120,13 @@ export function HomeContent({ user }: HomeContentProps) {
                 <Link href="/dashboard">
                   <Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700">
                     <Trophy className="h-5 w-5 mr-2" />
-                    Mi Dashboard
+                    {tPages('home.hero.myDashboard')}
                   </Button>
                 </Link>
                 <Link href="/tournaments">
                   <Button size="lg" variant="outline" className="px-8">
                     <Search className="h-5 w-5 mr-2" />
-                    Explorar Torneos
+                    {tPages('home.hero.exploreTournaments')}
                   </Button>
                 </Link>
               </>
@@ -134,13 +135,13 @@ export function HomeContent({ user }: HomeContentProps) {
                 <Link href="/auth/sign-up">
                   <Button size="lg" className="px-8 bg-blue-600 hover:bg-blue-700">
                     <Users className="h-5 w-5 mr-2" />
-                    Únete Gratis
+                    {tPages('home.hero.joinFree')}
                   </Button>
                 </Link>
                 <Link href="/tournaments">
                   <Button size="lg" variant="outline" className="px-8">
                     <Search className="h-5 w-5 mr-2" />
-                    Ver Torneos
+                    {tPages('home.hero.viewTournaments')}
                   </Button>
                 </Link>
               </>
@@ -152,15 +153,15 @@ export function HomeContent({ user }: HomeContentProps) {
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
               <div className="mb-6">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Encuentra tu próximo torneo
+                  {tPages('home.search.title')}
                 </h2>
                 <p className="text-gray-600">
-                  Busca entre miles de torneos de TCG, VGC y Pokémon GO
+                  {tPages('home.search.subtitle')}
                 </p>
               </div>
               
               <TournamentSearch 
-                placeholder="Buscar torneos por nombre, ciudad, tipo..."
+                placeholder={tPages('home.search.placeholder')}
                 autoFocus={false}
                 showFilters={false}
               />
@@ -169,11 +170,11 @@ export function HomeContent({ user }: HomeContentProps) {
                 <div className="flex items-center gap-6 text-sm text-gray-500">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Torneos activos</span>
+                    <span>{tPages('home.search.activeTournaments')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Inscripciones abiertas</span>
+                    <span>{tPages('home.search.openRegistrations')}</span>
                   </div>
                   {userLocation && (
                     <div className="flex items-center gap-2">
@@ -191,11 +192,11 @@ export function HomeContent({ user }: HomeContentProps) {
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
                     >
                       <MapPin className="w-3 h-3" />
-                      {isDetectingLocation ? 'Detectando...' : 'Detectar ubicación'}
+                      {isDetectingLocation ? tPages('home.search.detectingLocation') : tPages('home.search.detectLocation')}
                     </button>
                   )}
                   <Link href="/tournaments" className="text-blue-600 hover:text-blue-800 underline text-sm font-medium">
-                    Ver todos los torneos →
+                    {tPages('home.search.viewAllTournaments')}
                   </Link>
                 </div>
               </div>
@@ -205,15 +206,15 @@ export function HomeContent({ user }: HomeContentProps) {
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="text-2xl font-bold text-blue-600">500+</div>
-                <div className="text-sm text-gray-600">Torneos registrados</div>
+                <div className="text-sm text-gray-600">{tPages('home.stats.tournaments')}</div>
               </div>
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="text-2xl font-bold text-green-600">1,200+</div>
-                <div className="text-sm text-gray-600">Jugadores activos</div>
+                <div className="text-sm text-gray-600">{tPages('home.stats.players')}</div>
               </div>
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <div className="text-2xl font-bold text-purple-600">50+</div>
-                <div className="text-sm text-gray-600">Ciudades</div>
+                <div className="text-sm text-gray-600">{tPages('home.stats.cities')}</div>
               </div>
             </div>
           </div>
@@ -229,10 +230,10 @@ export function HomeContent({ user }: HomeContentProps) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">
-                Ubicación detectada
+                {tPages('home.location.detected')}
               </p>
               <p className="text-xs text-gray-600">
-                Mostrando torneos en {userLocation}
+                {tPages('home.location.showingTournaments', { location: userLocation })}
               </p>
             </div>
             <button
@@ -254,10 +255,10 @@ export function HomeContent({ user }: HomeContentProps) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">
-                Detectando ubicación...
+                {tPages('home.search.detectingLocation')}...
               </p>
               <p className="text-xs text-gray-600">
-                Para mostrar torneos cercanos
+                {tPages('home.location.showingTournaments', { location: 'tu área' })}
               </p>
             </div>
           </div>
@@ -278,10 +279,10 @@ export function HomeContent({ user }: HomeContentProps) {
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Torneos Destacados
+              {tPages('home.sections.featuredTournaments')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Descubre los próximos torneos más populares y encuentra el perfecto para ti
+              {tPages('home.sections.featuredSubtitle')}
             </p>
           </div>
           <UpcomingTournaments 
@@ -293,23 +294,23 @@ export function HomeContent({ user }: HomeContentProps) {
           <div className="text-center mt-12">
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                ¿No encuentras lo que buscas?
+                {tPages('home.sections.notFound')}
               </h3>
               <p className="text-gray-600 mb-6">
-                Explora nuestra base de datos completa de torneos o crea una alerta personalizada
+                {tPages('home.sections.notFoundSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/tournaments">
                   <Button size="lg" className="px-8">
                     <Search className="h-5 w-5 mr-2" />
-                    Explorar Todos los Torneos
+                    {tPages('home.sections.exploreAll')}
                   </Button>
                 </Link>
                 {!user && (
                   <Link href="/auth/sign-up">
                     <Button size="lg" variant="outline" className="px-8">
                       <Users className="h-5 w-5 mr-2" />
-                      Crear Cuenta para Alertas
+                      {tPages('home.sections.createAccount')}
                     </Button>
                   </Link>
                 )}
@@ -324,10 +325,10 @@ export function HomeContent({ user }: HomeContentProps) {
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Tendencias y Actividad
+              {tPages('home.sections.trendsAndActivity')}
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Descubre los tipos de torneos más populares y la actividad reciente en tu región
+              {tPages('home.sections.trendsSubtitle')}
             </p>
           </div>
           <PopularTournaments />
@@ -335,7 +336,7 @@ export function HomeContent({ user }: HomeContentProps) {
           {/* Quick Search by Type */}
           <div className="mt-12 text-center">
             <h3 className="text-xl font-semibold text-gray-900 mb-6">
-              Búsqueda rápida por formato
+              {tPages('home.sections.quickSearch')}
             </h3>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/tournaments?type=TCG">
@@ -366,10 +367,10 @@ export function HomeContent({ user }: HomeContentProps) {
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Todo lo que necesitas para torneos de Pokémon
+              {tPages('home.sections.features')}
             </h2>
             <p className="text-gray-600">
-              Desde la búsqueda hasta la gestión completa de resultados
+              {tPages('home.sections.featuresSubtitle')}
             </p>
           </div>
 
@@ -379,15 +380,15 @@ export function HomeContent({ user }: HomeContentProps) {
                 <Search className="h-8 w-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Búsqueda Inteligente
+                {tPages('home.features.search.title')}
               </h3>
               <p className="text-gray-600 mb-4">
-                Encuentra torneos por nombre, ubicación, fecha y tipo con sugerencias en tiempo real.
+                {tPages('home.features.search.description')}
               </p>
               <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Filtros avanzados</li>
-                <li>• Autocompletado</li>
-                <li>• Resultados relevantes</li>
+                <li>• {tPages('home.features.search.items.0')}</li>
+                <li>• {tPages('home.features.search.items.1')}</li>
+                <li>• {tPages('home.features.search.items.2')}</li>
               </ul>
             </div>
 
@@ -396,15 +397,15 @@ export function HomeContent({ user }: HomeContentProps) {
                 <Trophy className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Gestión Profesional
+                {tPages('home.features.management.title')}
               </h3>
               <p className="text-gray-600 mb-4">
-                Herramientas completas para organizadores con procesamiento automático de archivos TDF.
+                {tPages('home.features.management.description')}
               </p>
               <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Procesamiento TDF</li>
-                <li>• Reportes HTML</li>
-                <li>• Gestión de participantes</li>
+                <li>• {tPages('home.features.management.items.0')}</li>
+                <li>• {tPages('home.features.management.items.1')}</li>
+                <li>• {tPages('home.features.management.items.2')}</li>
               </ul>
             </div>
 
@@ -413,15 +414,15 @@ export function HomeContent({ user }: HomeContentProps) {
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Para Toda la Comunidad
+                {tPages('home.features.community.title')}
               </h3>
               <p className="text-gray-600 mb-4">
-                Soporte completo para TCG, VGC y Pokémon GO con perfiles personalizados.
+                {tPages('home.features.community.description')}
               </p>
               <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Múltiples formatos</li>
-                <li>• Perfiles de jugador</li>
-                <li>• Historial de torneos</li>
+                <li>• {tPages('home.features.community.items.0')}</li>
+                <li>• {tPages('home.features.community.items.1')}</li>
+                <li>• {tPages('home.features.community.items.2')}</li>
               </ul>
             </div>
           </div>
@@ -429,19 +430,19 @@ export function HomeContent({ user }: HomeContentProps) {
           {!user && (
             <div className="text-center mt-12">
               <p className="text-gray-600 mb-6">
-                ¿Listo para unirte a la comunidad?
+                {tPages('home.features.readyToJoin')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/auth/sign-up">
                   <Button size="lg">
                     <Users className="h-5 w-5 mr-2" />
-                    Crear Cuenta Gratis
+                    {tPages('home.features.createFreeAccount')}
                   </Button>
                 </Link>
                 <Link href="/tournaments">
                   <Button size="lg" variant="outline">
                     <Search className="h-5 w-5 mr-2" />
-                    Explorar Torneos
+                    {tPages('home.features.exploreTournaments')}
                   </Button>
                 </Link>
               </div>

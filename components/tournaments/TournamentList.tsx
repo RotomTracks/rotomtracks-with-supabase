@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TournamentFilters } from './TournamentFilters';
 import { TournamentCard } from './TournamentCard';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface Tournament {
   id: string;
@@ -65,6 +66,7 @@ export function TournamentList({
   searchParams,
   userRole
 }: TournamentListProps) {
+  const { tTournaments } = useTypedTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState(searchParams.q || '');
@@ -116,7 +118,7 @@ export function TournamentList({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <Search className="h-5 w-5" />
-              <span>Buscar Torneos</span>
+              <span>{tTournaments('list.searchTournaments')}</span>
             </CardTitle>
             <div className="flex items-center space-x-2">
               <Button
@@ -125,7 +127,7 @@ export function TournamentList({
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filtros
+                {tTournaments('list.filters')}
               </Button>
               <div className="flex border rounded-lg">
                 <Button
@@ -155,7 +157,7 @@ export function TournamentList({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Buscar por nombre o tipo..."
+                  placeholder={tTournaments('list.searchByName')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -164,7 +166,7 @@ export function TournamentList({
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Ciudad o país..."
+                  placeholder={tTournaments('list.cityOrCountry')}
                   value={locationQuery}
                   onChange={(e) => setLocationQuery(e.target.value)}
                   className="pl-10"
@@ -173,11 +175,11 @@ export function TournamentList({
               <div className="flex space-x-2">
                 <Button type="submit" className="flex-1">
                   <Search className="h-4 w-4 mr-2" />
-                  Buscar
+                  {tTournaments('list.search')}
                 </Button>
                 {hasActiveFilters && (
                   <Button type="button" variant="outline" onClick={clearFilters}>
-                    Limpiar
+                    {tTournaments('list.clear')}
                   </Button>
                 )}
               </div>
@@ -198,26 +200,26 @@ export function TournamentList({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">
-            {totalTournaments} torneo{totalTournaments !== 1 ? 's' : ''} encontrado{totalTournaments !== 1 ? 's' : ''}
+            {tTournaments('list.tournamentsFound', { count: totalTournaments })}
           </h2>
           {hasActiveFilters && (
             <p className="text-sm text-gray-600 mt-1">
-              Mostrando resultados filtrados
+              {tTournaments('list.showingFilteredResults')}
             </p>
           )}
         </div>
         
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">Ordenar por:</span>
+          <span className="text-sm text-gray-600">{tTournaments('list.sortBy')}</span>
           <select
             value={searchParams.sort || 'date'}
             onChange={(e) => handleSortChange(e.target.value)}
             className="text-sm border rounded px-3 py-1 bg-white"
           >
-            <option value="date">Fecha</option>
-            <option value="name">Nombre</option>
-            <option value="players">Participantes</option>
-            <option value="location">Ubicación</option>
+            <option value="date">{tTournaments('list.date')}</option>
+            <option value="name">{tTournaments('list.name')}</option>
+            <option value="players">{tTournaments('list.players')}</option>
+            <option value="location">{tTournaments('list.location')}</option>
           </select>
         </div>
       </div>
@@ -242,17 +244,17 @@ export function TournamentList({
           <CardContent className="text-center py-12">
             <Trophy className="h-16 w-16 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No se encontraron torneos
+              {tTournaments('list.noTournamentsFound')}
             </h3>
             <p className="text-gray-500 mb-4">
               {hasActiveFilters 
-                ? 'Intenta ajustar los filtros de búsqueda'
-                : 'No hay torneos disponibles en este momento'
+                ? tTournaments('list.tryAdjustingFilters')
+                : tTournaments('list.noTournamentsAvailable')
               }
             </p>
             {hasActiveFilters && (
               <Button onClick={clearFilters}>
-                Limpiar filtros
+                {tTournaments('list.clearFilters')}
               </Button>
             )}
           </CardContent>

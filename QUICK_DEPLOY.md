@@ -64,7 +64,7 @@ Valor: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN
 2. Selecciona tu proyecto
 3. Ve a **Authentication > Settings**
 4. Actualiza **Site URL** con tu dominio de Vercel: `https://tu-app.vercel.app`
-5. Añade a **Redirect URLs**: `https://tu-app.vercel.app/auth/callback`
+5. Añade a **Redirect URLs**: `https://tu-app.vercel.app/auth/confirm`
 
 ## 🧪 Verificar Despliegue
 

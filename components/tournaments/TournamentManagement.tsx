@@ -23,6 +23,7 @@ import { ProcessingStatus } from './ProcessingStatus';
 import { FileWatcher } from './FileWatcher';
 import { TournamentStatusManager } from './TournamentStatusManager';
 import type { Tournament } from '@/lib/types/tournament';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface TournamentFile {
   id: string;
@@ -46,6 +47,7 @@ interface TournamentManagementProps {
 }
 
 export function TournamentManagement({ tournament, files, stats }: TournamentManagementProps) {
+  const { tTournaments } = useTypedTranslation();
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -109,7 +111,7 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
                 </span>
                 <span className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
-                  <span>{tournament.current_players} jugadores</span>
+                  <span>{tournament.current_players} {tTournaments('management.players')}</span>
                 </span>
               </CardDescription>
             </div>
@@ -123,22 +125,22 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-blue-600">{stats.participants}</div>
-              <div className="text-sm text-gray-600">Participantes</div>
+              <div className="text-sm text-gray-600">{tTournaments('management.participants')}</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <Trophy className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-green-600">{stats.matches}</div>
-              <div className="text-sm text-gray-600">Partidas</div>
+              <div className="text-sm text-gray-600">{tTournaments('management.matches')}</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <BarChart3 className="h-8 w-8 text-purple-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-purple-600">{stats.results}</div>
-              <div className="text-sm text-gray-600">Resultados</div>
+              <div className="text-sm text-gray-600">{tTournaments('management.results')}</div>
             </div>
             <div className="text-center p-4 bg-orange-50 rounded-lg">
               <FileText className="h-8 w-8 text-orange-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-orange-600">{stats.files}</div>
-              <div className="text-sm text-gray-600">Archivos</div>
+              <div className="text-sm text-gray-600">{tTournaments('management.files')}</div>
             </div>
           </div>
         </CardContent>
@@ -149,23 +151,23 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="status" className="flex items-center space-x-2">
             <BarChart3 className="h-4 w-4" />
-            <span>Estado</span>
+            <span>{tTournaments('management.status')}</span>
           </TabsTrigger>
           <TabsTrigger value="upload" className="flex items-center space-x-2">
             <Upload className="h-4 w-4" />
-            <span>Subir Archivos</span>
+            <span>{tTournaments('management.uploadFiles')}</span>
           </TabsTrigger>
           <TabsTrigger value="process" className="flex items-center space-x-2">
             <Settings className="h-4 w-4" />
-            <span>Procesar</span>
+            <span>{tTournaments('management.process')}</span>
           </TabsTrigger>
           <TabsTrigger value="files" className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />
-            <span>Archivos</span>
+            <span>{tTournaments('management.files')}</span>
           </TabsTrigger>
           <TabsTrigger value="monitor" className="flex items-center space-x-2">
             <Eye className="h-4 w-4" />
-            <span>Monitoreo</span>
+            <span>{tTournaments('management.monitor')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -191,9 +193,9 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
           
           <Card>
             <CardHeader>
-              <CardTitle>Subida Manual</CardTitle>
+              <CardTitle>{tTournaments('management.manualUpload')}</CardTitle>
               <CardDescription>
-                Sube archivos TDF manualmente si prefieres no usar la detección automática
+                {tTournaments('management.manualUploadDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>

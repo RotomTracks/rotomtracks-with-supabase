@@ -1,5 +1,45 @@
 // Validation utilities for Tournament Management System
 
+import { UserRole } from '@/lib/types/tournament';
+
+// Auth form data interfaces
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface SignUpFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+  playerId: string;
+  birthYear: string;
+  userRole: UserRole;
+  organizationName?: string;
+  businessEmail?: string;
+  phoneNumber?: string;
+  address?: string;
+  pokemonLeagueUrl?: string;
+  experienceDescription?: string;
+}
+
+export interface PasswordResetFormData {
+  email: string;
+}
+
+export interface UpdatePasswordFormData {
+  password: string;
+  confirmPassword: string;
+}
+
+// Validation result interface
+export interface ValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
 /**
  * Validates Player ID format
  * Player ID must be 1-7 digits, range 1-9999999
@@ -113,14 +153,140 @@ export async function getNextTournamentSequence(year: number, month: number): Pr
 }
 
 /**
- * Validation error messages
+ * Validates a birth year
+ * @param year - The birth year to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validateBirthYear(year: string | number): boolean {
+  const yearNum = typeof year === 'string' ? parseInt(year, 10) : year;
+  
+  if (isNaN(yearNum)) return false;
+  
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - yearNum;
+  
+  // Must be at least 13 years old and less than 100 years old
+  return age >= 13 && age < 100;
+}
+
+/**
+ * Validates an email address
+ * @param email - The email to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validateEmail(email: string): boolean {
+  if (!email) return false;
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
+/**
+ * Validates a password
+ * @param password - The password to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validatePassword(password: string): boolean {
+  if (!password) return false;
+  
+  // Minimum 6 characters
+  return password.length >= 6;
+}
+
+/**
+ * Validates that two passwords match
+ * @param password - The original password
+ * @param confirmPassword - The confirmation password
+ * @returns boolean - true if they match, false otherwise
+ */
+export function validatePasswordMatch(password: string, confirmPassword: string): boolean {
+  return password === confirmPassword;
+}
+
+/**
+ * Validates a name (first name or last name)
+ * @param name - The name to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validateName(name: string): boolean {
+  if (!name) return false;
+  
+  // At least 1 character, only letters, spaces, hyphens, and apostrophes
+  const nameRegex = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s'-]+$/;
+  return nameRegex.test(name.trim()) && name.trim().length >= 1;
+}
+
+/**
+ * Validates an organization name
+ * @param name - The organization name to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validateOrganizationName(name: string): boolean {
+  if (!name) return false;
+  
+  // At least 2 characters
+  return name.trim().length >= 2;
+}
+
+/**
+ * Validates phone number (Spanish format)
+ * @param phone - The phone number to validate
+ * @returns boolean - true if valid, false otherwise
+ */
+export function validatePhoneNumber(phone: string): boolean {
+  if (!phone) return false;
+  
+  // Remove spaces, dashes, and parentheses
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  
+  // Spanish phone number patterns:
+  // Mobile: 6XX XXX XXX or 7XX XXX XXX (9 digits)
+  // Landline: 9XX XXX XXX (9 digits)
+  // International: +34 followed by 9 digits
+  const phoneRegex = /^(\+34)?[679]\d{8}$/;
+  
+  return phoneRegex.test(cleanPhone);
+}
+
+/**
+ * Validation error messages (Spanish)
  */
 export const ValidationMessages = {
-  PLAYER_ID_INVALID: 'Player ID must be a number between 1 and 9999999',
-  PLAYER_ID_REQUIRED: 'Player ID is required',
-  TOURNAMENT_ID_INVALID: 'Tournament ID must follow format YY-MM-XXXXXX (e.g., 25-02-000001)',
-  TOURNAMENT_ID_REQUIRED: 'Tournament ID is required',
-  TOURNAMENT_ID_EXISTS: 'A tournament with this ID already exists',
+  // Player ID validation
+  PLAYER_ID_INVALID: 'El Player ID debe ser un número entre 1 y 9999999',
+  PLAYER_ID_REQUIRED: 'El Player ID es obligatorio',
+  
+  // Tournament ID validation
+  TOURNAMENT_ID_INVALID: 'El ID del torneo debe seguir el formato YY-MM-XXXXXX (ej: 25-02-000001)',
+  TOURNAMENT_ID_REQUIRED: 'El ID del torneo es obligatorio',
+  TOURNAMENT_ID_EXISTS: 'Ya existe un torneo con este ID',
+  
+  // Birth year validation
+  BIRTH_YEAR_INVALID: 'El año de nacimiento debe ser un año válido',
+  BIRTH_YEAR_REQUIRED: 'El año de nacimiento es obligatorio',
+  BIRTH_YEAR_TOO_OLD: 'El año de nacimiento indica una edad mayor a 100 años',
+  BIRTH_YEAR_TOO_YOUNG: 'Debes tener al menos 13 años',
+  
+  // Email validation
+  EMAIL_INVALID: 'Ingresa un correo electrónico válido',
+  EMAIL_REQUIRED: 'El correo electrónico es obligatorio',
+  
+  // Password validation
+  PASSWORD_REQUIRED: 'La contraseña es obligatoria',
+  PASSWORD_TOO_SHORT: 'La contraseña debe tener al menos 6 caracteres',
+  PASSWORD_TOO_WEAK: 'La contraseña es muy débil',
+  PASSWORDS_NO_MATCH: 'Las contraseñas no coinciden',
+  
+  // Name validation
+  FIRST_NAME_REQUIRED: 'El nombre es obligatorio',
+  LAST_NAME_REQUIRED: 'Los apellidos son obligatorios',
+  
+  // Organization validation
+  ORGANIZATION_NAME_REQUIRED: 'El nombre de la organización es obligatorio para organizadores',
+  ORGANIZATION_NAME_TOO_SHORT: 'El nombre de la organización debe tener al menos 2 caracteres',
+  
+  // User role validation
+  USER_ROLE_REQUIRED: 'Selecciona un tipo de cuenta'
 } as const;
 
 /**
@@ -241,6 +407,193 @@ export function validateRegistrationForm(data: any): RegistrationValidationResul
     errors.player_id = ValidationMessages.PLAYER_ID_REQUIRED;
   } else if (!validatePlayerId(data.player_id)) {
     errors.player_id = ValidationMessages.PLAYER_ID_INVALID;
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+/**
+ * Validates login form data
+ * @param data - The login form data to validate
+ * @returns ValidationResult - validation result with errors
+ */
+export function validateLoginForm(data: LoginFormData): ValidationResult {
+  const errors: Record<string, string> = {};
+  
+  // Email validation
+  if (!data.email) {
+    errors.email = ValidationMessages.EMAIL_REQUIRED;
+  } else if (!validateEmail(data.email)) {
+    errors.email = ValidationMessages.EMAIL_INVALID;
+  }
+  
+  // Password validation
+  if (!data.password) {
+    errors.password = ValidationMessages.PASSWORD_REQUIRED;
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+/**
+ * Validates sign up form data
+ * @param data - The sign up form data to validate
+ * @returns ValidationResult - validation result with errors
+ */
+export function validateSignUpForm(data: SignUpFormData): ValidationResult {
+  const errors: Record<string, string> = {};
+  
+  // Email validation
+  if (!data.email) {
+    errors.email = ValidationMessages.EMAIL_REQUIRED;
+  } else if (!validateEmail(data.email)) {
+    errors.email = ValidationMessages.EMAIL_INVALID;
+  }
+  
+  // Password validation
+  if (!data.password) {
+    errors.password = ValidationMessages.PASSWORD_REQUIRED;
+  } else if (!validatePassword(data.password)) {
+    errors.password = ValidationMessages.PASSWORD_TOO_SHORT;
+  }
+  
+  // Confirm password validation
+  if (!data.confirmPassword) {
+    errors.confirmPassword = ValidationMessages.PASSWORD_REQUIRED;
+  } else if (!validatePasswordMatch(data.password, data.confirmPassword)) {
+    errors.confirmPassword = ValidationMessages.PASSWORDS_NO_MATCH;
+  }
+  
+  // First name validation
+  if (!data.firstName) {
+    errors.firstName = ValidationMessages.FIRST_NAME_REQUIRED;
+  } else if (!validateName(data.firstName)) {
+    errors.firstName = 'El nombre contiene caracteres no válidos';
+  }
+  
+  // Last name validation
+  if (!data.lastName) {
+    errors.lastName = ValidationMessages.LAST_NAME_REQUIRED;
+  } else if (!validateName(data.lastName)) {
+    errors.lastName = 'Los apellidos contienen caracteres no válidos';
+  }
+  
+  // Player ID validation
+  if (!data.playerId) {
+    errors.playerId = ValidationMessages.PLAYER_ID_REQUIRED;
+  } else if (!validatePlayerId(data.playerId)) {
+    errors.playerId = ValidationMessages.PLAYER_ID_INVALID;
+  }
+  
+  // Birth year validation
+  if (!data.birthYear) {
+    errors.birthYear = ValidationMessages.BIRTH_YEAR_REQUIRED;
+  } else if (!validateBirthYear(data.birthYear)) {
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - parseInt(data.birthYear, 10);
+    if (age < 13) {
+      errors.birthYear = ValidationMessages.BIRTH_YEAR_TOO_YOUNG;
+    } else if (age >= 100) {
+      errors.birthYear = ValidationMessages.BIRTH_YEAR_TOO_OLD;
+    } else {
+      errors.birthYear = ValidationMessages.BIRTH_YEAR_INVALID;
+    }
+  }
+  
+  // User role validation
+  if (!data.userRole) {
+    errors.userRole = ValidationMessages.USER_ROLE_REQUIRED;
+  }
+  
+  // Organizer-specific validation
+  if (data.userRole === 'organizer') {
+    if (!data.organizationName) {
+      errors.organizationName = ValidationMessages.ORGANIZATION_NAME_REQUIRED;
+    } else if (!validateOrganizationName(data.organizationName)) {
+      errors.organizationName = ValidationMessages.ORGANIZATION_NAME_TOO_SHORT;
+    }
+    
+    // Business email validation (optional)
+    if (data.businessEmail && !validateEmail(data.businessEmail)) {
+      errors.businessEmail = ValidationMessages.EMAIL_INVALID;
+    }
+    
+    // Phone number validation (optional)
+    if (data.phoneNumber && !validatePhoneNumber(data.phoneNumber)) {
+      errors.phoneNumber = 'Número de teléfono no válido';
+    }
+    
+    // Pokemon League URL validation (optional)
+    if (data.pokemonLeagueUrl && data.pokemonLeagueUrl.trim()) {
+      try {
+        const url = new URL(data.pokemonLeagueUrl.trim());
+        if (!url.protocol.startsWith('http')) {
+          errors.pokemonLeagueUrl = "La URL debe comenzar con http:// o https://";
+        }
+      } catch {
+        errors.pokemonLeagueUrl = "La URL no tiene un formato válido";
+      }
+    }
+    
+    // Experience description validation (optional, but if provided should be meaningful)
+    if (data.experienceDescription && data.experienceDescription.trim().length > 0 && data.experienceDescription.trim().length < 20) {
+      errors.experienceDescription = 'La descripción debe tener al menos 20 caracteres';
+    }
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+/**
+ * Validates password reset form data
+ * @param data - The password reset form data to validate
+ * @returns ValidationResult - validation result with errors
+ */
+export function validatePasswordResetForm(data: PasswordResetFormData): ValidationResult {
+  const errors: Record<string, string> = {};
+  
+  // Email validation
+  if (!data.email) {
+    errors.email = ValidationMessages.EMAIL_REQUIRED;
+  } else if (!validateEmail(data.email)) {
+    errors.email = ValidationMessages.EMAIL_INVALID;
+  }
+  
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+/**
+ * Validates update password form data
+ * @param data - The update password form data to validate
+ * @returns ValidationResult - validation result with errors
+ */
+export function validateUpdatePasswordForm(data: UpdatePasswordFormData): ValidationResult {
+  const errors: Record<string, string> = {};
+  
+  // Password validation
+  if (!data.password) {
+    errors.password = ValidationMessages.PASSWORD_REQUIRED;
+  } else if (!validatePassword(data.password)) {
+    errors.password = ValidationMessages.PASSWORD_TOO_SHORT;
+  }
+  
+  // Confirm password validation
+  if (!data.confirmPassword) {
+    errors.confirmPassword = ValidationMessages.PASSWORD_REQUIRED;
+  } else if (!validatePasswordMatch(data.password, data.confirmPassword)) {
+    errors.confirmPassword = ValidationMessages.PASSWORDS_NO_MATCH;
   }
   
   return {

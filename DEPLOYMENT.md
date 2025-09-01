@@ -26,8 +26,10 @@ Esta guía te ayudará a desplegar RotomTracks en producción usando Vercel y Su
 En Authentication > Settings:
 - **Site URL**: `https://tu-dominio.vercel.app`
 - **Redirect URLs**: 
-  - `https://tu-dominio.vercel.app/auth/callback`
-  - `http://localhost:3000/auth/callback` (para desarrollo)
+  - `https://tu-dominio.vercel.app/auth/confirm`
+  - `http://localhost:3000/auth/confirm` (para desarrollo)
+
+> **Nota sobre Password Reset**: Las URLs de redirección apuntan a `/auth/confirm` que maneja tanto la confirmación de registro como el reseteo de contraseñas. El sistema automáticamente redirige a `/auth/update-password` después de validar el token de recuperación.
 
 ### 3. Configurar Storage
 
