@@ -69,3 +69,8 @@ Thumbs.db
 # Local database files
 *.sqlite
 *.db
+
+# Project specific exclusions
+old-project/
+.kiro/
+pnpm-lock.yaml
