@@ -9,7 +9,6 @@ import {
   AlertCircle, 
   X,
   Loader2,
-  Download,
   Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

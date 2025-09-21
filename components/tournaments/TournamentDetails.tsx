@@ -18,7 +18,6 @@ import {
   MapPin, 
   User, 
   FileText,
-  ExternalLink,
   Download,
   Eye,
   Clock,
@@ -40,18 +39,14 @@ import type {
   TournamentResult, 
   TournamentMatch,
   TournamentStatus,
-  ParticipantStatus,
   UserRole
 } from '@/lib/types/tournament';
 
 // Utilities
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
 import { 
-  TournamentStatusManager,
   getStatusColor,
-  getStatusText,
-  STATUS_TRANSLATIONS
-} from '@/lib/utils/tournament-status';
+  getStatusText} from '@/lib/utils/tournament-status';
 
 interface TournamentFile {
   id: string;
@@ -98,13 +93,13 @@ export function TournamentDetails({
   const [selectedTab, setSelectedTab] = useState('overview');
 
   // Use centralized formatting utilities
-  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  const { formatDate, formatDateTime } = useTournamentFormatting();
 
   // Calculate tournament statistics
   const stats = {
     totalParticipants: participants.length,
-    activeParticipants: participants.filter(p => p.status === ParticipantStatus.CHECKED_IN).length,
-    droppedParticipants: participants.filter(p => p.status === ParticipantStatus.DROPPED).length,
+    activeParticipants: participants.filter(p => p.status === 'checked_in').length,
+    droppedParticipants: participants.filter(p => p.status === 'dropped').length,
     totalMatches: matches.length,
     completedMatches: matches.filter(m => m.match_status === 'completed').length,
     totalRounds: Math.max(...matches.map(m => m.round_number), 0),
@@ -333,7 +328,7 @@ export function TournamentDetails({
           <ParticipantsList
             participants={participants}
             results={results}
-            userRole={userRole}
+            userRole="viewer"
             tournamentStatus={tournament.status}
           />
         </TabsContent>

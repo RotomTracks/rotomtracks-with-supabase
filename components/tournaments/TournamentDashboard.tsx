@@ -5,25 +5,17 @@ import { useState, useEffect } from 'react';
 
 // UI Components
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Icons
 import { 
   Trophy, 
-  Plus, 
   Calendar, 
   Users, 
   MapPin, 
-  Clock,
   Settings,
-  BarChart3,
-  Filter,
   Search,
-  ArrowUpRight,
-  CheckCircle,
-  AlertCircle,
-  XCircle
+  AlertCircle
 } from 'lucide-react';
 
 // Next.js
@@ -40,24 +32,16 @@ import { useTranslation } from '@/lib/i18n/hooks/useTranslation';
 import { 
   Tournament, 
   TournamentType, 
-  TournamentStatus,
-  UserRole,
-  ParticipantStatus,
-  LoadingState
-} from '@/lib/types/tournament';
+  TournamentStatus} from '@/lib/types/tournament';
 
 // Utilities
-import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
 import { 
-  TournamentStatusManager,
-  getStatusColor,
-  getStatusText,
   STATUS_TRANSLATIONS
 } from '@/lib/utils/tournament-status';
 
 interface UserTournament extends Tournament {
   user_role: 'participant' | 'organizer';
-  registration_status?: ParticipantStatus;
+  registration_status?: 'registered' | 'checked_in' | 'dropped';
   registration_date?: string;
 }
 
@@ -73,8 +57,7 @@ export function TournamentDashboard({
   error: externalError = null 
 }: TournamentDashboardProps) {
   // Hooks
-  const { t } = useTranslation();
-  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  useTranslation();
   
   // State
   const [tournaments, setTournaments] = useState<UserTournament[]>([]);
@@ -116,7 +99,7 @@ export function TournamentDashboard({
           registration_open: true,
           organizer_id: isOrganizer ? user.id : 'other-organizer',
           user_role: isOrganizer ? 'organizer' : 'participant',
-          registration_status: isOrganizer ? undefined : 'confirmed',
+          registration_status: isOrganizer ? undefined : 'registered' as const,
           registration_date: isOrganizer ? undefined : '2024-03-01T10:00:00Z',
           description: 'El campeonato regional más importante de Madrid',
           created_at: '2024-02-01T10:00:00Z',
@@ -137,7 +120,7 @@ export function TournamentDashboard({
           registration_open: false,
           organizer_id: isOrganizer ? user.id : 'other-organizer',
           user_role: isOrganizer ? 'organizer' : 'participant',
-          registration_status: isOrganizer ? undefined : 'confirmed',
+          registration_status: isOrganizer ? undefined : 'checked_in' as const,
           registration_date: isOrganizer ? undefined : '2024-02-15T10:00:00Z',
           description: 'Liga Cup oficial de TCG en Barcelona',
           created_at: '2024-02-10T10:00:00Z',
@@ -158,7 +141,7 @@ export function TournamentDashboard({
           registration_open: true,
           organizer_id: isOrganizer ? 'other-organizer' : user.id,
           user_role: 'participant',
-          registration_status: 'registered',
+          registration_status: 'registered' as const,
           registration_date: '2024-04-01T10:00:00Z',
           description: 'Community Day especial en Valencia',
           created_at: '2024-03-15T10:00:00Z',
@@ -214,22 +197,7 @@ export function TournamentDashboard({
     return true;
   });
 
-  // Utility functions using centralized status management
-  const getStatusIcon = (status: string) => {
-    const statusConfig = TournamentStatusManager.getTournamentStatusConfig(status as TournamentStatus);
-    return statusConfig.icon;
-  };
 
-  const getRegistrationStatusBadge = (status?: ParticipantStatus) => {
-    if (!status) return null;
-    
-    const config = TournamentStatusManager.getParticipantStatusConfig(status);
-    return (
-      <Badge variant={config.badgeVariant} className={config.color}>
-        {config.icon} {config.label}
-      </Badge>
-    );
-  };
 
   // Computed values
   const organizingTournaments = tournaments.filter(t => t.user_role === 'organizer');
@@ -461,8 +429,8 @@ export function TournamentDashboard({
               {filteredTournaments.map((tournament) => (
                 <div key={tournament.id} role="listitem">
                   <TournamentCard
-                    tournament={tournament}
-                    userRole={tournament.user_role}
+                    tournament={tournament as any}
+                    userRole="authenticated"
                     showActions={true}
                     className="h-full"
                   />
@@ -510,8 +478,8 @@ export function TournamentDashboard({
                   .map((tournament) => (
                     <div key={tournament.id} role="listitem">
                       <TournamentCard
-                        tournament={tournament}
-                        userRole="organizer"
+                        tournament={tournament as any}
+                        userRole="authenticated"
                         showActions={true}
                         className="h-full"
                       />
@@ -564,8 +532,8 @@ export function TournamentDashboard({
                 .map((tournament) => (
                   <div key={tournament.id} role="listitem">
                     <TournamentCard
-                      tournament={tournament}
-                      userRole="participant"
+                      tournament={tournament as any}
+                      userRole="authenticated"
                       showActions={true}
                       className="h-full"
                     />

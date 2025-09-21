@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { TDFGenerator, type TDFPlayer, mapTournamentTypeToTDF, generateOrganizerPOPID } from '@/lib/tdf';
+import { TDFGenerator, mapTournamentTypeToTDF, generateOrganizerPOPID } from '@/lib/tdf';
 
 // GET /api/tournaments/[id]/tdf-download - Generate and download TDF file with registered players
 export async function GET(
@@ -67,15 +67,15 @@ export async function GET(
       );
     }
 
-    // Map participants to TournamentParticipant format
     const mappedParticipants = participants.map((p: any) => ({
       id: p.id,
       tournament_id: tournamentId,
-      user_id: p.user_id || p.id || 'unknown', // fallback to id if user_id not available
+      user_id: p.user_id || p.id || 'unknown',
       player_name: p.player_name,
       player_id: p.player_id || '',
+      player_birthdate: p.player_birthdate || '2000-01-01',
       registration_date: p.registration_date,
-      status: p.status || 'registered' // default status
+      status: p.status || 'registered'
     }));
 
     let generatedTDF;
@@ -268,13 +268,13 @@ export async function POST(
       );
     }
 
-    // Convert to TDF format
     const tdfParticipants = participants.map((p: any) => ({
       id: p.id,
       tournament_id: tournamentId,
       user_id: p.user_id || p.id || 'unknown',
       player_name: p.player_name,
       player_id: p.player_id || '',
+      player_birthdate: p.player_birthdate || '2000-01-01',
       registration_date: p.registration_date,
       status: p.status || 'registered'
     }));

@@ -239,7 +239,7 @@ export function formatCompactNumber(
       };
       
       return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(number);
-    } catch (error) {
+    } catch {
       // Fallback for browsers that don't support compact notation
     }
   }

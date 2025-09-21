@@ -11,7 +11,6 @@ import type {
   UpdateTournamentRequest,
   TournamentParticipant,
   TournamentResult,
-  TournamentMatch,
   TournamentFile,
   TournamentRegistrationRequest
 } from '@/lib/types/tournament';
@@ -239,7 +238,8 @@ export class ParticipantDatabase {
         tournament_id: registration.tournament_id,
         user_id: userId,
         player_name: registration.player_name,
-        player_id: registration.player_id
+        player_id: registration.player_id,
+        player_birthdate: registration.player_birthdate
       }])
       .select()
       .single();

@@ -48,11 +48,11 @@ export async function GET(
       .from('tournament_participants')
       .select(`
         id,
+        user_id,
         player_name,
         player_id,
         player_birthdate,
         registration_date,
-        tdf_userid,
         status
       `)
       .eq('tournament_id', tournamentId)
@@ -66,14 +66,15 @@ export async function GET(
       );
     }
 
-    // Convert to TDF format
     const tdfParticipants: TournamentParticipant[] = (participants || []).map(p => ({
       id: p.id,
+      tournament_id: tournamentId,
+      user_id: p.user_id,
       player_name: p.player_name,
       player_id: p.player_id,
       player_birthdate: p.player_birthdate,
       registration_date: p.registration_date,
-      tdf_userid: p.tdf_userid
+      status: p.status
     }));
 
     // Generate TDF
@@ -119,7 +120,7 @@ export async function GET(
       },
       participants: tdfParticipants.map(p => ({
         name: p.player_name,
-        tdf_userid: p.tdf_userid,
+        player_id: p.player_id,
         registration_date: p.registration_date
       }))
     });

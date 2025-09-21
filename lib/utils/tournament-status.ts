@@ -195,7 +195,19 @@ const PARTICIPANT_STATUS_TRANSITIONS: Record<ParticipantStatus, ParticipantStatu
 };
 
 /**
- * Tournament Status Manager - replaces all duplicated status functions
+ * Tournament Status Manager - Centralized status management for tournaments
+ * 
+ * Provides consistent status handling, translations, and color schemes
+ * across all tournament-related components and API routes.
+ * 
+ * @example
+ * ```typescript
+ * import { TournamentStatusManager } from '@/lib/utils/tournament-status';
+ * 
+ * const config = TournamentStatusManager.getStatusConfig('upcoming', 'tournament');
+ * const color = TournamentStatusManager.getStatusColor('upcoming', 'tournament');
+ * const label = TournamentStatusManager.getStatusLabel('upcoming', 'tournament');
+ * ```
  */
 export const TournamentStatusManager = {
   /**
@@ -336,40 +348,66 @@ export const TournamentStatusManager = {
  * These can be used as drop-in replacements for existing functions
  */
 
-// Tournament status functions (replaces duplicated functions in components)
+/**
+ * Get tournament status color classes
+ * @param status - Tournament status
+ * @returns Tailwind CSS color classes
+ */
 export const getStatusColor = (status: TournamentStatus): string => 
   TournamentStatusManager.getStatusColor(status, 'tournament');
 
+/**
+ * Get tournament status text in Spanish
+ * @param status - Tournament status
+ * @returns Translated status text
+ */
 export const getStatusText = (status: TournamentStatus): string => 
   TournamentStatusManager.getStatusLabel(status, 'tournament');
 
-export const getTournamentStatusColor = (status: TournamentStatus): string => 
-  TournamentStatusManager.getStatusColor(status, 'tournament');
-
-export const getTournamentStatusText = (status: TournamentStatus): string => 
-  TournamentStatusManager.getStatusLabel(status, 'tournament');
-
-// Participant status functions
+/**
+ * Get participant status color classes
+ * @param status - Participant status
+ * @returns Tailwind CSS color classes
+ */
 export const getParticipantStatusColor = (status: ParticipantStatus): string => 
   TournamentStatusManager.getStatusColor(status, 'participant');
 
+/**
+ * Get participant status text in Spanish
+ * @param status - Participant status
+ * @returns Translated status text
+ */
 export const getParticipantStatusText = (status: ParticipantStatus): string => 
   TournamentStatusManager.getStatusLabel(status, 'participant');
 
-// File status functions
+/**
+ * Get file upload status color classes
+ * @param status - File upload status
+ * @returns Tailwind CSS color classes
+ */
 export const getFileStatusColor = (status: FileUploadStatus): string => 
   TournamentStatusManager.getStatusColor(status, 'file');
 
+/**
+ * Get file upload status text in Spanish
+ * @param status - File upload status
+ * @returns Translated status text
+ */
 export const getFileStatusText = (status: FileUploadStatus): string => 
   TournamentStatusManager.getStatusLabel(status, 'file');
 
-// Tournament type functions
+/**
+ * Get tournament type color classes
+ * @param type - Tournament type
+ * @returns Tailwind CSS color classes
+ */
 export const getTournamentTypeColor = (type: TournamentType): string => 
   TournamentStatusManager.getTournamentTypeColor(type);
 
+/**
+ * Get tournament type icon
+ * @param type - Tournament type
+ * @returns Icon name or emoji
+ */
 export const getTournamentTypeIcon = (type: TournamentType): string => 
   TournamentStatusManager.getTournamentTypeIcon(type);
-
-// Export the main manager and types
-export { TournamentStatusManager };
-export type { StatusConfig, StatusTranslations, FileUploadStatus };

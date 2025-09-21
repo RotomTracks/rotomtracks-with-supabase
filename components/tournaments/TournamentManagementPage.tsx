@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 
 // Next.js
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 // UI Components
@@ -25,7 +24,6 @@ import {
   MapPin,
   Trophy,
   AlertCircle,
-  CheckCircle,
   Clock,
   UserPlus
 } from 'lucide-react';
@@ -36,13 +34,9 @@ import type { Tournament, TournamentStatus, UserRole } from '@/lib/types/tournam
 // Utilities
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
 import { 
-  TournamentStatusManager,
   getStatusColor,
-  getStatusText,
-  STATUS_TRANSLATIONS
+  getStatusText
 } from '@/lib/utils/tournament-status';
-
-
 
 interface TournamentManagementPageProps {
   tournamentId: string;
@@ -51,13 +45,10 @@ interface TournamentManagementPageProps {
 }
 
 export function TournamentManagementPage({ 
-  tournamentId, 
-  user, 
-  userRole = 'organizer' 
+  tournamentId
 }: TournamentManagementPageProps) {
   // Hooks
-  const router = useRouter();
-  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  const { formatDate } = useTournamentFormatting();
   
   // State
   const [tournament, setTournament] = useState<Tournament | null>(null);

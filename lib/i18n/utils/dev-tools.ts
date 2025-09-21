@@ -2,7 +2,7 @@
  * Development tools for translation validation and debugging
  */
 
-import { SupportedLanguage, SUPPORTED_LANGUAGES } from '../types';
+import { SupportedLanguage } from '../types';
 
 // Track missing translations in development
 const missingTranslations = new Set<string>();
@@ -116,7 +116,7 @@ export function validateTranslationKey(key: string): {
  */
 export function validateTranslationValue(
   key: string,
-  value: any,
+  value: unknown,
   language: SupportedLanguage
 ): {
   isValid: boolean;
@@ -186,9 +186,9 @@ export function validateTranslationValue(
  */
 export function compareTranslations(
   baseLanguage: SupportedLanguage,
-  baseTranslations: Record<string, any>,
+  baseTranslations: Record<string, unknown>,
   targetLanguage: SupportedLanguage,
-  targetTranslations: Record<string, any>
+  targetTranslations: Record<string, unknown>
 ): {
   missingInTarget: string[];
   missingInBase: string[];
@@ -200,14 +200,14 @@ export function compareTranslations(
   const typeMismatches: Array<{ key: string; baseType: string; targetType: string }> = [];
   const placeholderMismatches: Array<{ key: string; basePlaceholders: string[]; targetPlaceholders: string[] }> = [];
 
-  const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
-    const flattened: Record<string, any> = {};
+  const flattenObject = (obj: Record<string, unknown>, prefix = ''): Record<string, unknown> => {
+    const flattened: Record<string, unknown> = {};
     
     for (const [key, value] of Object.entries(obj)) {
       const fullKey = prefix ? `${prefix}.${key}` : key;
       
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        Object.assign(flattened, flattenObject(value, fullKey));
+        Object.assign(flattened, flattenObject(value as Record<string, unknown>, fullKey));
       } else {
         flattened[fullKey] = value;
       }

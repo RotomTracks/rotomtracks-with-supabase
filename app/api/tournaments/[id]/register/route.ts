@@ -2,18 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { TDFUtils } from '@/lib/tdf';
+import { ErrorCodes } from '@/lib/types/tournament';
+import {
+  withErrorHandling,
+  generateRequestId,
+  handleValidationError,
+  handleSupabaseError,
+  createErrorResponse
+} from '@/lib/utils/api-error-handler';
+import {
+  createParticipantResponse,
+  createSuccessResponse
+} from '@/lib/utils/api-response-formatter';
 
-// Validation schema for player registration
+// Validation schema for player registration - simplified since user data comes from profile
 const registrationSchema = z.object({
   tournament_id: z.string().uuid(),
-  player_name: z.string().min(2, 'Player name must be at least 2 characters'),
-  player_id: z.string().optional(),
-  player_birthdate: z.string().datetime(),
-  email: z.string().email('Invalid email format'),
-  phone: z.string().min(9, 'Phone number must be at least 9 characters'),
-  emergency_contact: z.string().optional(),
-  emergency_phone: z.string().optional(),
-  registration_source: z.string().default('web')
+  player_id: z.string().optional() // Optional override for player ID
 });
 
 // POST /api/tournaments/[id]/register - Register player for tournament
@@ -25,6 +30,29 @@ export async function POST(
     const supabase = await createClient();
     const { id: tournamentId } = await params;
 
+    // Check authentication - registration now requires an account
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return createErrorResponse(
+        ErrorCodes.UNAUTHORIZED,
+        'Debes tener una cuenta para registrarte en torneos'
+      );
+    }
+
+    // Get user profile
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('id, player_id, first_name, last_name')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || !userProfile) {
+      return createErrorResponse(
+        ErrorCodes.NOT_FOUND,
+        'Perfil de usuario no encontrado. Completa tu perfil antes de registrarte.'
+      );
+    }
+
     // Get tournament details
     const { data: tournament, error: tournamentError } = await supabase
       .from('tournaments')
@@ -32,26 +60,32 @@ export async function POST(
       .eq('id', tournamentId)
       .single();
 
-    if (tournamentError || !tournament) {
-      return NextResponse.json(
-        { error: 'Tournament not found' },
-        { status: 404 }
+    if (tournamentError) {
+      return handleSupabaseError(tournamentError, 'búsqueda de torneo');
+    }
+
+    if (!tournament) {
+      return createErrorResponse(
+        ErrorCodes.NOT_FOUND,
+        'Torneo no encontrado'
       );
     }
 
     // Check if registration is open
     if (!tournament.registration_open) {
-      return NextResponse.json(
-        { error: 'Registration is closed for this tournament' },
-        { status: 400 }
+      return createErrorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        'Las inscripciones están cerradas para este torneo',
+        { tournament_status: tournament.status }
       );
     }
 
     // Check if tournament is upcoming
     if (tournament.status !== 'upcoming') {
-      return NextResponse.json(
-        { error: 'Registration is only available for upcoming tournaments' },
-        { status: 400 }
+      return createErrorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        'Las inscripciones solo están disponibles para torneos próximos',
+        { current_status: tournament.status }
       );
     }
 
@@ -65,54 +99,31 @@ export async function POST(
     // Check if tournament is at capacity
     const isFull = tournament.max_players && tournament.current_players >= tournament.max_players;
     
-    // Check for duplicate registration by email
+    // Check for duplicate registration by user
     const { data: existingRegistration } = await supabase
       .from('tournament_participants')
       .select('id, status')
       .eq('tournament_id', tournamentId)
-      .eq('email', validatedData.email)
+      .eq('user_id', userProfile.id)
       .single();
 
     if (existingRegistration) {
-      return NextResponse.json(
-        { error: 'Player already registered', details: 'A player with this email is already registered' },
-        { status: 409 }
+      return createErrorResponse(
+        ErrorCodes.DUPLICATE_REGISTRATION,
+        'Ya estás registrado en este torneo',
+        { user_id: userProfile.id },
+        'user_id'
       );
     }
 
-    // Check for duplicate by player name (case insensitive)
-    const { data: nameCheck } = await supabase
-      .from('tournament_participants')
-      .select('id')
-      .eq('tournament_id', tournamentId)
-      .ilike('player_name', validatedData.player_name)
-      .single();
-
-    if (nameCheck) {
-      return NextResponse.json(
-        { error: 'Player already registered', details: 'A player with this name is already registered' },
-        { status: 409 }
-      );
-    }
-
-    // Generate TDF user ID for the player
-    const tdfUserId = TDFUtils.generatePlayerID();
-
-    // Prepare participant data
+    // Prepare participant data using user profile information
     const participantData = {
       tournament_id: tournamentId,
-      user_id: null, // Anonymous registration
-      player_name: validatedData.player_name,
-      player_id: validatedData.player_id || null,
-      player_birthdate: validatedData.player_birthdate,
-      email: validatedData.email,
-      phone: validatedData.phone,
-      emergency_contact: validatedData.emergency_contact || null,
-      emergency_phone: validatedData.emergency_phone || null,
-      registration_source: validatedData.registration_source,
-      tdf_userid: tdfUserId,
-      status: isFull ? 'waitlist' : 'registered',
-      registration_date: new Date().toISOString()
+      user_id: userProfile.id, // Always use authenticated user
+      player_name: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
+      player_id: userProfile.player_id || validatedData.player_id, // Required field
+      registration_date: new Date().toISOString(),
+      status: isFull ? 'waitlist' : 'registered'
     };
 
     // Insert participant
@@ -150,11 +161,14 @@ export async function POST(
     // await sendRegistrationConfirmationEmail(participant, tournament);
 
     return NextResponse.json({
-      participant,
-      status: isFull ? 'waitlist' : 'registered',
+      data: {
+        participant,
+        status: isFull ? 'waitlist' : 'registered'
+      },
       message: isFull 
-        ? 'Tournament is full. You have been added to the waitlist.'
-        : 'Registration successful! You will receive a confirmation email shortly.'
+        ? 'El torneo está lleno. Has sido añadido a la lista de espera.'
+        : 'Inscripción exitosa. ¡Bienvenido al torneo!',
+      timestamp: new Date().toISOString()
     }, { status: 201 });
 
   } catch (error) {

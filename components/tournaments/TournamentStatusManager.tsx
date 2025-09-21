@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Play, 
-  Pause, 
   CheckCircle, 
   XCircle, 
   Clock, 
@@ -16,7 +15,7 @@ import {
   Users,
   Settings
 } from 'lucide-react';
-import type { Tournament } from '@/lib/types/tournament';
+import type { Tournament, UserRole } from '@/lib/types/tournament';
 import { TournamentStatus } from '@/lib/types/tournament';
 
 interface TournamentStatusManagerProps {
@@ -25,7 +24,7 @@ interface TournamentStatusManagerProps {
   matchesCount: number;
   completedMatches: number;
   onStatusUpdate: (newStatus: string) => void;
-  userRole: 'organizer' | 'participant' | 'viewer';
+  userRole: UserRole;
 }
 
 export function TournamentStatusManager({
@@ -64,7 +63,7 @@ export function TournamentStatusManager({
       } else {
         setError(data.message || 'Error al actualizar el estado');
       }
-    } catch (error) {
+    } catch {
       setError('Error de conexión');
     } finally {
       setIsUpdating(false);

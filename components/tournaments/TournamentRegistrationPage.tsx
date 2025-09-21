@@ -1,22 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
   Calendar, 
   MapPin, 
-  Users, 
   Trophy,
   CheckCircle,
   AlertCircle,
-  Clock,
   UserPlus,
   Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import RealTimePlayerCount from './RealTimePlayerCount';
@@ -62,7 +58,6 @@ interface FormErrors {
 }
 
 export function TournamentRegistrationPage({ tournament }: TournamentRegistrationPageProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -165,7 +160,7 @@ export function TournamentRegistrationPage({ tournament }: TournamentRegistratio
       const registrationData = {
         tournament_id: tournament.id,
         player_name: `${formData.firstName} ${formData.lastName}`.trim(),
-        player_id: formData.playerId || null,
+        player_id: formData.playerId, // Required field
         player_birthdate: formData.birthdate,
         email: formData.email,
         phone: formData.phone,
@@ -223,17 +218,6 @@ export function TournamentRegistrationPage({ tournament }: TournamentRegistratio
       minute: '2-digit'
     });
   };
-
-  const getCapacityColor = () => {
-    if (!tournament.max_players) return 'text-gray-600';
-    const percentage = (tournament.current_players / tournament.max_players) * 100;
-    if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 70) return 'text-yellow-600';
-    return 'text-green-600';
-  };
-
-  const isNearCapacity = tournament.max_players && 
-    (tournament.current_players / tournament.max_players) >= 0.9;
 
   if (success) {
     return (

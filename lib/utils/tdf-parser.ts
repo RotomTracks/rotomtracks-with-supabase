@@ -140,7 +140,7 @@ export function extractTournamentSummary(content: string): TournamentSummary {
   }
 
   return {
-    id: getValue('ID') || generateTournamentId(),
+    id: getValue('ID') || '', // ID must come from TDF file
     name: getValue('Name'),
     city: getValue('City'),
     country: getValue('Country'),
@@ -255,10 +255,7 @@ function isValidDate(dateStr: string): boolean {
          date.getDate() === day;
 }
 
-// Generar ID único para torneo
-function generateTournamentId(): string {
-  return `tournament_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
+// Note: Tournament ID must come from TDF file, not generated
 
 // Calcular número de rondas sugeridas para Swiss
 function calculateRounds(playerCount: number): number {

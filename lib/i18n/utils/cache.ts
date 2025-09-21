@@ -5,7 +5,7 @@
 import { SupportedLanguage } from '../types';
 
 // In-memory cache for translations
-const translationCache = new Map<string, any>();
+const translationCache = new Map<string, unknown>();
 const translationTimestamps = new Map<string, number>();
 
 // Cache configuration
@@ -78,7 +78,8 @@ export function getCachedTranslation(
     return null;
   }
   
-  return translationCache.get(cacheKey) || null;
+  const cached = translationCache.get(cacheKey);
+  return typeof cached === 'string' ? cached : null;
 }
 
 /**
@@ -154,17 +155,17 @@ export function getCacheStats(): {
  */
 export function preloadTranslations(
   language: SupportedLanguage,
-  translations: Record<string, any>,
+  translations: Record<string, unknown>,
   prefix: string = ''
 ): void {
-  const preloadRecursive = (obj: any, currentPrefix: string) => {
+  const preloadRecursive = (obj: Record<string, unknown>, currentPrefix: string) => {
     for (const [key, value] of Object.entries(obj)) {
       const fullKey = currentPrefix ? `${currentPrefix}.${key}` : key;
       
       if (typeof value === 'string') {
         setCachedTranslation(language, fullKey, value);
       } else if (typeof value === 'object' && value !== null) {
-        preloadRecursive(value, fullKey);
+        preloadRecursive(value as Record<string, unknown>, fullKey);
       }
     }
   };

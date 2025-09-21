@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+import { ErrorCodes, TournamentType, TournamentStatus } from '@/lib/types/tournament';
+import {
+  withErrorHandling,
+  generateRequestId,
+  handleValidationError,
+  handleSupabaseError,
+  createErrorResponse
+} from '@/lib/utils/api-error-handler';
+import {
+  createSearchResponse,
+  validatePaginationParams,
+  validateSearchParams
+} from '@/lib/utils/api-response-formatter';
 import { 
-  validateSearchParams, 
+  validateSearchParams as validateAdvancedSearchParams, 
   validateAdvancedSearch,
   validateDateRange,
   sanitizeSearchQuery,
@@ -27,11 +40,8 @@ export async function GET(request: NextRequest) {
       const supabase = await createClient();
       const { searchParams } = new URL(request.url);
       
-      // Convert URLSearchParams to object for validation
-      const rawParams = Object.fromEntries(searchParams.entries());
-      
       // Validate and sanitize parameters
-      const validatedParams = validateSearchParams(rawParams);
+      const validatedParams = validateSearchParams(searchParams);
       
       // Sanitize query if provided
       if (validatedParams.query) {
@@ -41,13 +51,11 @@ export async function GET(request: NextRequest) {
       // Validate date range
       validateDateRange(validatedParams.date_from, validatedParams.date_to);
       
-      const { suggestions, ...searchFilters } = validatedParams;
-
       // Handle suggestions request
-      if (suggestions && validatedParams.query && validatedParams.query.length >= 2) {
+      if (validatedParams.query && validatedParams.query.length >= 2) {
         const suggestionResults = await generateSearchSuggestions(
           validatedParams.query,
-          validatedParams.limit
+          10 // Default limit
         );
         
         const searchTime = Date.now() - startTime;
@@ -70,28 +78,22 @@ export async function GET(request: NextRequest) {
       }
 
       // Build optimized search query
-      const searchQuery = await buildOptimizedSearchQuery({
-        ...searchFilters,
-        suggestions: false
+      const searchQuery = buildOptimizedSearchQuery({
+        ...validatedParams,
+        tournament_type: validatedParams.tournament_type as TournamentType,
+        status: validatedParams.status as TournamentStatus,
+        suggestions: false,
+        limit: 20,
+        offset: 0
       }, supabase);
       
       // Apply sorting and pagination
-      const finalQuery = searchQuery
+      const { data: tournaments, error, count } = await searchQuery
         .order('start_date', { ascending: true })
-        .range(searchFilters.offset, searchFilters.offset + searchFilters.limit - 1);
-
-      const { data: tournaments, error, count } = await finalQuery;
+        .range(0, 19);
 
       if (error) {
-        console.error('Error searching tournaments:', error);
-        return NextResponse.json(
-          { 
-            error: 'SEARCH_FAILED',
-            message: 'Failed to search tournaments',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-          },
-          { status: 500 }
-        );
+        return handleSupabaseError(error, 'búsqueda de torneos');
       }
 
       // Calculate relevance scores and rank results
@@ -109,7 +111,7 @@ export async function GET(request: NextRequest) {
       }
 
       const searchTime = Date.now() - startTime;
-      const filtersUsed = Object.values(searchFilters).filter(v => v !== undefined && v !== '').length;
+      const filtersUsed = Object.values(validatedParams).filter(v => v !== undefined && v !== '').length;
 
       // Log search analytics
       await logSearchAnalytics(
@@ -123,7 +125,14 @@ export async function GET(request: NextRequest) {
       const response = formatSearchResponse(
         rankedTournaments,
         count || 0,
-        { ...searchFilters, suggestions: false },
+        { 
+          ...validatedParams, 
+          tournament_type: validatedParams.tournament_type as any,
+          status: validatedParams.status as any,
+          suggestions: false, 
+          limit: 20, 
+          offset: 0 
+        },
         searchTime,
         !!validatedParams.query
       );
@@ -134,35 +143,23 @@ export async function GET(request: NextRequest) {
       const searchTime = Date.now() - startTime;
       
       if (error instanceof SearchValidationError) {
-        return NextResponse.json(
-          {
-            error: error.code,
-            message: error.message,
-            field: error.field
-          },
-          { status: 400 }
+        return createErrorResponse(
+          ErrorCodes.VALIDATION_ERROR,
+          error.message,
+          { search_time: searchTime },
+          error.field
         );
       }
       
       if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          {
-            error: 'VALIDATION_ERROR',
-            message: 'Invalid search parameters',
-            details: error.issues
-          },
-          { status: 400 }
-        );
+        return handleValidationError(error);
       }
       
-      console.error('Unexpected error in GET /api/tournaments/search:', error);
-      return NextResponse.json(
-        { 
-          error: 'INTERNAL_SERVER_ERROR',
-          message: 'An unexpected error occurred',
-          search_time: searchTime
-        },
-        { status: 500 }
+      console.error('Error inesperado en búsqueda de torneos:', error);
+      return createErrorResponse(
+        ErrorCodes.PROCESSING_ERROR,
+        'Ha ocurrido un error inesperado en la búsqueda',
+        { search_time: searchTime }
       );
     }
   });
@@ -204,7 +201,7 @@ export async function POST(request: NextRequest) {
       };
 
       // Build optimized search query
-      const searchQuery = await buildOptimizedSearchQuery({
+      const searchQuery = buildOptimizedSearchQuery({
         ...searchParams,
         suggestions: false
       }, supabase);
@@ -218,15 +215,7 @@ export async function POST(request: NextRequest) {
       const { data: tournaments, error, count } = await finalQuery;
 
       if (error) {
-        console.error('Error in advanced search:', error);
-        return NextResponse.json(
-          { 
-            error: 'ADVANCED_SEARCH_FAILED',
-            message: 'Failed to execute advanced search',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-          },
-          { status: 500 }
-        );
+        return handleSupabaseError(error, 'búsqueda avanzada de torneos');
       }
 
       // Calculate relevance scores if there's a query
@@ -277,35 +266,23 @@ export async function POST(request: NextRequest) {
       const searchTime = Date.now() - startTime;
       
       if (error instanceof SearchValidationError) {
-        return NextResponse.json(
-          {
-            error: error.code,
-            message: error.message,
-            field: error.field
-          },
-          { status: 400 }
+        return createErrorResponse(
+          ErrorCodes.VALIDATION_ERROR,
+          error.message,
+          { search_time: searchTime },
+          error.field
         );
       }
       
       if (error instanceof z.ZodError) {
-        return NextResponse.json(
-          {
-            error: 'VALIDATION_ERROR',
-            message: 'Invalid request body',
-            details: error.issues
-          },
-          { status: 400 }
-        );
+        return handleValidationError(error);
       }
       
-      console.error('Unexpected error in POST /api/tournaments/search:', error);
-      return NextResponse.json(
-        { 
-          error: 'INTERNAL_SERVER_ERROR',
-          message: 'An unexpected error occurred',
-          search_time: searchTime
-        },
-        { status: 500 }
+      console.error('Error inesperado en búsqueda avanzada de torneos:', error);
+      return createErrorResponse(
+        ErrorCodes.PROCESSING_ERROR,
+        'Ha ocurrido un error inesperado en la búsqueda avanzada',
+        { search_time: searchTime }
       );
     }
   });

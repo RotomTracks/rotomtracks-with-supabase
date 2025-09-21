@@ -16,15 +16,24 @@ if (isBrowser) {
 } else {
   // Simple fallback for Node.js environment
   // In a real production environment, you might want to use a proper XML parser
+  
+  interface ElementLike {
+    textContent: string;
+    getAttribute: (attr: string) => string | null;
+  }
+  
   class SimpleDOMParser {
-    parseFromString(xmlString: string, mimeType: string): any {
+    parseFromString(xmlString: string): {
+      querySelector: (selector: string) => ElementLike | null;
+      querySelectorAll: (selector: string) => ElementLike[];
+    } {
       // Very basic XML parsing - this is a simplified implementation
       // In production, consider using a proper XML parser library
       
       const doc = {
-        querySelector: (selector: string) => {
+        querySelector: (selector: string): ElementLike | null => {
           // Basic selector support for our TDF parsing needs
-          const match = xmlString.match(new RegExp(`<${selector}[^>]*>([^<]*)</${selector}>`, 'i'));
+          const match: RegExpMatchArray | null = xmlString.match(new RegExp(`<${selector}[^>]*>([^<]*)</${selector}>`, 'i'));
           if (match) {
             return {
               textContent: match[1],
@@ -36,7 +45,7 @@ if (isBrowser) {
           }
           
           // Handle self-closing tags with attributes
-          const selfClosingMatch = xmlString.match(new RegExp(`<${selector}([^>]*)/?>`, 'i'));
+          const selfClosingMatch: RegExpMatchArray | null = xmlString.match(new RegExp(`<${selector}([^>]*)/?>`, 'i'));
           if (selfClosingMatch) {
             return {
               textContent: '',
@@ -49,15 +58,16 @@ if (isBrowser) {
           
           return null;
         },
-        querySelectorAll: (selector: string) => {
-          const matches = [];
+        querySelectorAll: (selector: string): ElementLike[] => {
+          const matches: ElementLike[] = [];
           const regex = new RegExp(`<${selector}[^>]*>.*?</${selector}>`, 'gi');
-          let match;
+          let match: RegExpExecArray | null;
           while ((match = regex.exec(xmlString)) !== null) {
+            const matchText = match[0];
             matches.push({
-              textContent: match[0].replace(/<[^>]*>/g, ''),
+              textContent: matchText.replace(/<[^>]*>/g, ''),
               getAttribute: (attr: string) => {
-                const attrMatch = match[0].match(new RegExp(`${attr}="([^"]*)"`, 'i'));
+                const attrMatch = matchText.match(new RegExp(`${attr}="([^"]*)"`, 'i'));
                 return attrMatch ? attrMatch[1] : null;
               }
             });
@@ -69,9 +79,12 @@ if (isBrowser) {
       // Check for parser errors
       if (xmlString.includes('parsererror')) {
         const errorDoc = { ...doc };
-        errorDoc.querySelector = (selector: string) => {
+        errorDoc.querySelector = (selector: string): ElementLike | null => {
           if (selector === 'parsererror') {
-            return { textContent: 'Parser error' };
+            return { 
+              textContent: 'Parser error',
+              getAttribute: () => null
+            };
           }
           return doc.querySelector(selector);
         };
@@ -87,7 +100,7 @@ if (isBrowser) {
 
 // Make DOMParser available globally
 if (!isBrowser && typeof global !== 'undefined') {
-  (global as any).DOMParser = DOMParserImpl;
+  (global as typeof globalThis).DOMParser = DOMParserImpl;
 }
 
 export { DOMParserImpl as DOMParser };

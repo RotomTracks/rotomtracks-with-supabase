@@ -55,7 +55,7 @@ export function TournamentCard({
   className = ''
 }: TournamentCardProps) {
   // Use centralized formatting utilities
-  const { formatShortDate, formatTime } = useTournamentFormatting();
+  const { formatDate, formatTime } = useTournamentFormatting();
 
   // Get tournament type icon using centralized utility
   const tournamentIcon = getTournamentTypeIcon(tournament.tournament_type as TournamentType);
@@ -82,7 +82,6 @@ export function TournamentCard({
 
   // Tournament state checks
   const isUpcoming = tournament.status === TournamentStatus.UPCOMING;
-  const isOngoing = tournament.status === TournamentStatus.ONGOING;
   const canRegister = tournament.registration_open && isUpcoming;
 
   if (viewMode === 'list') {
@@ -109,7 +108,7 @@ export function TournamentCard({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatShortDate(tournament.start_date)}</span>
+                  <span>{formatDate(tournament.start_date)}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
@@ -184,7 +183,7 @@ export function TournamentCard({
         <div className="space-y-3 flex-1">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Calendar className="h-4 w-4" />
-            <span>{formatShortDate(tournament.start_date)} • {formatTime(tournament.start_date)}</span>
+            <span>{formatDate(tournament.start_date)} • {formatTime(tournament.start_date)}</span>
           </div>
           
           <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -224,7 +223,7 @@ export function TournamentCard({
         
         {showActions && (
           <div className="flex items-center space-x-2 mt-4 pt-4 border-t">
-            {canRegister && (userRole === 'authenticated' || userRole === 'participant') && !tournament.registration_status && (
+            {canRegister && userRole === 'authenticated' && !tournament.registration_status && (
               <Button size="sm" className="flex-1">
                 <UserPlus className="h-4 w-4 mr-1" />
                 Registrarse

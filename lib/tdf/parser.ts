@@ -395,7 +395,7 @@ export class TDFParser {
     try {
       const players = this.extractPlayers(xmlContent);
       return players.length === 0;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -416,7 +416,7 @@ export class TDFParser {
       // Check if tournament type is supported
       try {
         this.mapTournamentType(metadata.gametype, metadata.mode);
-      } catch (error) {
+      } catch {
         return { 
           compatible: false, 
           reason: `Unsupported tournament type: ${metadata.gametype}:${metadata.mode}` 
@@ -446,7 +446,7 @@ export class TDFUtils {
       const [month, day, year] = tdfDate.split('/');
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       return date.toISOString();
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid TDF date format: ${tdfDate}`);
     }
   }
@@ -461,7 +461,7 @@ export class TDFUtils {
       const day = date.getDate().toString().padStart(2, '0');
       const year = date.getFullYear().toString();
       return `${month}/${day}/${year}`;
-    } catch (error) {
+    } catch {
       throw new Error(`Invalid ISO date format: ${isoDate}`);
     }
   }
@@ -508,6 +508,3 @@ export class TDFUtils {
     }
   }
 }
-
-// Export types for use in other modules
-export type { TDFMetadata, TDFPlayer, ValidationResult, ParsedTDF };

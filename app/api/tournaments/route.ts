@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { TournamentType, CreateTournamentRequest } from '@/lib/types/tournament';
+import { TournamentType, CreateTournamentRequest, ErrorCodes } from '@/lib/types/tournament';
 import { z } from 'zod';
+import {
+  withErrorHandling,
+  generateRequestId,
+  handleValidationError,
+  handleSupabaseError,
+  handleAuthError,
+  handleForbiddenError,
+  createErrorResponse,
+  validateAuthentication,
+  validateUserRole
+} from '@/lib/utils/api-error-handler';
+import {
+  createTournamentListResponse,
+  createTournamentResponse,
+  validatePaginationParams,
+  validateSearchParams
+} from '@/lib/utils/api-response-formatter';
 
 // Validation schema for tournament creation
 const createTournamentSchema = z.object({
@@ -18,199 +35,169 @@ const createTournamentSchema = z.object({
 });
 
 // GET /api/tournaments - List tournaments with filtering and pagination
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const { searchParams } = new URL(request.url);
-    
-    // Get query parameters
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50);
-    const offset = (page - 1) * limit;
-    
-    const search = searchParams.get('search');
-    const city = searchParams.get('city');
-    const country = searchParams.get('country');
-    const tournament_type = searchParams.get('tournament_type');
-    const status = searchParams.get('status');
-    const date_from = searchParams.get('date_from');
-    const date_to = searchParams.get('date_to');
+export const GET = withErrorHandling(async (request: NextRequest) => {
+  const requestId = generateRequestId();
+  const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+  
+  // Validate and format pagination parameters
+  const { page, limit, offset } = validatePaginationParams(searchParams);
+  
+  // Validate and format search parameters
+  const searchFilters = validateSearchParams(searchParams);
 
-    // Build query
-    let query = supabase
-      .from('tournaments')
-      .select(`
-        *,
-        organizer:user_profiles!tournaments_organizer_id_fkey(
-          first_name,
-          last_name,
-          organization_name
-        )
-      `)
-      .order('start_date', { ascending: false });
+  // Build query with consistent field selection
+  let query = supabase
+    .from('tournaments')
+    .select(`
+      *,
+      organizer:user_profiles!tournaments_organizer_id_fkey(
+        first_name,
+        last_name,
+        organization_name
+      )
+    `, { count: 'exact' })
+    .order('start_date', { ascending: false });
 
-    // Apply filters
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%`);
+  // Apply filters with proper validation
+  if (searchFilters.query) {
+    const searchTerm = searchFilters.query.trim();
+    if (searchTerm.length >= 2) {
+      query = query.or(`name.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%,country.ilike.%${searchTerm}%`);
     }
-    
-    if (city) {
-      query = query.eq('city', city);
-    }
-    
-    if (country) {
-      query = query.eq('country', country);
-    }
-    
-    if (tournament_type) {
-      query = query.eq('tournament_type', tournament_type);
-    }
-    
-    if (status) {
-      query = query.eq('status', status);
-    }
-    
-    if (date_from) {
-      query = query.gte('start_date', date_from);
-    }
-    
-    if (date_to) {
-      query = query.lte('start_date', date_to);
-    }
-
-    // Apply pagination
-    query = query.range(offset, offset + limit - 1);
-
-    const { data: tournaments, error, count } = await query;
-
-    if (error) {
-      console.error('Error fetching tournaments:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch tournaments', details: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      tournaments: tournaments || [],
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        hasMore: (count || 0) > offset + limit
-      }
-    });
-
-  } catch (error) {
-    console.error('Unexpected error in GET /api/tournaments:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
   }
-}
+  
+  if (searchFilters.city) {
+    query = query.eq('city', searchFilters.city);
+  }
+  
+  if (searchFilters.country) {
+    query = query.eq('country', searchFilters.country);
+  }
+  
+  if (searchFilters.tournament_type) {
+    query = query.eq('tournament_type', searchFilters.tournament_type);
+  }
+  
+  if (searchFilters.status) {
+    query = query.eq('status', searchFilters.status);
+  }
+  
+  if (searchFilters.date_from) {
+    query = query.gte('start_date', searchFilters.date_from);
+  }
+  
+  if (searchFilters.date_to) {
+    query = query.lte('start_date', searchFilters.date_to);
+  }
+
+  if (searchFilters.organizer_id) {
+    query = query.eq('organizer_id', searchFilters.organizer_id);
+  }
+
+  // Apply pagination
+  query = query.range(offset, offset + limit - 1);
+
+  const { data: tournaments, error, count } = await query;
+
+  if (error) {
+    return handleSupabaseError(error, 'búsqueda de torneos', requestId);
+  }
+
+  return createTournamentListResponse(
+    tournaments || [],
+    count || 0,
+    page,
+    limit,
+    'Torneos obtenidos exitosamente',
+    requestId
+  );
+});
 
 // POST /api/tournaments - Create a new tournament
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
+  const requestId = generateRequestId();
+  const supabase = await createClient();
+  
+  // Validate authentication
+  const authResult = await validateAuthentication(supabase, requestId);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+  const { user } = authResult;
+
+  // Validate user role
+  const roleResult = await validateUserRole(supabase, user.id as string, 'organizer', requestId);
+  if (roleResult instanceof NextResponse) {
+    return roleResult;
+  }
+
+  // Parse and validate request body
+  const body = await request.json();
+  let validatedData: z.infer<typeof createTournamentSchema>;
+  
   try {
-    const supabase = await createClient();
-    
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
-    // Get user profile to check role
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('user_role')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
-    }
-
-    // Check if user is an organizer
-    if (profile.user_role !== 'organizer') {
-      return NextResponse.json(
-        { error: 'Only organizers can create tournaments' },
-        { status: 403 }
-      );
-    }
-
-    // Parse and validate request body
-    const body = await request.json();
-    const validatedData = createTournamentSchema.parse(body);
-
-    // Check for duplicate official tournament ID
-    const { data: existingTournament, error: duplicateError } = await supabase
-      .from('tournaments')
-      .select('id')
-      .eq('official_tournament_id', validatedData.official_tournament_id)
-      .single();
-
-    if (existingTournament) {
-      return NextResponse.json(
-        { error: 'Tournament with this official ID already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Create tournament
-    const tournamentData = {
-      ...validatedData,
-      organizer_id: user.id,
-      status: 'upcoming',
-      current_players: 0,
-      registration_open: true,
-    };
-
-    const { data: tournament, error: createError } = await supabase
-      .from('tournaments')
-      .insert([tournamentData])
-      .select(`
-        *,
-        organizer:user_profiles!tournaments_organizer_id_fkey(
-          first_name,
-          last_name,
-          organization_name
-        )
-      `)
-      .single();
-
-    if (createError) {
-      console.error('Error creating tournament:', createError);
-      return NextResponse.json(
-        { error: 'Failed to create tournament', details: createError.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(
-      { tournament, message: 'Tournament created successfully' },
-      { status: 201 }
-    );
-
+    validatedData = createTournamentSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation error', details: error.issues },
-        { status: 400 }
-      );
+      return handleValidationError(error, requestId);
     }
+    throw error;
+  }
 
-    console.error('Unexpected error in POST /api/tournaments:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+  // Check for duplicate official tournament ID
+  const { data: existingTournament, error: duplicateError } = await supabase
+    .from('tournaments')
+    .select('id')
+    .eq('official_tournament_id', validatedData.official_tournament_id)
+    .single();
+
+  if (duplicateError && duplicateError.code !== 'PGRST116') {
+    return handleSupabaseError(duplicateError, 'verificación de duplicados', requestId);
+  }
+
+  if (existingTournament) {
+    return createErrorResponse(
+      ErrorCodes.DUPLICATE_TOURNAMENT_ID,
+      'Ya existe un torneo con este ID oficial',
+      undefined,
+      'official_tournament_id',
+      requestId
     );
   }
-}
+
+  // Create tournament with consistent data structure
+  const tournamentData = {
+    ...validatedData,
+    organizer_id: user.id,
+    status: 'upcoming',
+    current_players: 0,
+    registration_open: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const { data: tournament, error: createError } = await supabase
+    .from('tournaments')
+    .insert([tournamentData])
+    .select(`
+      *,
+      organizer:user_profiles!tournaments_organizer_id_fkey(
+        first_name,
+        last_name,
+        organization_name
+      )
+    `)
+    .single();
+
+  if (createError) {
+    return handleSupabaseError(createError, 'creación de torneo', requestId);
+  }
+
+  return createTournamentResponse(
+    tournament,
+    'Torneo creado exitosamente',
+    201,
+    requestId
+  );
+});

@@ -4,7 +4,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useLanguage } from './useLanguage';
-import { SupportedLanguage } from '../types';
 import { getCachedTranslation, setCachedTranslation, preloadTranslations } from '../utils/cache';
 import { loadLocaleModule } from '../utils/lazy-loader';
 

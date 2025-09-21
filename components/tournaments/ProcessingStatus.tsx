@@ -1,11 +1,16 @@
 'use client';
 
+// React
 import { useState, useEffect, useCallback } from 'react';
+
+// UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+
+// Icons
 import { 
   Play, 
   Pause, 
@@ -17,25 +22,50 @@ import {
   RefreshCw,
   X
 } from 'lucide-react';
-import { backgroundJobManager, type ProcessingJob, type JobProgress } from '@/lib/utils/background-jobs';
+
+// Hooks
 import { useTypedTranslation } from '@/lib/i18n';
+
+// Types
+import { backgroundJobManager, type ProcessingJob, type JobProgress } from '@/lib/utils/background-jobs';
+import { UserRole, LoadingState } from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  STATUS_TRANSLATIONS
+} from '@/lib/utils/tournament-status';
 
 interface ProcessingStatusProps {
   tournamentId: string;
   fileId?: string;
   onProcessingComplete?: (result: any) => void;
+  userRole?: UserRole;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export function ProcessingStatus({ 
   tournamentId, 
   fileId, 
-  onProcessingComplete 
+  onProcessingComplete,
+  userRole = UserRole.ORGANIZER,
+  loading = false,
+  error: externalError = null
 }: ProcessingStatusProps) {
+  // Hooks
   const { tCommon, tTournaments } = useTypedTranslation();
+  const { formatDateTime } = useTournamentFormatting();
+  
+  // State
   const [jobs, setJobs] = useState<ProcessingJob[]>([]);
   const [activeJob, setActiveJob] = useState<ProcessingJob | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Use external error if provided
+  const currentError = externalError || error;
 
   // Load existing jobs
   const loadJobs = useCallback(async () => {
@@ -161,6 +191,7 @@ export function ProcessingStatus({
     loadJobs();
   }, [loadJobs]);
 
+  // Use centralized status management for processing jobs
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'text-green-600';
@@ -181,16 +212,42 @@ export function ProcessingStatus({
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Completado';
+      case 'failed': return 'Fallido';
+      case 'processing': return 'Procesando';
+      case 'pending': return 'Pendiente';
+      default: return status;
+    }
   };
+
+  // Render loading state
+  const renderLoadingState = () => (
+    <div className="space-y-4" role="status" aria-label="Cargando estado de procesamiento">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Play className="h-5 w-5" />
+            <span>Estado de Procesamiento</span>
+          </CardTitle>
+          <CardDescription>
+            Procesa archivos TDF y genera reportes de torneos
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+      <span className="sr-only">Cargando estado de procesamiento...</span>
+    </div>
+  );
+
+  if (loading) return renderLoadingState();
 
   return (
     <div className="space-y-4">
@@ -199,18 +256,18 @@ export function ProcessingStatus({
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Play className="h-5 w-5" />
-            <span>{tTournaments('processing.title')}</span>
+            <span>Estado de Procesamiento</span>
           </CardTitle>
           <CardDescription>
-            {tTournaments('processing.description')}
+            Procesa archivos TDF y genera reportes de torneos
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Error Display */}
-          {error && (
-            <Alert variant="destructive">
+          {currentError && (
+            <Alert variant="destructive" role="alert">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
+              <AlertDescription>{currentError}</AlertDescription>
             </Alert>
           )}
 
@@ -221,7 +278,7 @@ export function ProcessingStatus({
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(activeJob.status)}
                   <span className={`font-medium ${getStatusColor(activeJob.status)}`}>
-                    {tTournaments(`processing.status.${activeJob.status}`)}
+                    {getStatusText(activeJob.status)}
                   </span>
                 </div>
                 
@@ -230,9 +287,10 @@ export function ProcessingStatus({
                     size="sm"
                     variant="outline"
                     onClick={cancelProcessing}
+                    aria-label="Cancelar procesamiento"
                   >
                     <X className="h-4 w-4 mr-1" />
-                    {tCommon('buttons.cancel')}
+                    Cancelar
                   </Button>
                 )}
               </div>
@@ -240,8 +298,8 @@ export function ProcessingStatus({
               {activeJob.status === 'processing' && (
                 <div className="space-y-2">
                   <Progress value={activeJob.progress} className="h-3" />
-                  <p className="text-sm text-gray-600">
-                    {tTournaments('processing.progress', { progress: activeJob.progress })}
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Progreso: {activeJob.progress}%
                   </p>
                 </div>
               )}
@@ -274,7 +332,7 @@ export function ProcessingStatus({
           )}
 
           {!fileId && (
-            <Alert>
+            <Alert role="status">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 Selecciona un archivo TDF para procesar
@@ -290,18 +348,19 @@ export function ProcessingStatus({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Historial de Procesamiento</span>
-              <Button size="sm" variant="outline" onClick={loadJobs}>
+              <Button size="sm" variant="outline" onClick={loadJobs} aria-label="Actualizar historial">
                 <RefreshCw className="h-4 w-4 mr-1" />
                 Actualizar
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-3" role="list" aria-label="Historial de trabajos de procesamiento">
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg"
+                  role="listitem"
                 >
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(job.status)}
@@ -316,13 +375,13 @@ export function ProcessingStatus({
                         >
                           {job.status}
                         </Badge>
-                        <span className="text-sm text-gray-600">
-                          {formatDate(job.started_at)}
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {formatDateTime(job.started_at || '')}
                         </span>
                       </div>
                       
                       {job.result_data && (
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {job.result_data.participants} participantes, {' '}
                           {job.result_data.matches} partidas, {' '}
                           {job.result_data.results} resultados
@@ -342,7 +401,8 @@ export function ProcessingStatus({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(job.result_data.reportUrl, '_blank')}
+                        onClick={() => job.result_data?.reportUrl && window.open(job.result_data.reportUrl, '_blank')}
+                        aria-label="Ver reporte del torneo"
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         Ver Reporte

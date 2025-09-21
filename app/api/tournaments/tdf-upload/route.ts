@@ -1,142 +1,166 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TDFParser, TDFUtils } from '@/lib/tdf';
-import { TournamentType } from '@/lib/types/tournament';
+import { TournamentType, ErrorCodes, TDFImportReport } from '@/lib/types/tournament';
+import {
+  withErrorHandling,
+  generateRequestId,
+  handleSupabaseError,
+  handleFileUploadError,
+  validateAuthentication,
+  validateUserRole,
+  createErrorResponse
+} from '@/lib/utils/api-error-handler';
+import {
+  createTournamentResponse
+} from '@/lib/utils/api-response-formatter';
 
 // POST /api/tournaments/tdf-upload - Create tournament from TDF file
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling(async (request: NextRequest) => {
+  const requestId = generateRequestId();
+  const supabase = await createClient();
+  
+  // Validate authentication
+  const authResult = await validateAuthentication(supabase, requestId);
+  if (authResult instanceof NextResponse) {
+    return authResult;
+  }
+  const { user } = authResult;
+
+  // Validate user role
+  const roleResult = await validateUserRole(supabase, user.id as string, 'organizer', requestId);
+  if (roleResult instanceof NextResponse) {
+    return roleResult;
+  }
+
+  // Parse form data
+  const formData = await request.formData();
+  const file = formData.get('tdf') as File;
+
+  if (!file) {
+    return createErrorResponse(
+      ErrorCodes.VALIDATION_ERROR,
+      'No se proporcionó archivo TDF',
+      undefined,
+      'file',
+      requestId
+    );
+  }
+
+  // Validate file extension
+  if (!file.name.toLowerCase().endsWith('.tdf')) {
+    return createErrorResponse(
+      ErrorCodes.INVALID_FILE_FORMAT,
+      'El archivo debe tener extensión .tdf',
+      { provided_extension: file.name.split('.').pop() },
+      'file',
+      requestId
+    );
+  }
+
+  // Validate file size (10MB limit)
+  if (file.size > 10 * 1024 * 1024) {
+    return createErrorResponse(
+      ErrorCodes.UPLOAD_ERROR,
+      'Archivo demasiado grande (máximo 10MB)',
+      { file_size: file.size, max_size: 10 * 1024 * 1024 },
+      'file',
+      requestId
+    );
+  }
+
+  // Read file content
+  const fileContent = await file.text();
+
+  // Parse and validate TDF
+  let parsedTDF;
   try {
-    const supabase = await createClient();
-    
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    parsedTDF = TDFParser.parse(fileContent);
+  } catch (error) {
+    return createErrorResponse(
+      ErrorCodes.INVALID_FILE_FORMAT,
+      'Archivo TDF inválido',
+      { 
+        parsing_error: error instanceof Error ? error.message : 'Error de análisis desconocido',
+        file_name: file.name
+      },
+      'file',
+      requestId
+    );
+  }
 
-    // Get user profile to check role
-    const { data: profile, error: profileError } = await supabase
-      .from('user_profiles')
-      .select('user_role')
-      .eq('id', user.id)
-      .single();
+  // Check compatibility
+  const compatibility = TDFParser.isCompatible(fileContent);
+  if (!compatibility.compatible) {
+    return createErrorResponse(
+      ErrorCodes.INVALID_FILE_FORMAT,
+      'Archivo TDF no compatible',
+      { 
+        reason: compatibility.reason,
+        file_name: file.name
+      },
+      'file',
+      requestId
+    );
+  }
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
-    }
+  const { metadata, players } = parsedTDF;
 
-    // Check if user is an organizer
-    if (profile.user_role !== 'organizer') {
-      return NextResponse.json(
-        { error: 'Only organizers can upload TDF files' },
-        { status: 403 }
-      );
-    }
+  // Map tournament type
+  let tournamentType: TournamentType;
+  try {
+    tournamentType = TDFParser.mapTournamentType(metadata.gametype, metadata.mode);
+  } catch (error) {
+    return createErrorResponse(
+      ErrorCodes.INVALID_FILE_FORMAT,
+      'Tipo de torneo no soportado',
+      { 
+        gametype: metadata.gametype,
+        mode: metadata.mode,
+        supported_types: Object.values(TournamentType)
+      },
+      'tournament_type',
+      requestId
+    );
+  }
 
-    // Parse form data
-    const formData = await request.formData();
-    const file = formData.get('tdf') as File;
+  // Check for duplicate tournament ID
+  const { data: existingTournament, error: duplicateError } = await supabase
+    .from('tournaments')
+    .select('id')
+    .eq('official_tournament_id', metadata.id)
+    .single();
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No TDF file provided' },
-        { status: 400 }
-      );
-    }
+  if (duplicateError && duplicateError.code !== 'PGRST116') {
+    return handleSupabaseError(duplicateError, 'verificación de duplicados', requestId);
+  }
 
-    // Validate file
-    if (!file.name.toLowerCase().endsWith('.tdf')) {
-      return NextResponse.json(
-        { error: 'File must have .tdf extension' },
-        { status: 400 }
-      );
-    }
+  if (existingTournament) {
+    return createErrorResponse(
+      ErrorCodes.DUPLICATE_TOURNAMENT_ID,
+      'Ya existe un torneo con este ID oficial',
+      { official_tournament_id: metadata.id },
+      'official_tournament_id',
+      requestId
+    );
+  }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      return NextResponse.json(
-        { error: 'File too large (maximum 10MB)' },
-        { status: 400 }
-      );
-    }
-
-    // Read file content
-    const fileContent = await file.text();
-
-    // Parse and validate TDF
-    let parsedTDF;
-    try {
-      parsedTDF = TDFParser.parse(fileContent);
-    } catch (error) {
-      return NextResponse.json(
-        { 
-          error: 'Invalid TDF file', 
-          details: error instanceof Error ? error.message : 'Unknown parsing error'
-        },
-        { status: 400 }
-      );
-    }
-
-    // Check compatibility
-    const compatibility = TDFParser.isCompatible(fileContent);
-    if (!compatibility.compatible) {
-      return NextResponse.json(
-        { 
-          error: 'TDF file not compatible', 
-          details: compatibility.reason 
-        },
-        { status: 400 }
-      );
-    }
-
-    const { metadata, players } = parsedTDF;
-
-    // Map tournament type
-    let tournamentType: TournamentType;
-    try {
-      tournamentType = TDFParser.mapTournamentType(metadata.gametype, metadata.mode);
-    } catch (error) {
-      return NextResponse.json(
-        { 
-          error: 'Unsupported tournament type', 
-          details: `${metadata.gametype}:${metadata.mode}` 
-        },
-        { status: 400 }
-      );
-    }
-
-    // Check for duplicate tournament ID
-    const { data: existingTournament } = await supabase
-      .from('tournaments')
-      .select('id')
-      .eq('official_tournament_id', metadata.id)
-      .single();
-
-    if (existingTournament) {
-      return NextResponse.json(
-        { error: 'Tournament with this official ID already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Convert TDF date to ISO format
-    let startDate: string;
-    try {
-      startDate = TDFUtils.convertTDFDateToISO(metadata.startdate);
-    } catch (error) {
-      return NextResponse.json(
-        { 
-          error: 'Invalid start date format in TDF', 
-          details: metadata.startdate 
-        },
-        { status: 400 }
-      );
-    }
+  // Convert TDF date to ISO format
+  let startDate: string;
+  try {
+    startDate = TDFUtils.convertTDFDateToISO(metadata.startdate);
+  } catch (error) {
+    return createErrorResponse(
+      ErrorCodes.INVALID_FILE_FORMAT,
+      'Formato de fecha de inicio inválido en TDF',
+      { 
+        provided_date: metadata.startdate,
+        expected_format: 'MM/DD/YYYY'
+      },
+      'start_date',
+      requestId
+    );
+  }
 
     // Store original TDF file in Supabase Storage
     const fileName = `${metadata.id}_original.tdf`;
@@ -195,8 +219,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (createError) {
-      console.error('Error creating tournament:', createError);
-      
       // Clean up uploaded file if tournament creation failed
       if (!storageError) {
         await supabase.storage
@@ -204,53 +226,122 @@ export async function POST(request: NextRequest) {
           .remove([filePath]);
       }
       
-      return NextResponse.json(
-        { error: 'Failed to create tournament', details: createError.message },
-        { status: 500 }
-      );
+      return handleSupabaseError(createError, 'creación de torneo desde TDF', requestId);
     }
 
-    // If TDF has players, create participant records
+    // Process TDF players - only import those with existing accounts
+    let importReport: TDFImportReport = {
+      total_participants: players.length,
+      imported_participants: 0,
+      skipped_participants: 0,
+      skipped_users: [],
+      imported_users: []
+    };
+
     if (players.length > 0) {
-      const participantData = players.map(player => ({
-        tournament_id: tournament.id,
-        user_id: null, // TDF players don't have user accounts initially
-        player_name: `${player.firstname} ${player.lastname}`.trim(),
-        player_id: player.userid,
-        player_birthdate: TDFUtils.convertTDFDateToISO(player.birthdate),
-        registration_date: TDFUtils.convertTDFDateToISO(player.creationdate),
-        registration_source: 'tdf',
-        status: player.dropped ? 'dropped' : 'confirmed',
-        tdf_userid: player.userid
-      }));
+      // Find existing users by player_id
+      const playerIds = players.map(p => p.userid).filter(Boolean);
+      
+      const { data: existingUsers, error: usersError } = await supabase
+        .from('user_profiles')
+        .select('id, player_id, first_name, last_name')
+        .in('player_id', playerIds);
 
-      const { error: participantsError } = await supabase
-        .from('tournament_participants')
-        .insert(participantData);
+      if (usersError) {
+        console.error('Error fetching existing users:', usersError);
+      }
 
-      if (participantsError) {
-        console.error('Error creating participants:', participantsError);
-        // Don't fail the tournament creation, just log the error
+      const userMap = new Map();
+      (existingUsers || []).forEach(user => {
+        if (user.player_id) {
+          userMap.set(user.player_id, user);
+        }
+      });
+
+      const participantsToImport = [];
+
+      for (const player of players) {
+        const playerName = `${player.firstname} ${player.lastname}`.trim();
+        
+        if (!player.userid) {
+          importReport.skipped_users.push({
+            player_name: playerName,
+            player_id: '', // No player_id available
+            player_birthdate: player.birthdate || '',
+            reason: 'invalid_data'
+          });
+          importReport.skipped_participants++;
+          continue;
+        }
+
+        const existingUser = userMap.get(player.userid);
+        
+        if (!existingUser) {
+          importReport.skipped_users.push({
+            player_name: playerName,
+            player_id: player.userid,
+            player_birthdate: player.birthdate || '',
+            reason: 'no_account'
+          });
+          importReport.skipped_participants++;
+          continue;
+        }
+
+        // User exists, add to import list
+        participantsToImport.push({
+          tournament_id: tournament.id,
+          user_id: existingUser.id,
+          player_name: playerName,
+          player_id: player.userid,
+          registration_date: TDFUtils.convertTDFDateToISO(player.creationdate),
+          status: player.dropped ? 'dropped' : 'registered'
+        });
+
+        importReport.imported_users.push({
+          player_name: playerName,
+          player_id: player.userid,
+          player_birthdate: player.birthdate || '',
+          user_id: existingUser.id
+        });
+        importReport.imported_participants++;
+      }
+
+      // Insert participants that have accounts
+      if (participantsToImport.length > 0) {
+        const { error: participantsError } = await supabase
+          .from('tournament_participants')
+          .insert(participantsToImport);
+
+        if (participantsError) {
+          console.error('Error creating participants:', participantsError);
+          return handleSupabaseError(participantsError, 'creación de participantes', requestId);
+        }
+
+        // Update tournament player count
+        await supabase
+          .from('tournaments')
+          .update({ 
+            current_players: participantsToImport.length,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', tournament.id);
       }
     }
 
     return NextResponse.json({
-      tournament,
-      metadata: {
-        original_filename: file.name,
-        players_imported: players.length,
-        is_empty: players.length === 0,
-        tournament_type: tournamentType,
-        file_stored: !storageError
+      data: {
+        tournament,
+        import_report: importReport,
+        metadata: {
+          original_filename: file.name,
+          tournament_type: tournamentType,
+          file_stored: !storageError
+        }
       },
-      message: 'Tournament created successfully from TDF file'
+      message: importReport.skipped_participants > 0 
+        ? `Torneo creado. Se importaron ${importReport.imported_participants} de ${importReport.total_participants} participantes.`
+        : 'Torneo creado exitosamente desde archivo TDF',
+      timestamp: new Date().toISOString(),
+      request_id: requestId
     }, { status: 201 });
-
-  } catch (error) {
-    console.error('Unexpected error in TDF upload:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+});

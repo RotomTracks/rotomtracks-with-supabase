@@ -1,6 +1,6 @@
 /**
  * Tournament Formatting Utilities
- * 
+ *
  * Centralized formatting functions for tournaments that handle:
  * - TDF to Web date conversion (MM/DD/YYYY <-> ISO)
  * - Consistent date/time formatting using existing i18n system
@@ -8,7 +8,7 @@
  * - Error handling and validation
  */
 
-import { useFormatting } from '@/lib/i18n';
+import { useFormatting } from "@/lib/i18n";
 
 // Types for TDF date conversion
 export interface TDFDateConversion {
@@ -21,16 +21,19 @@ export interface TDFDateConversion {
 // Main tournament formatters interface
 export interface TournamentFormatters {
   // Date formatting using existing useFormatting hook
-  formatDate: (date: string | Date, style?: 'short' | 'medium' | 'long') => string;
+  formatDate: (
+    date: string | Date,
+    style?: "short" | "medium" | "long"
+  ) => string;
   formatTime: (date: string | Date) => string;
   formatDateTime: (date: string | Date) => string;
   formatRelativeTime: (date: string | Date) => string;
-  
+
   // TDF-specific formatting
   formatTDFDate: (tdfDate: string) => string;
   formatPlayerName: (firstName: string, lastName: string) => string;
   formatTournamentId: (id: string) => string;
-  
+
   // Conversion utilities
   dateConversion: TDFDateConversion;
 }
@@ -46,23 +49,31 @@ export const TDFDateConversion: TDFDateConversion = {
   tdfToISO: (tdfDate: string): string => {
     try {
       if (!TDFDateConversion.validateTDFDate(tdfDate)) {
-        throw new Error(`Invalid TDF date format: ${tdfDate}. Expected MM/DD/YYYY`);
+        throw new Error(
+          `Invalid TDF date format: ${tdfDate}. Expected MM/DD/YYYY`
+        );
       }
 
-      const [month, day, year] = tdfDate.split('/').map(Number);
+      const [month, day, year] = tdfDate.split("/").map(Number);
       const date = new Date(year, month - 1, day);
-      
+
       // Validate the constructed date
-      if (date.getFullYear() !== year || 
-          date.getMonth() !== month - 1 || 
-          date.getDate() !== day) {
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) {
         throw new Error(`Invalid date values in TDF date: ${tdfDate}`);
       }
-      
+
       return date.toISOString();
     } catch (error) {
-      console.error('TDF to ISO conversion error:', error);
-      throw new Error(`Failed to convert TDF date "${tdfDate}" to ISO: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("TDF to ISO conversion error:", error);
+      throw new Error(
+        `Failed to convert TDF date "${tdfDate}" to ISO: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   },
 
@@ -76,19 +87,23 @@ export const TDFDateConversion: TDFDateConversion = {
       }
 
       const date = new Date(isoDate);
-      
+
       if (isNaN(date.getTime())) {
         throw new Error(`Invalid date value: ${isoDate}`);
       }
 
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = date.getDate().toString().padStart(2, "0");
       const year = date.getFullYear().toString();
-      
+
       return `${month}/${day}/${year}`;
     } catch (error) {
-      console.error('ISO to TDF conversion error:', error);
-      throw new Error(`Failed to convert ISO date "${isoDate}" to TDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("ISO to TDF conversion error:", error);
+      throw new Error(
+        `Failed to convert ISO date "${isoDate}" to TDF: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   },
 
@@ -96,19 +111,21 @@ export const TDFDateConversion: TDFDateConversion = {
    * Validate TDF date format (MM/DD/YYYY)
    */
   validateTDFDate: (date: string): boolean => {
-    if (!date || typeof date !== 'string') return false;
-    
+    if (!date || typeof date !== "string") return false;
+
     const regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/;
     if (!regex.test(date)) return false;
-    
+
     try {
-      const [month, day, year] = date.split('/').map(Number);
+      const [month, day, year] = date.split("/").map(Number);
       const dateObj = new Date(year, month - 1, day);
-      
-      return dateObj.getFullYear() === year &&
-             dateObj.getMonth() === month - 1 &&
-             dateObj.getDate() === day &&
-             dateObj <= new Date(); // Don't allow future dates beyond reasonable limits
+
+      return (
+        dateObj.getFullYear() === year &&
+        dateObj.getMonth() === month - 1 &&
+        dateObj.getDate() === day &&
+        dateObj <= new Date()
+      ); // Don't allow future dates beyond reasonable limits
     } catch {
       return false;
     }
@@ -118,15 +135,15 @@ export const TDFDateConversion: TDFDateConversion = {
    * Validate ISO date format
    */
   validateISODate: (date: string): boolean => {
-    if (!date || typeof date !== 'string') return false;
-    
+    if (!date || typeof date !== "string") return false;
+
     try {
       const dateObj = new Date(date);
       return !isNaN(dateObj.getTime()) && dateObj.toISOString() === date;
     } catch {
       return false;
     }
-  }
+  },
 };
 
 /**
@@ -139,13 +156,13 @@ export const TDFFormatters = {
   formatTDFDate: (tdfDate: string): string => {
     try {
       const isoDate = TDFDateConversion.tdfToISO(tdfDate);
-      return new Date(isoDate).toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      return new Date(isoDate).toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     } catch (error) {
-      console.error('TDF date formatting error:', error);
+      console.error("TDF date formatting error:", error);
       return tdfDate; // Return original if conversion fails
     }
   },
@@ -154,13 +171,13 @@ export const TDFFormatters = {
    * Format player name consistently
    */
   formatPlayerName: (firstName: string, lastName: string): string => {
-    const first = firstName?.trim() || '';
-    const last = lastName?.trim() || '';
-    
-    if (!first && !last) return 'Nombre no disponible';
+    const first = firstName?.trim() || "";
+    const last = lastName?.trim() || "";
+
+    if (!first && !last) return "Nombre no disponible";
     if (!first) return last;
     if (!last) return first;
-    
+
     return `${first} ${last}`;
   },
 
@@ -168,84 +185,89 @@ export const TDFFormatters = {
    * Format tournament ID (YY-MM-XXXXXX)
    */
   formatTournamentId: (id: string): string => {
-    if (!id || typeof id !== 'string') return 'ID no válido';
-    
+    if (!id || typeof id !== "string") return "ID no válido";
+
     const regex = /^\d{2}-\d{2}-\d{6}$/;
     if (!regex.test(id)) {
-      console.warn(`Invalid tournament ID format: ${id}. Expected YY-MM-XXXXXX`);
+      console.warn(
+        `Invalid tournament ID format: ${id}. Expected YY-MM-XXXXXX`
+      );
       return id; // Return as-is if format is wrong
     }
-    
+
     return id.toUpperCase();
   },
 
-  /**
-   * Generate a new tournament ID
-   */
-  generateTournamentId: (date: Date = new Date()): string => {
-    const year = date.getFullYear().toString().slice(-2);
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const sequence = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-    
-    return `${year}-${month}-${sequence}`;
-  }
+  // Note: official_tournament_id comes from TDF files, not generated
 };
 
 /**
- * Hook-based tournament formatters that use the existing i18n system
- * This should be used in React components
+ * React hook for tournament formatting utilities
+ *
+ * Provides access to all tournament formatting functions with proper
+ * internationalization support. Use this in React components.
+ *
+ * @returns Tournament formatting utilities
+ * @example
+ * ```typescript
+ * const { formatDate, formatTime, formatTDFDate } = useTournamentFormatting();
+ * const formattedDate = formatDate(tournament.start_date);
+ * ```
  */
 export function useTournamentFormatting(): TournamentFormatters {
   const formatting = useFormatting();
 
   return {
     // Delegate to existing i18n formatting functions
-    formatDate: (date: string | Date, style: 'short' | 'medium' | 'long' = 'medium') => {
+    formatDate: (
+      date: string | Date,
+      style: "short" | "medium" | "long" = "medium"
+    ) => {
       try {
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
-        
+        const dateObj = typeof date === "string" ? new Date(date) : date;
+
         switch (style) {
-          case 'short':
+          case "short":
             return formatting.formatShortDate(dateObj);
-          case 'long':
+          case "long":
             return formatting.formatLongDate(dateObj);
-          case 'medium':
+          case "medium":
           default:
             return formatting.formatDate(dateObj);
         }
       } catch (error) {
-        console.error('Date formatting error:', error);
-        return 'Fecha inválida';
+        console.error("Date formatting error:", error);
+        return "Fecha inválida";
       }
     },
 
     formatTime: (date: string | Date) => {
       try {
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        const dateObj = typeof date === "string" ? new Date(date) : date;
         return formatting.formatTime(dateObj);
       } catch (error) {
-        console.error('Time formatting error:', error);
-        return 'Hora inválida';
+        console.error("Time formatting error:", error);
+        return "Hora inválida";
       }
     },
 
     formatDateTime: (date: string | Date) => {
       try {
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        const dateObj = typeof date === "string" ? new Date(date) : date;
         return formatting.formatDateTime(dateObj);
       } catch (error) {
-        console.error('DateTime formatting error:', error);
-        return 'Fecha y hora inválida';
+        console.error("DateTime formatting error:", error);
+        return "Fecha y hora inválida";
       }
     },
 
     formatRelativeTime: (date: string | Date) => {
       try {
-        const dateObj = typeof date === 'string' ? new Date(date) : date;
+        const dateObj = typeof date === "string" ? new Date(date) : date;
         return formatting.formatRelativeTime(dateObj);
       } catch (error) {
-        console.error('Relative time formatting error:', error);
-        return 'Tiempo inválido';
+        console.error("Relative time formatting error:", error);
+        return "Tiempo inválido";
       }
     },
 
@@ -255,7 +277,7 @@ export function useTournamentFormatting(): TournamentFormatters {
     formatTournamentId: TDFFormatters.formatTournamentId,
 
     // Conversion utilities
-    dateConversion: TDFDateConversion
+    dateConversion: TDFDateConversion,
   };
 }
 
@@ -265,63 +287,73 @@ export function useTournamentFormatting(): TournamentFormatters {
  */
 export const TournamentFormatting = {
   // Date formatting with default Spanish locale
-  formatDate: (date: string | Date, style: 'short' | 'medium' | 'long' = 'medium'): string => {
+  formatDate: (
+    date: string | Date,
+    style: "short" | "medium" | "long" = "medium"
+  ): string => {
     try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+
       if (isNaN(dateObj.getTime())) {
-        throw new Error('Invalid date');
+        throw new Error("Invalid date");
       }
 
-      const options: Intl.DateTimeFormatOptions = {
-        short: { year: 'numeric', month: '2-digit', day: '2-digit' },
-        medium: { year: 'numeric', month: 'long', day: 'numeric' },
-        long: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }
-      }[style];
+      const optionsMap: Record<string, Intl.DateTimeFormatOptions> = {
+        short: { year: "numeric", month: "2-digit", day: "2-digit" },
+        medium: { year: "numeric", month: "long", day: "numeric" },
+        long: {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "long",
+        },
+      };
+      
+      const options: Intl.DateTimeFormatOptions = optionsMap[style];
 
-      return new Intl.DateTimeFormat('es-ES', options).format(dateObj);
+      return new Intl.DateTimeFormat("es-ES", options).format(dateObj);
     } catch (error) {
-      console.error('Date formatting error:', error);
-      return 'Fecha inválida';
+      console.error("Date formatting error:", error);
+      return "Fecha inválida";
     }
   },
 
   formatTime: (date: string | Date): string => {
     try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+
       if (isNaN(dateObj.getTime())) {
-        throw new Error('Invalid date');
+        throw new Error("Invalid date");
       }
 
-      return new Intl.DateTimeFormat('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      return new Intl.DateTimeFormat("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
       }).format(dateObj);
     } catch (error) {
-      console.error('Time formatting error:', error);
-      return 'Hora inválida';
+      console.error("Time formatting error:", error);
+      return "Hora inválida";
     }
   },
 
   formatDateTime: (date: string | Date): string => {
     try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+
       if (isNaN(dateObj.getTime())) {
-        throw new Error('Invalid date');
+        throw new Error("Invalid date");
       }
 
-      return new Intl.DateTimeFormat('es-ES', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return new Intl.DateTimeFormat("es-ES", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       }).format(dateObj);
     } catch (error) {
-      console.error('DateTime formatting error:', error);
-      return 'Fecha y hora inválida';
+      console.error("DateTime formatting error:", error);
+      return "Fecha y hora inválida";
     }
   },
 
@@ -329,11 +361,10 @@ export const TournamentFormatting = {
   ...TDFFormatters,
 
   // Conversion utilities
-  dateConversion: TDFDateConversion
+  dateConversion: TDFDateConversion,
 };
 
-// Export individual utilities for specific use cases
-export { TDFDateConversion, TDFFormatters };
+// TDFFormatters and TDFDateConversion are already exported above
 
 // Export types
-export type { TDFDateConversion as TDFDateConversionType, TournamentFormatters };
+export type { TDFDateConversion as TDFDateConversionType };

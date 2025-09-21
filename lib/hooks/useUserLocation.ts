@@ -73,7 +73,7 @@ export function useUserLocation() {
           loading: false,
           hasPermission: true
         }));
-      } catch (geocodeError) {
+      } catch {
         // Fallback to just coordinates
         setState(prev => ({
           ...prev,

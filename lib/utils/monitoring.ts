@@ -25,7 +25,7 @@ export interface ErrorMetrics {
   stack_trace?: string;
   user_id?: string;
   ip_address?: string;
-  request_body?: any;
+  request_body?: Record<string, unknown>;
   timestamp: Date;
 }
 

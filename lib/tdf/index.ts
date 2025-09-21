@@ -82,5 +82,4 @@ export class TDFManager {
 }
 
 // Re-export parser and generator classes
-import { TDFParser, TDFUtils } from './parser';
-import { TDFGenerator } from './generator';
+import { TDFParser } from './parser';

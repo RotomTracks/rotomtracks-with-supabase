@@ -24,7 +24,6 @@ interface TournamentStandingsProps {
 export function TournamentStandings({
   participants,
   results,
-  tournamentStatus,
 }: TournamentStandingsProps) {
   // Create participant lookup map
   const participantMap = useMemo(() => {

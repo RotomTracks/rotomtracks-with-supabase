@@ -1,5 +1,4 @@
-// Tournament Management System Types
-// Defines all TypeScript interfaces and types for the tournament system
+
 
 export enum TournamentType {
   TCG_PRERELEASE = 'TCG Prerelease',
@@ -111,9 +110,10 @@ export interface TournamentWithOrganizer extends Tournament {
 export interface TournamentParticipant {
   id: string;
   tournament_id: string;
-  user_id: string;
+  user_id: string; // Always required - only users with accounts can participate
   player_name: string;
-  player_id: string;
+  player_id: string; // Always required - TDF always provides this
+  player_birthdate: string; // Always required - TDF always provides this
   registration_date: string;
   status: ParticipantStatus;
 }
@@ -275,7 +275,8 @@ export interface UpdateTournamentRequest {
 export interface TournamentRegistrationRequest {
   tournament_id: string;
   player_name: string;
-  player_id: string; // Format: 1-7 digits, range 1-9999999
+  player_id: string;
+  player_birthdate: string;
 }
 
 // Tournament File Upload Request
@@ -320,6 +321,25 @@ export interface ProcessTournamentResponse {
   error?: string;
 }
 
+// TDF Import Report Interface
+export interface TDFImportReport {
+  total_participants: number;
+  imported_participants: number;
+  skipped_participants: number;
+  imported_users: Array<{
+    player_name: string;
+    player_id: string; // Always required - TDF always provides this
+    player_birthdate: string; // Always required - TDF always provides this
+    user_id: string;
+  }>;
+  skipped_users: Array<{
+    player_name: string;
+    player_id: string; // Always required - TDF always provides this
+    player_birthdate: string; // Always required - TDF always provides this
+    reason: 'no_account' | 'duplicate' | 'invalid_data';
+  }>;
+}
+
 // Tournament Statistics
 export interface TournamentStatistics {
   total_tournaments: number;
@@ -348,12 +368,38 @@ export interface TournamentDashboardData {
   statistics: TournamentStatistics;
 }
 
-// API Error Response
+// API Error Response (Enhanced)
 export interface APIError {
   error: string;
   message: string;
-  code: string;
-  details?: any;
+  code: ErrorCodes;
+  details?: Record<string, unknown>;
+  field?: string;
+  timestamp: string;
+  request_id?: string;
+}
+
+// Standard API Response
+export interface APIResponse<T = unknown> {
+  data: T;
+  message?: string;
+  timestamp: string;
+  request_id?: string;
+}
+
+// Paginated API Response
+export interface PaginatedAPIResponse<T = unknown> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+    totalPages: number;
+  };
+  message?: string;
+  timestamp: string;
+  request_id?: string;
 }
 
 // Common error codes
@@ -651,8 +697,8 @@ export interface TDFParticipant {
   tournament_id: string;
   user_id: string;
   player_name: string;
-  player_id: string;
-  player_birthdate?: string; // For TDF compatibility
+  player_id: string; // Always required - TDF always provides this
+  player_birthdate: string; // Always required - TDF always provides this
   tdf_userid?: string; // TDF-specific user ID
   registration_date: string;
   registration_source: 'web' | 'tdf';
@@ -661,7 +707,7 @@ export interface TDFParticipant {
 
 // Extended Tournament interface with TDF metadata
 export interface TournamentWithTDF extends Tournament {
-  tdf_metadata?: Record<string, any>;
+  tdf_metadata?: Record<string, unknown>;
   original_tdf_file_path?: string;
   has_tdf_data: boolean;
 }
@@ -669,7 +715,7 @@ export interface TournamentWithTDF extends Tournament {
 // TDF Conversion utilities types
 export interface TDFConversionResult {
   success: boolean;
-  data?: any;
+  data?: Record<string, unknown>;
   errors: string[];
   warnings: string[];
 }

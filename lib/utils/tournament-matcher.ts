@@ -1,4 +1,5 @@
 // Tournament Matcher - Detecta automáticamente torneos existentes
+import { Tournament } from '../types/tournament';
 import { extractTournamentSummary, validateTDFFile } from './tdf-parser';
 import { createClient } from '@/lib/supabase/client';
 
@@ -86,7 +87,7 @@ export async function matchTournamentFile(
 // Evaluar qué tan probable es que un archivo corresponda a un torneo
 function evaluateTournamentMatch(
   summary: ReturnType<typeof extractTournamentSummary>,
-  tournament: any
+  tournament: Tournament
 ): TournamentMatch {
   let confidence = 0;
   const reasons: string[] = [];
@@ -263,7 +264,7 @@ export async function updateExistingTournament(
     const summary = extractTournamentSummary(fileContent);
     
     // Actualizar información del torneo si es necesario
-    const updates: any = {
+    const updates: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
 

@@ -18,10 +18,10 @@ export interface AuthError {
 
 /**
  * Authenticates a request and returns user information
- * @param request - The Next.js request object
+ * @param _request - The Next.js request object
  * @returns Promise<AuthContext | AuthError>
  */
-export async function authenticateRequest(request: NextRequest): Promise<AuthContext | AuthError> {
+export async function authenticateRequest(_request: NextRequest): Promise<AuthContext | AuthError> {
   try {
     const supabase = await createClient();
     

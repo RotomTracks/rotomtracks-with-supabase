@@ -99,7 +99,7 @@ export function useAuth(): UseAuthReturn {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event) => {
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           await fetchUserAndProfile();
         }
@@ -128,7 +128,7 @@ export function useAuth(): UseAuthReturn {
  * Hook for checking if current user has specific permissions
  */
 export function usePermissions() {
-  const { user, profile, isAuthenticated, isOrganizer, isPlayer } = useAuth();
+  const { user, profile, isAuthenticated, isOrganizer } = useAuth();
 
   const canCreateTournaments = isAuthenticated && isOrganizer;
   const canManageTournaments = isAuthenticated && isOrganizer;

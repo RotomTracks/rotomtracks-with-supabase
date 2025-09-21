@@ -11,15 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { 
   Select,
   SelectContent,
   SelectItem,
@@ -28,11 +19,7 @@ import {
 } from '@/components/ui/select';
 import { 
   Settings, 
-  Calendar, 
-  Users, 
-  MapPin,
   FileText,
-  Clock,
   Save,
   AlertCircle,
   CheckCircle,

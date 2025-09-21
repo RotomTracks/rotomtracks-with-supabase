@@ -1,12 +1,23 @@
 // HTML Report Generator - Maintains Python system styling
-import { 
-  Tournament, 
-  TournamentParticipant, 
-  TournamentMatch, 
-  TournamentResult,
-  MatchOutcome 
-} from '@/lib/types/tournament';
+import { Tournament } from '@/lib/types/tournament';
 import { PlayerResult, MatchResult } from './tdf-parser';
+// Import only the date formatting function we need
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date');
+    }
+    return new Intl.DateTimeFormat('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return 'Fecha inválida';
+  }
+};
 
 interface ReportData {
   tournament: Tournament;
@@ -74,14 +85,6 @@ export async function generateHTMLReport(data: ReportData): Promise<string> {
 }
 
 function generateHeader(tournament: Tournament): string {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   return `
     <header class="tournament-header">
         <div class="header-content">

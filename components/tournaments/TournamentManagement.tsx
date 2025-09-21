@@ -31,7 +31,7 @@ import { FileWatcher } from './FileWatcher';
 import { TournamentStatusManager } from './TournamentStatusManager';
 
 // Types
-import type { Tournament, TournamentStatus, UserRole } from '@/lib/types/tournament';
+import { Tournament, TournamentStatus, UserRole } from '@/lib/types/tournament';
 
 // Hooks
 import { useTypedTranslation } from '@/lib/i18n';
@@ -39,7 +39,6 @@ import { useTypedTranslation } from '@/lib/i18n';
 // Utilities
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
 import { 
-  TournamentStatusManager as StatusManager,
   getStatusColor,
   getStatusText
 } from '@/lib/utils/tournament-status';
@@ -70,27 +69,27 @@ export function TournamentManagement({
   tournament, 
   files, 
   stats, 
-  userRole = 'organizer' 
+  userRole = UserRole.ORGANIZER 
 }: TournamentManagementProps) {
   // Hooks
   const { tTournaments } = useTypedTranslation();
-  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  const { formatDate, formatDateTime } = useTournamentFormatting();
   
   // State
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Event handlers
-  const handleFileUpload = (fileId: string, fileName: string) => {
+  const handleFileUpload = (fileId: string, _fileName: string) => {
     setSelectedFileId(fileId);
     setRefreshKey(prev => prev + 1);
   };
 
-  const handleProcessingComplete = (result: any) => {
+  const handleProcessingComplete = (_result: any) => {
     setRefreshKey(prev => prev + 1);
   };
 
-  const handleStatusUpdate = (newStatus: string) => {
+  const handleStatusUpdate = (_newStatus: string) => {
     setRefreshKey(prev => prev + 1);
   };
 
@@ -198,8 +197,8 @@ export function TournamentManagement({
         <TabsContent value="upload" className="space-y-6">
           <SmartFileUpload
             userId={tournament.organizer_id}
-            onTournamentCreated={(id) => {}}
-            onTournamentUpdated={(id) => {}}
+            onTournamentCreated={(_id) => {}}
+            onTournamentUpdated={(_id) => {}}
           />
           
           <Card>
@@ -291,7 +290,7 @@ export function TournamentManagement({
         <TabsContent value="monitor" className="space-y-6">
           <FileWatcher
             tournamentId={tournament.id}
-            onFileUpload={(file) => {
+            onFileUpload={(_file) => {
               // Handle file upload from watcher
             }}
           />

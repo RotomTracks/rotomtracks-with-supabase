@@ -30,6 +30,8 @@ async function getTournamentData(tournamentId: string, userId: string) {
     .from('tournament_participants')
     .select(`
       id,
+      tournament_id,
+      user_id,
       player_name,
       player_id,
       player_birthdate,

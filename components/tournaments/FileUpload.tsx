@@ -1,12 +1,27 @@
 'use client';
 
+// React
 import { useCallback, useRef, useState } from 'react';
-import { Upload, File, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Icons
+import { Upload, File, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+
+// Hooks
 import { useFileUpload } from '@/hooks/use-file-upload';
+
+// Constants
 import { FILE_UPLOAD_CONFIG } from '@/lib/constants/tournament';
+
+// Types
+import { UserRole, LoadingState } from '@/lib/types/tournament';
+
+// Utilities
+import { useFormatting } from '@/lib/i18n';
 
 interface FileUploadProps {
   tournamentId: string;
@@ -16,6 +31,8 @@ interface FileUploadProps {
   maxSize?: number;
   disabled?: boolean;
   multiple?: boolean;
+  userRole?: UserRole;
+  loading?: boolean;
 }
 
 export function FileUpload({
@@ -26,7 +43,13 @@ export function FileUpload({
   maxSize = FILE_UPLOAD_CONFIG.maxSize,
   disabled = false,
   multiple = true,
+  userRole = UserRole.ORGANIZER,
+  loading = false,
 }: FileUploadProps) {
+  // Hooks
+  const { formatFileSize } = useFormatting();
+  
+  // State
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -111,6 +134,22 @@ export function FileUpload({
     }
   }, [handleFileSelect, disabled]);
 
+  // Render loading state
+  const renderLoadingState = () => (
+    <div className="space-y-4" role="status" aria-label="Cargando subida de archivos">
+      <div className="border-2 border-dashed rounded-lg p-8 text-center bg-gray-50 dark:bg-gray-800">
+        <div className="animate-pulse">
+          <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto mb-2"></div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto"></div>
+        </div>
+      </div>
+      <span className="sr-only">Cargando subida de archivos...</span>
+    </div>
+  );
+
+  if (loading) return renderLoadingState();
+
   return (
     <div className="space-y-4">
       {/* Upload Area */}
@@ -118,25 +157,28 @@ export function FileUpload({
         className={`
           border-2 border-dashed rounded-lg p-8 text-center transition-colors
           ${isDragOver 
-            ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
           }
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+          ${disabled || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         `}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => !disabled && fileInputRef.current?.click()}
+        onClick={() => !disabled && !loading && fileInputRef.current?.click()}
+        role="button"
+        aria-label="Área de subida de archivos"
+        tabIndex={disabled || loading ? -1 : 0}
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <div className="space-y-2">
-          <p className="text-lg font-medium text-gray-900">
+          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
             {isDragOver 
               ? 'Suelta los archivos aquí' 
               : 'Arrastra archivos TDF aquí o haz clic para seleccionar'
             }
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Archivos soportados: {acceptedTypes.join(', ')} 
             (máximo {Math.round(maxSize / (1024 * 1024))}MB)
           </p>
@@ -149,15 +191,15 @@ export function FileUpload({
           accept={acceptedTypes.join(',')}
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
-          disabled={disabled}
+          disabled={disabled || loading}
         />
       </div>
 
       {/* Upload Statistics */}
       {stats.total > 0 && (
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-4 text-sm">
-            <span className="text-gray-600">
+            <span className="text-gray-600 dark:text-gray-400">
               {stats.completed}/{stats.total} completados
             </span>
             {stats.failed > 0 && (
@@ -178,6 +220,7 @@ export function FileUpload({
             variant="outline"
             onClick={clearFiles}
             disabled={stats.isUploading}
+            aria-label="Limpiar todos los archivos"
           >
             Limpiar todo
           </Button>
@@ -186,29 +229,30 @@ export function FileUpload({
 
       {/* File List */}
       {files.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="font-medium text-gray-900">Archivos</h4>
+        <div className="space-y-3" role="list" aria-label="Lista de archivos">
+          <h4 className="font-medium text-gray-900 dark:text-gray-100">Archivos</h4>
           
           {files.map((uploadFile) => (
             <div
               key={uploadFile.id}
-              className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+              className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+              role="listitem"
             >
               <File className="h-5 w-5 text-gray-400 flex-shrink-0" />
               
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                   {uploadFile.file.name}
                 </p>
-                <p className="text-xs text-gray-500">
-                  {(uploadFile.file.size / (1024 * 1024)).toFixed(2)} MB
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatFileSize(uploadFile.file.size)}
                 </p>
                 
                 {/* Progress Bar */}
                 {uploadFile.status === 'uploading' && (
                   <div className="mt-2">
                     <Progress value={uploadFile.progress} className="h-2" />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {uploadFile.progress}% completado
                     </p>
                   </div>
@@ -239,6 +283,7 @@ export function FileUpload({
                       variant="outline"
                       onClick={() => retryUpload(uploadFile.id)}
                       className="text-xs"
+                      aria-label={`Reintentar subida de ${uploadFile.file.name}`}
                     >
                       Reintentar
                     </Button>
@@ -260,6 +305,7 @@ export function FileUpload({
                     variant="ghost"
                     onClick={() => removeFile(uploadFile.id)}
                     className="p-1 h-6 w-6"
+                    aria-label={`Eliminar ${uploadFile.file.name}`}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -272,7 +318,7 @@ export function FileUpload({
 
       {/* Upload Status */}
       {stats.isUploading && (
-        <Alert>
+        <Alert role="status">
           <Upload className="h-4 w-4" />
           <AlertDescription>
             Subiendo archivos... Por favor no cierres esta página.
@@ -281,7 +327,7 @@ export function FileUpload({
       )}
 
       {stats.hasErrors && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Algunos archivos no se pudieron subir. Revisa los errores arriba.
@@ -290,7 +336,7 @@ export function FileUpload({
       )}
 
       {stats.isComplete && stats.total > 0 && (
-        <Alert>
+        <Alert role="status">
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>
             ¡Todos los archivos se han subido exitosamente!

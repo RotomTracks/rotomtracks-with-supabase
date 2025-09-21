@@ -1,6 +1,12 @@
 'use client';
 
+// React
 import React, { useState } from 'react';
+
+// Next.js
+import Link from 'next/link';
+
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +18,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useRealTimeNotifications } from '@/lib/hooks/useRealTimeUpdates';
+
+// Icons
 import { 
   Bell, 
   BellRing, 
@@ -24,17 +31,38 @@ import {
   CheckCheck,
   Loader2
 } from 'lucide-react';
-import Link from 'next/link';
+
+// Hooks
+import { useRealTimeNotifications } from '@/lib/hooks/useRealTimeUpdates';
+
+// Types
+import { UserRole, LoadingState } from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  STATUS_TRANSLATIONS
+} from '@/lib/utils/tournament-status';
 
 interface NotificationCenterProps {
   className?: string;
   showAsDropdown?: boolean;
+  userRole?: UserRole;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export default function NotificationCenter({ 
   className = '',
-  showAsDropdown = true 
+  showAsDropdown = true,
+  userRole = UserRole.PLAYER,
+  loading: externalLoading = false,
+  error: externalError = null
 }: NotificationCenterProps) {
+  // Hooks
+  const { formatDateTime, formatRelativeTime } = useTournamentFormatting();
+  
   const { 
     notifications, 
     unreadCount, 
@@ -44,7 +72,12 @@ export default function NotificationCenter({
     markAllAsRead 
   } = useRealTimeNotifications({ enabled: true });
 
+  // State
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Use external loading/error states if provided
+  const currentLoading = externalLoading || isLoading;
+  const currentError = externalError || error;
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -62,7 +95,7 @@ export default function NotificationCenter({
   };
 
   const getNotificationColor = (type: string, read: boolean) => {
-    const baseClasses = read ? 'bg-gray-50' : 'bg-white border-l-4';
+    const baseClasses = read ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900 border-l-4';
     
     switch (type) {
       case 'registration':
@@ -78,21 +111,9 @@ export default function NotificationCenter({
     }
   };
 
+  // Use centralized formatting for timestamps
   const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-    if (diffInMinutes < 1) {
-      return 'Just now';
-    } else if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      return `${hours}h ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
+    return formatRelativeTime ? formatRelativeTime(timestamp) : formatDateTime(timestamp);
   };
 
   const handleNotificationClick = (notificationId: string) => {
@@ -122,42 +143,44 @@ export default function NotificationCenter({
         
         <DropdownMenuContent align="end" className="w-80">
           <div className="flex items-center justify-between p-2">
-            <h3 className="font-semibold">Notifications</h3>
+            <h3 className="font-semibold">Notificaciones</h3>
             {unreadCount > 0 && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={markAllAsRead}
                 className="text-xs"
+                aria-label="Marcar todas como leídas"
               >
-                Mark all read
+                Marcar como leídas
               </Button>
             )}
           </div>
           
           <DropdownMenuSeparator />
           
-          {error && (
+          {currentError && (
             <div className="p-2">
-              <Alert variant="destructive">
+              <Alert variant="destructive" role="alert">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription className="text-xs">
-                  Failed to load notifications
+                  Error al cargar notificaciones
                 </AlertDescription>
               </Alert>
             </div>
           )}
           
-          {isLoading && notifications.length === 0 && (
-            <div className="flex items-center justify-center p-4">
+          {currentLoading && notifications.length === 0 && (
+            <div className="flex items-center justify-center p-4" role="status" aria-live="polite">
               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              <span className="text-sm text-muted-foreground">Loading...</span>
+              <span className="text-sm text-muted-foreground">Cargando...</span>
+              <span className="sr-only">Cargando notificaciones...</span>
             </div>
           )}
           
-          {notifications.length === 0 && !isLoading && !error && (
+          {notifications.length === 0 && !currentLoading && !currentError && (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              No notifications
+              Sin notificaciones
             </div>
           )}
           
@@ -207,7 +230,7 @@ export default function NotificationCenter({
           
           <div className="p-2 text-center">
             <p className="text-xs text-muted-foreground">
-              Updates every 10 seconds
+              Se actualiza cada 10 segundos
             </p>
           </div>
         </DropdownMenuContent>
@@ -223,7 +246,7 @@ export default function NotificationCenter({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notifications
+              Notificaciones
               {unreadCount > 0 && (
                 <Badge variant="destructive">
                   {unreadCount}
@@ -231,40 +254,40 @@ export default function NotificationCenter({
               )}
             </CardTitle>
             <CardDescription>
-              Tournament updates and alerts
+              Actualizaciones y alertas de torneos
             </CardDescription>
           </div>
           
           {unreadCount > 0 && (
-            <Button variant="outline" size="sm" onClick={markAllAsRead}>
-              Mark all read
+            <Button variant="outline" size="sm" onClick={markAllAsRead} aria-label="Marcar todas como leídas">
+              Marcar como leídas
             </Button>
           )}
         </div>
       </CardHeader>
       
       <CardContent>
-        {error && (
-          <Alert variant="destructive" className="mb-4">
+        {currentError && (
+          <Alert variant="destructive" className="mb-4" role="alert">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load notifications: {error.message}
+              Error al cargar notificaciones: {currentError instanceof Error ? currentError.message : currentError}
             </AlertDescription>
           </Alert>
         )}
 
-        {notifications.length === 0 && !isLoading ? (
+        {notifications.length === 0 && !currentLoading ? (
           <div className="text-center py-8 text-muted-foreground">
             <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No notifications</p>
-            <p className="text-sm">You'll receive updates about your tournaments here</p>
+            <p>Sin notificaciones</p>
+            <p className="text-sm">Recibirás actualizaciones sobre tus torneos aquí</p>
           </div>
         ) : (
           <div className="space-y-3">
             {notifications.map((notification) => (
               <div 
                 key={notification.id}
-                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-50 ${getNotificationColor(notification.type, notification.read)}`}
+                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${getNotificationColor(notification.type, notification.read)}`}
                 onClick={() => handleNotificationClick(notification.id)}
               >
                 <div className="flex items-start gap-3">
@@ -301,16 +324,17 @@ export default function NotificationCenter({
           </div>
         )}
 
-        {isLoading && notifications.length === 0 && (
-          <div className="flex items-center justify-center py-8">
+        {currentLoading && notifications.length === 0 && (
+          <div className="flex items-center justify-center py-8" role="status" aria-live="polite">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-muted-foreground">Loading notifications...</span>
+            <span className="ml-2 text-muted-foreground">Cargando notificaciones...</span>
+            <span className="sr-only">Cargando notificaciones...</span>
           </div>
         )}
 
-        <div className="mt-4 pt-3 border-t">
+        <div className="mt-4 pt-3 border-t dark:border-gray-700">
           <p className="text-xs text-muted-foreground text-center">
-            Updates every 10 seconds
+            Se actualiza cada 10 segundos
           </p>
         </div>
       </CardContent>

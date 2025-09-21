@@ -1,10 +1,15 @@
 'use client';
 
+// React
 import { useState, useMemo } from 'react';
+
+// UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Icons
 import { 
   Trophy, 
   ChevronDown, 
@@ -21,13 +26,25 @@ import {
   User,
   BarChart3
 } from 'lucide-react';
+
+// Types
 import type { 
   Tournament, 
   TournamentParticipant, 
   TournamentResult, 
-  TournamentMatch 
+  TournamentMatch,
+  UserRole,
+  TournamentStatus
 } from '@/lib/types/tournament';
 import { MatchOutcome } from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  getStatusColor,
+  getStatusText
+} from '@/lib/utils/tournament-status';
 
 interface ResultsViewerProps {
   tournamentId: string;
@@ -36,7 +53,9 @@ interface ResultsViewerProps {
   results: TournamentResult[];
   matches: TournamentMatch[];
   htmlReportUrl?: string;
-  userRole: 'organizer' | 'participant' | 'viewer';
+  userRole: UserRole | 'organizer' | 'participant' | 'viewer';
+  loading?: boolean;
+  error?: string | null;
 }
 
 export function ResultsViewer({
@@ -46,8 +65,14 @@ export function ResultsViewer({
   results,
   matches,
   htmlReportUrl,
-  userRole
+  userRole,
+  loading = false,
+  error = null
 }: ResultsViewerProps) {
+  // Hooks
+  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  
+  // State
   const [expandedRounds, setExpandedRounds] = useState<Set<number>>(new Set([1]));
   const [viewMode, setViewMode] = useState<'standings' | 'rounds'>('standings');
 
@@ -128,10 +153,10 @@ export function ResultsViewer({
 
   const getPositionColor = (position: number) => {
     switch (position) {
-      case 1: return 'bg-gradient-to-r from-yellow-100 to-yellow-50 border-yellow-300';
-      case 2: return 'bg-gradient-to-r from-gray-100 to-gray-50 border-gray-300';
-      case 3: return 'bg-gradient-to-r from-orange-100 to-orange-50 border-orange-300';
-      default: return position <= 8 ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50';
+      case 1: return 'bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-900/20 dark:to-yellow-800/10 border-yellow-300 dark:border-yellow-700';
+      case 2: return 'bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 border-gray-300 dark:border-gray-600';
+      case 3: return 'bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/20 dark:to-orange-800/10 border-orange-300 dark:border-orange-700';
+      default: return position <= 8 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800';
     }
   };
 
@@ -148,49 +173,75 @@ export function ResultsViewer({
   };
 
   const getOutcomeColor = (outcome: MatchOutcome | undefined) => {
-    if (!outcome) return 'bg-gray-100 text-gray-800';
+    if (!outcome) return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
     switch (outcome) {
       case MatchOutcome.PLAYER1_WINS:
-      case MatchOutcome.PLAYER2_WINS: return 'bg-green-100 text-green-800';
-      case MatchOutcome.DRAW: return 'bg-yellow-100 text-yellow-800';
-      case MatchOutcome.BYE: return 'bg-purple-100 text-purple-800';
-      case MatchOutcome.DOUBLE_LOSS: return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case MatchOutcome.PLAYER2_WINS: return 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400';
+      case MatchOutcome.DRAW: return 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400';
+      case MatchOutcome.BYE: return 'bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400';
+      case MatchOutcome.DOUBLE_LOSS: return 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400';
+      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  // Render loading state
+  const renderLoadingState = () => (
+    <Card>
+      <CardContent className="text-center py-12" role="status" aria-label="Cargando resultados">
+        <div className="animate-pulse space-y-4">
+          <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-2"></div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto"></div>
+        </div>
+        <span className="sr-only">Cargando resultados del torneo...</span>
+      </CardContent>
+    </Card>
+  );
 
-  if (results.length === 0 && matches.length === 0) {
-    return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <BarChart3 className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Resultados No Disponibles
-          </h3>
-          <p className="text-gray-500 mb-4">
-            Los resultados se mostrarán aquí una vez que se procesen los datos del torneo
-          </p>
-          {htmlReportUrl && (
-            <Button
-              onClick={() => window.open(htmlReportUrl, '_blank')}
-              className="mt-4"
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Ver Reporte HTML
-            </Button>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
+  // Render error state
+  const renderErrorState = () => (
+    <Card>
+      <CardContent className="text-center py-12" role="alert">
+        <BarChart3 className="h-16 w-16 mx-auto text-red-300 mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          Error al Cargar Resultados
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-4">
+          {error || 'No se pudieron cargar los resultados del torneo'}
+        </p>
+      </CardContent>
+    </Card>
+  );
+
+  // Render empty state
+  const renderEmptyState = () => (
+    <Card>
+      <CardContent className="text-center py-12">
+        <BarChart3 className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          Resultados No Disponibles
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-4">
+          Los resultados se mostrarán aquí una vez que se procesen los datos del torneo
+        </p>
+        {htmlReportUrl && (
+          <Button
+            onClick={() => window.open(htmlReportUrl, '_blank')}
+            className="mt-4"
+            aria-label="Ver reporte HTML del torneo"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Ver Reporte HTML
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  // Early returns for different states
+  if (loading) return renderLoadingState();
+  if (error) return renderErrorState();
+  if (results.length === 0 && matches.length === 0) return renderEmptyState();
 
   return (
     <div className="space-y-6">
@@ -210,7 +261,7 @@ export function ResultsViewer({
                 </div>
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatDate(tournament.start_date)}</span>
+                  <span>{formatDate(tournament.start_date, 'long')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
@@ -224,6 +275,7 @@ export function ResultsViewer({
                   variant="secondary"
                   size="sm"
                   onClick={() => window.open(htmlReportUrl, '_blank')}
+                  aria-label="Ver reporte HTML del torneo"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   Ver Reporte HTML
@@ -237,6 +289,7 @@ export function ResultsViewer({
                     link.download = `${tournament.name}-resultados.html`;
                     link.click();
                   }}
+                  aria-label="Descargar reporte HTML"
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Descargar
@@ -249,11 +302,13 @@ export function ResultsViewer({
 
       {/* View Mode Toggle */}
       <div className="flex justify-center">
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1" role="group" aria-label="Cambiar vista de resultados">
           <Button
             variant={viewMode === 'standings' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('standings')}
+            aria-pressed={viewMode === 'standings'}
+            aria-label="Ver clasificación final"
           >
             <Trophy className="h-4 w-4 mr-2" />
             Clasificación Final
@@ -262,6 +317,8 @@ export function ResultsViewer({
             variant={viewMode === 'rounds' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('rounds')}
+            aria-pressed={viewMode === 'rounds'}
+            aria-label="Ver rondas del torneo"
           >
             <Swords className="h-4 w-4 mr-2" />
             Rondas del Torneo
@@ -433,10 +490,10 @@ export function ResultsViewer({
                                 </td>
                                 <td className={`py-3 px-2 ${isPlayer1Winner ? 'font-bold text-green-600' : ''}`}>
                                   <div>
-                                    <div className="font-medium">
+                                    <div className="font-medium dark:text-gray-100">
                                       {player1?.player_name || 'Jugador 1'}
                                     </div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
                                       {player1?.player_id || 'N/A'}
                                     </div>
                                   </div>
@@ -447,10 +504,10 @@ export function ResultsViewer({
                                 <td className={`py-3 px-2 ${isPlayer2Winner ? 'font-bold text-green-600' : ''}`}>
                                   {player2 ? (
                                     <div>
-                                      <div className="font-medium">
+                                      <div className="font-medium dark:text-gray-100">
                                         {player2.player_name}
                                       </div>
-                                      <div className="text-sm text-gray-500">
+                                      <div className="text-sm text-gray-500 dark:text-gray-400">
                                         {player2.player_id}
                                       </div>
                                     </div>
@@ -483,6 +540,7 @@ export function ResultsViewer({
               variant="outline"
               size="sm"
               onClick={() => setExpandedRounds(new Set(rounds))}
+              aria-label="Expandir todas las rondas"
             >
               Expandir Todas
             </Button>
@@ -490,6 +548,7 @@ export function ResultsViewer({
               variant="outline"
               size="sm"
               onClick={() => setExpandedRounds(new Set())}
+              aria-label="Colapsar todas las rondas"
             >
               Colapsar Todas
             </Button>
@@ -509,6 +568,7 @@ export function ResultsViewer({
               variant="outline"
               size="sm"
               onClick={() => window.open(htmlReportUrl, '_blank')}
+              aria-label="Ver reporte HTML completo"
             >
               <Eye className="h-4 w-4 mr-2" />
               Ver Reporte HTML

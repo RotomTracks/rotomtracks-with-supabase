@@ -123,7 +123,7 @@ export const searchAnalyticsSchema = z.object({
 
 // Rate limiting validation
 export const rateLimitSchema = z.object({
-  ip: z.string().ip(),
+  ip: z.string().regex(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/, "Invalid IP address"),
   endpoint: z.string(),
   timestamp: z.date().default(() => new Date()),
   requests_count: z.number().int().min(1).default(1)

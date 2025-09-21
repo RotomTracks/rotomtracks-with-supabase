@@ -131,34 +131,7 @@ export const SEARCH_CONFIG = {
   debounceMs: 300,
 } as const;
 
-// Tournament Status Colors - Updated to use centralized status management
-// These are kept for backward compatibility but should use TournamentStatusManager
-export const STATUS_COLORS = {
-  upcoming: {
-    bg: 'bg-blue-100 dark:bg-blue-900/20',
-    text: 'text-blue-800 dark:text-blue-300',
-    border: 'border-blue-200 dark:border-blue-800',
-    full: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-  },
-  ongoing: {
-    bg: 'bg-green-100 dark:bg-green-900/20',
-    text: 'text-green-800 dark:text-green-300',
-    border: 'border-green-200 dark:border-green-800',
-    full: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-  },
-  completed: {
-    bg: 'bg-gray-100 dark:bg-gray-900/20',
-    text: 'text-gray-800 dark:text-gray-300',
-    border: 'border-gray-200 dark:border-gray-800',
-    full: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
-  },
-  cancelled: {
-    bg: 'bg-red-100 dark:bg-red-900/20',
-    text: 'text-red-800 dark:text-red-300',
-    border: 'border-red-200 dark:border-red-800',
-    full: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
-  },
-} as const;
+
 
 // Tournament Type Colors - Updated to include full classes and icons
 export const TYPE_COLORS = {
@@ -360,26 +333,7 @@ export const TDF_CONSTANTS = {
   SUPPORTED_MODES: ['PRERELEASE', 'LEAGUECHALLENGE', 'TCG1DAY', 'VGCPREMIER', 'GOPREMIER'],
 } as const;
 
-// Status Translation Constants
-export const STATUS_LABELS = {
-  TOURNAMENT: {
-    upcoming: 'Próximo',
-    ongoing: 'En Curso',
-    completed: 'Completado',
-    cancelled: 'Cancelado',
-  },
-  PARTICIPANT: {
-    registered: 'Registrado',
-    checked_in: 'Confirmado',
-    dropped: 'Retirado',
-  },
-  FILE: {
-    pending: 'Pendiente',
-    uploading: 'Subiendo',
-    completed: 'Completado',
-    error: 'Error',
-  },
-} as const;
+
 
 // Breakpoints (matching Tailwind CSS)
 export const BREAKPOINTS = {

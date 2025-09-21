@@ -32,19 +32,7 @@ function mapTournamentTypeToTDF(tournamentType: TournamentType): { gametype: str
   }
 }
 
-/**
- * Generate a tournament ID in TDF format (YY-MM-XXXXXX)
- */
-function generateTournamentID(date?: Date): string {
-  const now = date || new Date();
-  const year = now.getFullYear().toString().slice(-2);
-  const month = (now.getMonth() + 1).toString().padStart(2, '0');
-  
-  // Generate a 6-digit sequence number
-  const sequence = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-  
-  return `${year}-${month}-${sequence}`;
-}
+// Note: Tournament ID comes from TDF files uploaded by users, not generated
 
 /**
  * Validate tournament ID format
@@ -292,7 +280,6 @@ function validateTDFFile(content: string): {
 // Export all utility functions
 export {
   mapTournamentTypeToTDF,
-  generateTournamentID,
   isValidTournamentID,
   formatTDFDate,
   formatTDFTimestamp,

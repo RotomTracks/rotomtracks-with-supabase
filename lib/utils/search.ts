@@ -3,7 +3,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { Tournament, TournamentType } from '@/lib/types/tournament';
+import { Tournament } from '@/lib/types/tournament';
 import { SearchParams } from '@/lib/validations/search';
 
 // Search suggestion types
@@ -221,9 +221,9 @@ export function calculateRelevanceScore(
 /**
  * Build optimized search query with full-text search
  */
-export async function buildOptimizedSearchQuery(
+export function buildOptimizedSearchQuery(
   params: SearchParams,
-  supabase: any
+  supabase: ReturnType<typeof import('@/lib/supabase/client').createClient>
 ) {
   let searchQuery = supabase
     .from('tournaments')

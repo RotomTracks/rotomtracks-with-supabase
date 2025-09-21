@@ -11,7 +11,12 @@ export interface ProcessingJob {
   started_at?: string;
   completed_at?: string;
   error_message?: string;
-  result_data?: any;
+  result_data?: {
+    participants: number;
+    matches: number;
+    results: number;
+    reportUrl: string | null;
+  };
   created_by: string;
 }
 
@@ -20,7 +25,12 @@ export interface JobProgress {
   progress: number;
   status: string;
   message: string;
-  data?: any;
+  data?: {
+    participants: number;
+    matches: number;
+    results: number;
+    reportUrl: string | null;
+  };
 }
 
 class BackgroundJobManager {
@@ -37,7 +47,7 @@ class BackgroundJobManager {
       updateData?: boolean;
     } = {}
   ): Promise<string> {
-    const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const jobId = `job_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     
     const job: ProcessingJob = {
       id: jobId,
@@ -72,12 +82,12 @@ class BackgroundJobManager {
   }
 
   // Update job progress
-  private updateProgress(jobId: string, progress: number, status: string, message: string, data?: any): void {
+  private updateProgress(jobId: string, progress: number, status: string, message: string, data?: JobProgress['data']): void {
     const job = this.jobs.get(jobId);
     if (!job) return;
 
     job.progress = progress;
-    job.status = status as any;
+    job.status = status as ProcessingJob['status'];
 
     const progressUpdate: JobProgress = {
       jobId,
@@ -144,7 +154,7 @@ class BackgroundJobManager {
       const { TDFParser } = await import('./tdf-parser');
       const { tournament, players: participants, matches, standings: results } = TDFParser.parse(fileContent);
 
-      let processedData = {
+      const processedData = {
         participants: 0,
         matches: 0,
         results: 0,

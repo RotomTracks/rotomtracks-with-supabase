@@ -1,6 +1,9 @@
 'use client';
 
+// React
 import React, { useState } from 'react';
+
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +15,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,46 +25,63 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+// Icons
 import { 
   Users, 
-  UserCheck, 
   UserX, 
   MoreVertical,
   Search,
   Filter,
   CheckCircle,
   XCircle,
-  Clock,
-  Mail,
-  Phone,
   Calendar,
   AlertCircle,
   Loader2
 } from 'lucide-react';
-import { TournamentParticipant } from '@/lib/types/tournament';
+
+// Types
+import { TournamentParticipant, ParticipantStatus, UserRole } from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager
+} from '@/lib/utils/tournament-status';
 
 interface PlayerManagementProps {
   tournamentId: string;
   participants: TournamentParticipant[];
   onParticipantUpdate: () => void;
+  userRole?: UserRole;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export default function PlayerManagement({ 
   tournamentId, 
   participants, 
-  onParticipantUpdate 
+  onParticipantUpdate,
+  userRole = UserRole.ORGANIZER,
+  loading = false,
+  error: externalError = null
 }: PlayerManagementProps) {
+  // Hooks
+  const { formatDate, formatDateTime } = useTournamentFormatting();
+  
+  // State
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<TournamentParticipant | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Use external error if provided
+  const currentError = externalError || error;
 
   // Filter participants based on search and status
   const filteredParticipants = participants.filter(participant => {
     const matchesSearch = participant.player_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         participant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (participant.player_id && participant.player_id.includes(searchTerm));
     
     const matchesStatus = statusFilter === 'all' || participant.status === statusFilter;
@@ -70,13 +89,12 @@ export default function PlayerManagement({
     return matchesSearch && matchesStatus;
   });
 
-  // Statistics
+  // Statistics using enum values
   const stats = {
     total: participants.length,
-    registered: participants.filter(p => p.status === 'registered').length,
-    confirmed: participants.filter(p => p.status === 'confirmed').length,
-    waitlist: participants.filter(p => p.status === 'waitlist').length,
-    dropped: participants.filter(p => p.status === 'dropped').length,
+    registered: participants.filter(p => p.status === ParticipantStatus.REGISTERED).length,
+    confirmed: participants.filter(p => p.status === ParticipantStatus.CHECKED_IN).length,
+    dropped: participants.filter(p => p.status === ParticipantStatus.DROPPED).length,
   };
 
   const updateParticipantStatus = async (participantId: string, newStatus: string) => {
@@ -127,37 +145,19 @@ export default function PlayerManagement({
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'registered':
-        return <UserCheck className="h-4 w-4 text-blue-600" />;
-      case 'waitlist':
-        return <Clock className="h-4 w-4 text-orange-600" />;
-      case 'dropped':
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      default:
-        return <Users className="h-4 w-4 text-gray-600" />;
-    }
+  // Use centralized status management
+  const getParticipantStatusBadge = (status: ParticipantStatus) => {
+    const config = TournamentStatusManager.getParticipantStatusConfig(status);
+    return (
+      <Badge className={config.color}>
+        {config.icon}
+        <span className="ml-1">{config.label}</span>
+      </Badge>
+    );
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'registered':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'waitlist':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'dropped':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  return (
+  // Render loading state
+  const renderLoadingState = () => (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -168,29 +168,65 @@ export default function PlayerManagement({
           Manage tournament participants, approve registrations, and update player status
         </CardDescription>
       </CardHeader>
+      <CardContent>
+        <div className="space-y-4" role="status" aria-label="Cargando participantes">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse">
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-8 mx-auto mb-2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mx-auto"></div>
+              </div>
+            ))}
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            ))}
+          </div>
+          <span className="sr-only">Cargando participantes...</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  if (loading) return renderLoadingState();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Users className="h-5 w-5" />
+          Gestión de Participantes
+        </CardTitle>
+        <CardDescription>
+          Gestiona los participantes del torneo, aprueba registros y actualiza estados
+        </CardDescription>
+      </CardHeader>
       
       <CardContent className="space-y-6">
         {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="text-center p-3 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-gray-600">{stats.total}</div>
-            <div className="text-sm text-gray-700">Total</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">{stats.total}</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">Total</div>
           </div>
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">{stats.registered}</div>
-            <div className="text-sm text-blue-700">Registered</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">
+              Registrados
+            </div>
           </div>
-          <div className="text-center p-3 bg-green-50 rounded-lg">
+          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
-            <div className="text-sm text-green-700">Confirmed</div>
+            <div className="text-sm text-green-700 dark:text-green-300">
+              Confirmados
+            </div>
           </div>
-          <div className="text-center p-3 bg-orange-50 rounded-lg">
-            <div className="text-2xl font-bold text-orange-600">{stats.waitlist}</div>
-            <div className="text-sm text-orange-700">Waitlist</div>
-          </div>
-          <div className="text-center p-3 bg-red-50 rounded-lg">
+          <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <div className="text-2xl font-bold text-red-600">{stats.dropped}</div>
-            <div className="text-sm text-red-700">Dropped</div>
+            <div className="text-sm text-red-700 dark:text-red-300">
+              Retirados
+            </div>
           </div>
         </div>
 
@@ -199,43 +235,44 @@ export default function PlayerManagement({
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
-            <Label htmlFor="search">Search Players</Label>
+            <Label htmlFor="search">Buscar Participantes</Label>
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search"
-                placeholder="Search by name, email, or player ID..."
+                placeholder="Buscar por nombre o ID de jugador..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
+                aria-label="Buscar participantes"
               />
             </div>
           </div>
           
           <div>
-            <Label htmlFor="status-filter">Filter by Status</Label>
+            <Label htmlFor="status-filter">Filtrar por Estado</Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto" aria-label="Filtrar por estado">
                   <Filter className="h-4 w-4 mr-2" />
-                  {statusFilter === 'all' ? 'All Status' : statusFilter}
+                  {statusFilter === 'all' ? 'Todos los Estados' : 
+                   statusFilter === ParticipantStatus.REGISTERED ? 'Registrados' :
+                   statusFilter === ParticipantStatus.CHECKED_IN ? 'Confirmados' :
+                   statusFilter === ParticipantStatus.DROPPED ? 'Retirados' : statusFilter}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                  All Status
+                  Todos los Estados
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('registered')}>
-                  Registered
+                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.REGISTERED)}>
+                  Registrados
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('confirmed')}>
-                  Confirmed
+                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.CHECKED_IN)}>
+                  Confirmados
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('waitlist')}>
-                  Waitlist
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter('dropped')}>
-                  Dropped
+                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.DROPPED)}>
+                  Retirados
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -243,54 +280,42 @@ export default function PlayerManagement({
         </div>
 
         {/* Error Display */}
-        {error && (
-          <Alert variant="destructive">
+        {currentError && (
+          <Alert variant="destructive" role="alert">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{currentError}</AlertDescription>
           </Alert>
         )}
 
         {/* Participants List */}
-        <div className="space-y-3">
+        <div className="space-y-3" role="list" aria-label="Lista de participantes">
           {filteredParticipants.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No participants found</p>
+              <p>No se encontraron participantes</p>
               {searchTerm && (
-                <p className="text-sm">Try adjusting your search or filter criteria</p>
+                <p className="text-sm">Intenta ajustar tu búsqueda o criterios de filtro</p>
               )}
             </div>
           ) : (
             filteredParticipants.map((participant, index) => (
               <div 
                 key={participant.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                role="listitem"
               >
                 <div className="flex items-center gap-4 flex-1">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium">
+                  <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-sm font-medium">
                     {index + 1}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium truncate">{participant.player_name}</h4>
-                      <Badge className={getStatusColor(participant.status)}>
-                        {getStatusIcon(participant.status)}
-                        <span className="ml-1">{participant.status}</span>
-                      </Badge>
+                      {getParticipantStatusBadge(participant.status as ParticipantStatus)}
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
-                        <span className="truncate">{participant.email}</span>
-                      </div>
-                      {participant.phone && (
-                        <div className="flex items-center gap-1">
-                          <Phone className="h-3 w-3" />
-                          <span>{participant.phone}</span>
-                        </div>
-                      )}
                       {participant.player_id && (
                         <div className="flex items-center gap-1">
                           <span className="text-xs">ID:</span>
@@ -299,7 +324,7 @@ export default function PlayerManagement({
                       )}
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        <span>{new Date(participant.registration_date).toLocaleDateString()}</span>
+                        <span>{formatDate(participant.registration_date, 'short')}</span>
                       </div>
                     </div>
                   </div>
@@ -312,83 +337,58 @@ export default function PlayerManagement({
                         variant="outline" 
                         size="sm"
                         onClick={() => setSelectedParticipant(participant)}
+                        aria-label={`Ver detalles de ${participant.player_name}`}
                       >
-                        View Details
+                        Ver Detalles
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Player Details</DialogTitle>
+                        <DialogTitle>Detalles del Participante</DialogTitle>
                         <DialogDescription>
-                          Complete information for {participant.player_name}
+                          Información completa de {participant.player_name}
                         </DialogDescription>
                       </DialogHeader>
                       
                       {selectedParticipant && (
                         <div className="space-y-4">
                           <div>
-                            <Label>Name</Label>
+                            <Label>Nombre</Label>
                             <p className="text-sm">{selectedParticipant.player_name}</p>
                           </div>
                           
-                          <div>
-                            <Label>Email</Label>
-                            <p className="text-sm">{selectedParticipant.email}</p>
-                          </div>
-                          
-                          {selectedParticipant.phone && (
-                            <div>
-                              <Label>Phone</Label>
-                              <p className="text-sm">{selectedParticipant.phone}</p>
-                            </div>
-                          )}
-                          
                           {selectedParticipant.player_id && (
                             <div>
-                              <Label>Player ID</Label>
+                              <Label>ID de Jugador</Label>
                               <p className="text-sm">{selectedParticipant.player_id}</p>
                             </div>
                           )}
                           
                           {selectedParticipant.player_birthdate && (
                             <div>
-                              <Label>Birth Date</Label>
+                              <Label>Fecha de Nacimiento</Label>
                               <p className="text-sm">
-                                {new Date(selectedParticipant.player_birthdate).toLocaleDateString()}
+                                {formatDate(selectedParticipant.player_birthdate, 'long')}
                               </p>
                             </div>
                           )}
                           
                           <div>
-                            <Label>Registration Date</Label>
+                            <Label>Fecha de Registro</Label>
                             <p className="text-sm">
-                              {new Date(selectedParticipant.registration_date).toLocaleString()}
+                              {formatDateTime(selectedParticipant.registration_date)}
                             </p>
                           </div>
                           
                           <div>
-                            <Label>Registration Source</Label>
-                            <p className="text-sm">{selectedParticipant.registration_source}</p>
+                            <Label>Estado</Label>
+                            <p className="text-sm">
+                              {selectedParticipant.status === ParticipantStatus.REGISTERED ? 'Registrado' :
+                               selectedParticipant.status === ParticipantStatus.CHECKED_IN ? 'Confirmado' :
+                               selectedParticipant.status === ParticipantStatus.DROPPED ? 'Retirado' : 
+                               selectedParticipant.status}
+                            </p>
                           </div>
-                          
-                          {selectedParticipant.tdf_userid && (
-                            <div>
-                              <Label>TDF User ID</Label>
-                              <p className="text-sm font-mono">{selectedParticipant.tdf_userid}</p>
-                            </div>
-                          )}
-                          
-                          {selectedParticipant.emergency_contact && (
-                            <div>
-                              <Label>Emergency Contact</Label>
-                              <p className="text-sm">{selectedParticipant.emergency_contact}</p>
-                              {selectedParticipant.emergency_phone && (
-                                <p className="text-sm text-muted-foreground">
-                                  {selectedParticipant.emergency_phone}
-                                </p>
-                              )}
-                            </div>
-                          )}
                         </div>
                       )}
                     </DialogContent>
@@ -409,30 +409,23 @@ export default function PlayerManagement({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      {participant.status === 'registered' && (
+                      {participant.status === ParticipantStatus.REGISTERED && (
                         <DropdownMenuItem 
-                          onClick={() => updateParticipantStatus(participant.id, 'confirmed')}
+                          onClick={() => updateParticipantStatus(participant.id, ParticipantStatus.CHECKED_IN)}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Confirm Registration
+                          Confirmar Registro
                         </DropdownMenuItem>
                       )}
                       
-                      {participant.status === 'waitlist' && (
-                        <DropdownMenuItem 
-                          onClick={() => updateParticipantStatus(participant.id, 'registered')}
-                        >
-                          <UserCheck className="h-4 w-4 mr-2" />
-                          Move to Registered
-                        </DropdownMenuItem>
-                      )}
+
                       
-                      {participant.status !== 'dropped' && (
+                      {participant.status !== ParticipantStatus.DROPPED && (
                         <DropdownMenuItem 
-                          onClick={() => updateParticipantStatus(participant.id, 'dropped')}
+                          onClick={() => updateParticipantStatus(participant.id, ParticipantStatus.DROPPED)}
                         >
                           <UserX className="h-4 w-4 mr-2" />
-                          Mark as Dropped
+                          Marcar como Retirado
                         </DropdownMenuItem>
                       )}
                       
@@ -441,7 +434,7 @@ export default function PlayerManagement({
                         className="text-red-600"
                       >
                         <XCircle className="h-4 w-4 mr-2" />
-                        Remove Participant
+                        Eliminar Participante
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

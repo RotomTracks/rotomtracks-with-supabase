@@ -17,7 +17,6 @@ interface TranslationListProps {
  * Component that renders translation arrays as formatted lists
  */
 export function TranslationList({
-  translationKey,
   className,
   itemClassName,
   as: Component = 'ul',

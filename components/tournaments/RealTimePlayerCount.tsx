@@ -1,10 +1,14 @@
 'use client';
 
+// React
 import React from 'react';
+
+// UI Components
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useRealTimePlayerCount } from '@/lib/hooks/useRealTimeUpdates';
+
+// Icons
 import { 
   Users, 
   UserPlus, 
@@ -13,6 +17,21 @@ import {
   AlertCircle,
   Loader2
 } from 'lucide-react';
+
+// Hooks
+import { useRealTimePlayerCount } from '@/lib/hooks/useRealTimeUpdates';
+
+// Types
+import { TournamentStatus, UserRole, ParticipantStatus } from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  getStatusColor,
+  getStatusText,
+  STATUS_TRANSLATIONS
+} from '@/lib/utils/tournament-status';
 
 interface RealTimePlayerCountProps {
   tournamentId: string;
@@ -23,6 +42,9 @@ interface RealTimePlayerCountProps {
   showRecentRegistrations?: boolean;
   compact?: boolean;
   className?: string;
+  userRole?: UserRole;
+  loading?: boolean;
+  error?: string | null;
 }
 
 export default function RealTimePlayerCount({
@@ -33,8 +55,14 @@ export default function RealTimePlayerCount({
   initialStatus = 'upcoming',
   showRecentRegistrations = false,
   compact = false,
-  className = ''
+  className = '',
+  userRole = UserRole.PLAYER,
+  loading: externalLoading = false,
+  error: externalError = null
 }: RealTimePlayerCountProps) {
+  // Hooks
+  const { formatDateTime, formatTime } = useTournamentFormatting();
+  
   const {
     currentPlayers,
     maxPlayers,
@@ -44,6 +72,10 @@ export default function RealTimePlayerCount({
     isLoading,
     error
   } = useRealTimePlayerCount(tournamentId, true);
+  
+  // Use external loading/error states if provided
+  const currentLoading = externalLoading || isLoading;
+  const currentError = externalError || error;
 
   // Use real-time data if available, otherwise fall back to initial values
   const playerCount = currentPlayers || initialCount;
@@ -68,19 +100,13 @@ export default function RealTimePlayerCount({
     return 'secondary';
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'ongoing':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'completed':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
+  // Use centralized status management
+  const getTournamentStatusBadge = (status: string) => {
+    return (
+      <Badge className={getStatusColor(status as TournamentStatus)}>
+        {getStatusText(status as TournamentStatus)}
+      </Badge>
+    );
   };
 
   if (compact) {
@@ -94,14 +120,14 @@ export default function RealTimePlayerCount({
           </span>
         </div>
         
-        {isRegistrationOpen && status === 'upcoming' && (
+        {isRegistrationOpen && status === TournamentStatus.UPCOMING && (
           <Badge variant="outline" className="text-green-600 border-green-600">
             <UserPlus className="h-3 w-3 mr-1" />
-            Open
+            Abierto
           </Badge>
         )}
         
-        {isLoading && (
+        {currentLoading && (
           <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
         )}
       </div>
@@ -116,15 +142,13 @@ export default function RealTimePlayerCount({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-medium">Participants</h3>
-              {isLoading && (
+              <h3 className="font-medium">Participantes</h3>
+              {currentLoading && (
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               )}
             </div>
             
-            <Badge className={getStatusColor(status)}>
-              {status}
-            </Badge>
+            {getTournamentStatusBadge(status)}
           </div>
 
           {/* Player Count */}
@@ -139,23 +163,23 @@ export default function RealTimePlayerCount({
                 )}
               </div>
               <p className="text-sm text-muted-foreground">
-                {playerCount === 1 ? 'participant' : 'participants'}
+                {playerCount === 1 ? 'participante' : 'participantes'}
               </p>
             </div>
             
             <div className="flex flex-col gap-2">
-              {isRegistrationOpen && status === 'upcoming' && (
+              {isRegistrationOpen && status === TournamentStatus.UPCOMING && (
                 <Badge variant="outline" className="text-green-600 border-green-600">
                   <UserPlus className="h-3 w-3 mr-1" />
-                  Registration Open
+                  Registro Abierto
                 </Badge>
               )}
               
               {maxPlayerCount && (
                 <Badge variant={getCapacityBadgeVariant(playerCount, maxPlayerCount)}>
-                  {playerCount >= maxPlayerCount ? 'Full' : 
-                   playerCount >= maxPlayerCount * 0.9 ? 'Nearly Full' : 
-                   'Available'}
+                  {playerCount >= maxPlayerCount ? 'Completo' : 
+                   playerCount >= maxPlayerCount * 0.9 ? 'Casi Completo' : 
+                   'Disponible'}
                 </Badge>
               )}
             </div>
@@ -178,17 +202,17 @@ export default function RealTimePlayerCount({
                 />
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                {Math.round((playerCount / maxPlayerCount) * 100)}% capacity
+                {Math.round((playerCount / maxPlayerCount) * 100)}% de capacidad
               </p>
             </div>
           )}
 
           {/* Capacity Alert */}
           {maxPlayerCount && playerCount >= maxPlayerCount && (
-            <Alert>
+            <Alert role="alert">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Tournament is at full capacity. New registrations will be waitlisted.
+                El torneo está completo. Los nuevos registros se pondrán en lista de espera.
               </AlertDescription>
             </Alert>
           )}
@@ -198,7 +222,7 @@ export default function RealTimePlayerCount({
             <div className="space-y-2">
               <h4 className="text-sm font-medium flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                Recent Registrations
+                Registros Recientes
               </h4>
               <div className="space-y-1">
                 {recentRegistrations.slice(0, 3).map((registration) => (
@@ -215,7 +239,7 @@ export default function RealTimePlayerCount({
                         {registration.status}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        {new Date(registration.registration_date).toLocaleTimeString()}
+                        {formatTime(registration.registration_date)}
                       </span>
                     </div>
                   </div>
@@ -223,7 +247,7 @@ export default function RealTimePlayerCount({
                 
                 {recentRegistrations.length > 3 && (
                   <p className="text-xs text-muted-foreground text-center">
-                    +{recentRegistrations.length - 3} more recent registrations
+                    +{recentRegistrations.length - 3} registros recientes más
                   </p>
                 )}
               </div>
@@ -231,18 +255,18 @@ export default function RealTimePlayerCount({
           )}
 
           {/* Error Display */}
-          {error && (
-            <Alert variant="destructive">
+          {currentError && (
+            <Alert variant="destructive" role="alert">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Failed to load real-time updates: {error.message}
+                Error al cargar actualizaciones en tiempo real: {currentError instanceof Error ? currentError.message : currentError}
               </AlertDescription>
             </Alert>
           )}
 
           {/* Last Update */}
           <p className="text-xs text-muted-foreground text-center">
-            Updates every 3 seconds
+            Se actualiza cada 3 segundos
           </p>
         </div>
       </CardContent>

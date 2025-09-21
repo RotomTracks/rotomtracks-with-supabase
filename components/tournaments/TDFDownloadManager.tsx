@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -20,7 +18,7 @@ import {
 } from 'lucide-react';
 import { TournamentParticipant, Tournament } from '@/lib/types/tournament';
 
-interface LocalTournament extends Tournament {
+interface LocalTournament extends Omit<Tournament, 'status'> {
   status: string;
   start_date: string;
   original_tdf_file_path?: string;
@@ -39,14 +37,12 @@ export default function TDFDownloadManager({
   onDownloadComplete 
 }: TDFDownloadManagerProps) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [includeWaitlist, setIncludeWaitlist] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   // Calculate participant statistics
   const registeredCount = participants.filter(p => p.status === 'registered').length;
-  const confirmedCount = participants.filter(p => p.status === 'confirmed').length;
-  const waitlistCount = participants.filter(p => p.status === 'waitlist').length;
+  const confirmedCount = participants.filter(p => p.status === 'checked_in').length;
   const totalActiveCount = registeredCount + confirmedCount;
 
   const handleDownload = async (useCustomOptions = false) => {
@@ -71,7 +67,6 @@ export default function TDFDownloadManager({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            includeWaitlist,
             customSettings: {},
             playerFilters: {}
           }),
@@ -149,7 +144,7 @@ export default function TDFDownloadManager({
           </div>
           
           <div className="flex items-center gap-2">
-            {tournament.original_tdf_file_path ? (
+            {(tournament as LocalTournament).original_tdf_file_path ? (
               <Badge variant="secondary">Has Original TDF</Badge>
             ) : (
               <Badge variant="outline">Generated from Scratch</Badge>
@@ -172,11 +167,6 @@ export default function TDFDownloadManager({
               <div className="text-2xl font-bold text-blue-600">{confirmedCount}</div>
               <div className="text-sm text-blue-700">Confirmed</div>
             </div>
-            
-            <div className="text-center p-3 bg-orange-50 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">{waitlistCount}</div>
-              <div className="text-sm text-orange-700">Waitlist</div>
-            </div>
           </div>
         </div>
 
@@ -190,16 +180,9 @@ export default function TDFDownloadManager({
           </h4>
           
           <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="include-waitlist" 
-                checked={includeWaitlist}
-                onCheckedChange={(checked) => setIncludeWaitlist(checked as boolean)}
-              />
-              <Label htmlFor="include-waitlist" className="text-sm">
-                Include waitlisted players ({waitlistCount} players)
-              </Label>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              TDF will include all registered and confirmed participants.
+            </p>
           </div>
         </div>
 

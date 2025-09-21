@@ -4,18 +4,14 @@
 import { useState } from 'react';
 
 // UI Components
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 // Icons
 import { 
   Search, 
-  Filter, 
   MapPin, 
-  Calendar, 
-  Users, 
   Trophy,
   ChevronLeft,
   ChevronRight,
@@ -25,7 +21,6 @@ import {
 } from 'lucide-react';
 
 // Next.js
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Components
@@ -35,21 +30,11 @@ import { TournamentCard } from './TournamentCard';
 // Types
 import { 
   Tournament, 
-  TournamentType, 
-  TournamentStatus,
-  UserRole,
-  LoadingState 
-} from '@/lib/types/tournament';
+  UserRole} from '@/lib/types/tournament';
 
 // Hooks and Utilities
 import { useTypedTranslation } from '@/lib/i18n';
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
-import { 
-  TournamentStatusManager,
-  getStatusColor,
-  getStatusText,
-  STATUS_TRANSLATIONS
-} from '@/lib/utils/tournament-status';
 
 interface TournamentListProps {
   tournaments: Tournament[];
@@ -81,7 +66,7 @@ export function TournamentList({
 }: TournamentListProps) {
   // Hooks
   const { tTournaments } = useTypedTranslation();
-  const { formatDate, formatTime } = useTournamentFormatting();
+  useTournamentFormatting();
   const router = useRouter();
   const currentSearchParams = useSearchParams();
   

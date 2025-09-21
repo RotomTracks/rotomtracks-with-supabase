@@ -15,8 +15,7 @@ import {
 import { 
   TOURNAMENT_LIMITS, 
   PLAYER_ID_CONFIG, 
-  TOURNAMENT_ID_CONFIG,
-  FILE_UPLOAD_CONFIG 
+  TOURNAMENT_ID_CONFIG
 } from '@/lib/constants/tournament';
 
 // Base validation schemas
@@ -87,6 +86,7 @@ export const TournamentParticipantSchema = z.object({
   user_id: z.string().uuid(),
   player_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres').max(100),
   player_id: PlayerIdSchema,
+  player_birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha debe estar en formato YYYY-MM-DD'),
   registration_date: z.string().datetime(),
   status: ParticipantStatusSchema,
 });
@@ -220,6 +220,7 @@ export const TournamentRegistrationRequestSchema = z.object({
   tournament_id: z.string().uuid(),
   player_name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres').max(100),
   player_id: PlayerIdSchema,
+  player_birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha debe estar en formato YYYY-MM-DD'),
 });
 
 export const CreateOrganizerRequestSchema = z.object({

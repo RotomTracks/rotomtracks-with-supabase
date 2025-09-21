@@ -5,15 +5,18 @@
 import { SupportedLanguage } from '../types';
 
 // Cache for loaded locale modules
-const localeModuleCache = new Map<SupportedLanguage, any>();
+const localeModuleCache = new Map<SupportedLanguage, Record<string, unknown>>();
 
 /**
  * Dynamically load a locale module
  */
-export async function loadLocaleModule(language: SupportedLanguage): Promise<any> {
+export async function loadLocaleModule(language: SupportedLanguage): Promise<Record<string, unknown>> {
   // Return cached module if available
   if (localeModuleCache.has(language)) {
-    return localeModuleCache.get(language);
+    const cached = localeModuleCache.get(language);
+    if (cached) {
+      return cached;
+    }
   }
 
   try {

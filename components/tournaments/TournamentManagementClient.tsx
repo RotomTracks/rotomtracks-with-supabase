@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TDFDownloadManager from '@/components/tournaments/TDFDownloadManager';
@@ -16,7 +15,6 @@ import {
   Calendar, 
   MapPin, 
   Users, 
-  Settings,
   ArrowLeft,
   Trophy,
   FileText
@@ -24,26 +22,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TournamentParticipant, Tournament } from '@/lib/types/tournament';
-
-interface LocalTournament extends Tournament {
-  id: string;
-  name: string;
-  description: string;
-  tournament_type: string;
-  city: string;
-  state?: string;
-  country: string;
-  start_date: string;
-  end_date?: string;
-  status: string;
-  current_players: number;
-  max_players?: number;
-  registration_open: boolean;
-  official_tournament_id?: string;
-  organizer_name?: string;
-  organizer_popid?: string;
-  tdf_metadata?: any;
-}
 
 interface TournamentManagementClientProps {
   tournament: Tournament;
@@ -55,24 +33,17 @@ export default function TournamentManagementClient({
   participants: initialParticipants 
 }: TournamentManagementClientProps) {
   const router = useRouter();
-  const [tournament, setTournament] = useState(initialTournament);
-  const [participants, setParticipants] = useState(initialParticipants);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const tournament = initialTournament;
+  const participants = initialParticipants;
 
   // Calculate statistics
   const registeredCount = participants.filter(p => p.status === 'registered').length;
-  const confirmedCount = participants.filter(p => p.status === 'confirmed').length;
-  const waitlistCount = participants.filter(p => p.status === 'waitlist').length;
+  const confirmedCount = participants.filter(p => p.status === 'checked_in').length;
   const totalCount = participants.length;
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      // Refresh the page data
-      router.refresh();
-    } finally {
-      setIsRefreshing(false);
-    }
+    // Refresh the page data
+    router.refresh();
   };
 
   const handleParticipantUpdate = () => {
@@ -209,7 +180,7 @@ export default function TournamentManagementClient({
         {/* TDF Generation Tab */}
         <TabsContent value="tdf" className="space-y-6">
           <TDFDownloadManager 
-            tournament={tournament}
+            tournament={tournament as any}
             participants={participants}
           />
         </TabsContent>
@@ -217,7 +188,7 @@ export default function TournamentManagementClient({
         {/* Settings Tab */}
         <TabsContent value="settings" className="space-y-6">
           <TournamentSettings 
-            tournament={tournament}
+            tournament={tournament as any}
             onTournamentUpdate={handleTournamentUpdate}
           />
         </TabsContent>
