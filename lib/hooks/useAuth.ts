@@ -32,8 +32,17 @@ export function useAuth(): UseAuthReturn {
       setLoading(true);
       setError(null);
 
-      // Get current user
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Auth request timed out')), 8000);
+      });
+
+      // Get current user with timeout
+      const userPromise = supabase.auth.getUser();
+      const { data: { user: currentUser }, error: userError } = await Promise.race([
+        userPromise,
+        timeoutPromise
+      ]) as any;
       
       if (userError) {
         throw userError;
@@ -43,11 +52,16 @@ export function useAuth(): UseAuthReturn {
 
       // If user exists, fetch their profile
       if (currentUser) {
-        const { data: userProfile, error: profileError } = await supabase
+        const profilePromise = supabase
           .from('user_profiles')
           .select('*')
           .eq('user_id', currentUser.id)
           .single();
+
+        const { data: userProfile, error: profileError } = await Promise.race([
+          profilePromise,
+          timeoutPromise
+        ]) as any;
 
         if (profileError && profileError.code !== 'PGRST116') {
           // PGRST116 means no rows returned, which is fine for new users
@@ -61,6 +75,9 @@ export function useAuth(): UseAuthReturn {
     } catch (err) {
       console.error('Error fetching user and profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch user data');
+      // Set user to null and profile to null on error so the app can continue
+      setUser(null);
+      setProfile(null);
     } finally {
       setLoading(false);
     }

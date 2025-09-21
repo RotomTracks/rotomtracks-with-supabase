@@ -9,43 +9,71 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const { user, loading, error } = useAuth();
   const [showTimeout, setShowTimeout] = useState(false);
+  const [forceShow, setForceShow] = useState(false);
 
-  // Show timeout message after 10 seconds of loading
+  // Show timeout message after 5 seconds of loading
   useEffect(() => {
     if (loading) {
       const timer = setTimeout(() => {
         setShowTimeout(true);
-      }, 10000);
+      }, 5000);
 
-      return () => clearTimeout(timer);
+      // Force show the app after 12 seconds even if auth is still loading
+      const forceTimer = setTimeout(() => {
+        setForceShow(true);
+      }, 12000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(forceTimer);
+      };
     } else {
       setShowTimeout(false);
+      setForceShow(false);
     }
   }, [loading]);
 
-  if (loading) {
+  // Show loading screen only if we haven't forced show and we're still loading
+  if (loading && !forceShow) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 mb-4">Cargando Rotom Tracks...</p>
+          
           {showTimeout && (
             <div className="max-w-md mx-auto">
               <p className="text-gray-600 mb-4">
                 La aplicación está tardando más de lo esperado en cargar...
               </p>
-              <button 
-                onClick={() => window.location.reload()} 
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Recargar página
-              </button>
+              <div className="space-y-2">
+                <button 
+                  onClick={() => setForceShow(true)} 
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mr-2"
+                >
+                  Continuar sin autenticación
+                </button>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Recargar página
+                </button>
+              </div>
             </div>
           )}
+          
           {error && (
             <div className="max-w-md mx-auto mt-4">
-              <p className="text-red-600 text-sm">
-                Error: {error}
+              <p className="text-red-600 text-sm mb-2">
+                Error de conexión: {error}
               </p>
+              <button 
+                onClick={() => setForceShow(true)} 
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Continuar sin autenticación
+              </button>
             </div>
           )}
         </div>
@@ -53,6 +81,7 @@ export default function Home() {
     );
   }
 
+  // Show the app (either auth loaded successfully or we forced it)
   return (
     <main className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -65,6 +94,13 @@ export default function Home() {
         {/* Footer */}
         <HomeFooter user={user} />
       </div>
+      
+      {/* Show a small indicator if auth is still loading */}
+      {loading && forceShow && (
+        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">
+          Cargando autenticación...
+        </div>
+      )}
     </main>
   );
 }
