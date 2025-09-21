@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { FormCard, FormField, LoadingButton, ErrorMessage } from "@/components/auth/shared";
+import { FormCard, FormField, LoadingButton, ErrorMessage, ValidationSummary, SuccessAnimation, SkipLinks } from "@/components/auth/shared";
 import { useFormAccessibility } from "@/components/auth/shared/useFormAccessibility";
 import { useRealTimeValidation } from "@/components/auth/shared/useRealTimeValidation";
 import { useTypedTranslation } from "@/lib/i18n";
@@ -22,6 +22,7 @@ export function LoginForm({
   });
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -29,16 +30,20 @@ export function LoginForm({
   const {
     getFieldError,
     getFieldSuccess,
+    isFieldValidating,
     handleFieldChange,
     handleFieldBlur,
     validateAllFields,
     clearAllErrors,
-    hasAnyErrors
+    hasAnyErrors,
+    validationSummary
   } = useRealTimeValidation<LoginFormData>({
     validateFn: validateLoginForm,
     debounceMs: 500, // Slightly longer debounce for login
     validateOnChange: true,
     validateOnBlur: true,
+    showSuccessStates: true,
+    enableProgressiveValidation: true,
   });
 
   const { formRef, ariaLiveMessage } = useFormAccessibility({
@@ -103,9 +108,14 @@ export function LoginForm({
         return;
       }
       
-      // Check for custom redirect parameter, default to profile
-      const redirectTo = searchParams.get('redirect') || '/profile';
-      router.push(redirectTo);
+      // Show success animation before redirect
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        // Check for custom redirect parameter, default to profile
+        const redirectTo = searchParams.get('redirect') || '/profile';
+        router.push(redirectTo);
+      }, 1500);
     } catch (error: unknown) {
       setGeneralError(
         error instanceof Error 
@@ -119,17 +129,22 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <FormCard
-        title={tAuth('login.title')}
-        description={tAuth('login.description')}
-        className="max-w-md mx-auto"
-      >
+      <SkipLinks />
+      
+      <main id="main-content" role="main">
+        <FormCard
+          title={tAuth('login.title')}
+          description={tAuth('login.description')}
+          className="max-w-md mx-auto"
+        >
         <form 
           ref={formRef}
           onSubmit={handleLogin} 
           className="space-y-6"
           noValidate
           aria-label="Formulario de inicio de sesión"
+          id="form-section"
+          role="form"
         >
           {/* Screen reader announcement for form status */}
           <div 
@@ -144,8 +159,22 @@ export function LoginForm({
 
           {generalError && (
             <ErrorMessage 
+              title="Error de inicio de sesión"
               message={generalError} 
               onDismiss={() => setGeneralError(null)}
+              onRetry={() => {
+                setGeneralError(null);
+                clearAllErrors();
+              }}
+            />
+          )}
+
+          {/* Validation Summary */}
+          {(formData.email || formData.password) && (
+            <ValidationSummary 
+              summary={validationSummary}
+              showProgress={true}
+              showDetails={false}
             />
           )}
           
@@ -159,10 +188,11 @@ export function LoginForm({
             onBlur={() => handleInputBlur('email')}
             error={getFieldError('email')}
             success={getFieldSuccess('email')}
+            isValidating={isFieldValidating('email')}
             required
             autoComplete="email"
             className="space-y-3"
-            helpText={!formData.email && !getFieldError('email') ? tAuth('login.emailHelp') : undefined}
+            helpText={!formData.email && !getFieldError('email') && !isFieldValidating('email') ? tAuth('login.emailHelp') : undefined}
           />
           
           <div className="space-y-3">
@@ -186,6 +216,7 @@ export function LoginForm({
               onBlur={() => handleInputBlur('password')}
               error={getFieldError('password')}
               success={getFieldSuccess('password')}
+              isValidating={isFieldValidating('password')}
               required
               autoComplete="current-password"
             />
@@ -196,7 +227,7 @@ export function LoginForm({
             className="w-full mt-6"
             loading={isLoading}
             loadingText={tAuth('login.loadingButton')}
-            disabled={isLoading || hasAnyErrors || !formData.email || !formData.password}
+            disabled={isLoading || hasAnyErrors || !validationSummary.canSubmit}
             aria-describedby={generalError ? "login-error" : undefined}
           >
             {tAuth('login.submitButton')}
@@ -216,6 +247,15 @@ export function LoginForm({
           </div>
         </div>
       </FormCard>
+      </main>
+
+      {/* Success Animation */}
+      <SuccessAnimation
+        show={showSuccess}
+        title="¡Bienvenido!"
+        message="Iniciando sesión..."
+        onComplete={() => setShowSuccess(false)}
+      />
     </div>
   );
 }

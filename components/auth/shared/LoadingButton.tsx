@@ -21,7 +21,7 @@ export function LoadingButton({
   return (
     <Button
       disabled={loading || disabled}
-      className={cn("transition-all duration-200", className)}
+      className={cn("transition-all duration-200 min-h-[44px] touch-manipulation", className)}
       aria-busy={loading}
       aria-live="polite"
       {...props}

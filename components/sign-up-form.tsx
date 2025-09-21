@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { UserRole } from "@/lib/types/tournament";
-import { FormCard, FormField, LoadingButton, ErrorMessage } from "@/components/auth/shared";
+import { FormCard, FormField, LoadingButton, ErrorMessage, ValidationSummary, SuccessAnimation, SkipLinks } from "@/components/auth/shared";
 import { useRealTimeValidation } from "@/components/auth/shared/useRealTimeValidation";
 import { useFormAccessibility } from "@/components/auth/shared/useFormAccessibility";
 import { useTypedTranslation } from "@/lib/i18n";
@@ -136,6 +136,7 @@ export function SignUpForm({
   
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isOrganizerSectionOpen, setIsOrganizerSectionOpen] = useState(false);
   const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState<string>("");
   const router = useRouter();
@@ -144,16 +145,20 @@ export function SignUpForm({
   const {
     getFieldError,
     getFieldSuccess,
+    isFieldValidating,
     handleFieldChange,
     handleFieldBlur,
     validateAllFields,
     clearAllErrors,
-    hasAnyErrors
+    hasAnyErrors,
+    validationSummary
   } = useRealTimeValidation<SignUpFormData>({
     validateFn: validateSignUpForm,
     debounceMs: 300,
     validateOnChange: true,
     validateOnBlur: true,
+    showSuccessStates: true,
+    enableProgressiveValidation: true,
   });
 
   const { formRef, ariaLiveMessage } = useFormAccessibility({
@@ -267,7 +272,12 @@ export function SignUpForm({
         }
       }
 
-      router.push("/auth/sign-up-success");
+      // Show success animation before redirect
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        router.push("/auth/sign-up-success");
+      }, 2000);
     } catch (error: unknown) {
       console.error("Sign up error:", error);
       setGeneralError(
@@ -282,17 +292,22 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <FormCard
-        title={String(tAuth('signUp.title'))}
-        description={String(tAuth('signUp.description'))}
-        className="w-full max-w-2xl mx-auto px-4 sm:px-6"
-      >
+      <SkipLinks />
+      
+      <main id="main-content" role="main">
+        <FormCard
+          title={String(tAuth('signUp.title'))}
+          description={String(tAuth('signUp.description'))}
+          className="w-full max-w-2xl mx-auto px-4 sm:px-6"
+        >
         <form 
           ref={formRef}
           onSubmit={handleSignUp} 
           className="space-y-6 sm:space-y-8"
           noValidate
           aria-label="Formulario de registro"
+          id="form-section"
+          role="form"
         >
           {/* Screen reader announcements */}
           <div 
@@ -308,8 +323,22 @@ export function SignUpForm({
 
           {generalError && (
             <ErrorMessage 
+              title="Error en el registro"
               message={generalError} 
               onDismiss={() => setGeneralError(null)}
+              onRetry={() => {
+                setGeneralError(null);
+                clearAllErrors();
+              }}
+            />
+          )}
+
+          {/* Validation Summary */}
+          {validationSummary.totalFields > 0 && (
+            <ValidationSummary 
+              summary={validationSummary}
+              showProgress={true}
+              showDetails={true}
             />
           )}
 
@@ -328,6 +357,7 @@ export function SignUpForm({
               onBlur={() => handleInputBlur('email')}
               error={getFieldError('email')}
               success={getFieldSuccess('email')}
+              isValidating={isFieldValidating('email')}
               required
               autoComplete="email"
             />
@@ -343,6 +373,7 @@ export function SignUpForm({
                 onBlur={() => handleInputBlur('password')}
                 error={getFieldError('password')}
                 success={getFieldSuccess('password')}
+                isValidating={isFieldValidating('password')}
                 required
                 autoComplete="new-password"
               />
@@ -357,6 +388,7 @@ export function SignUpForm({
                 onBlur={() => handleInputBlur('confirmPassword')}
                 error={getFieldError('confirmPassword')}
                 success={getFieldSuccess('confirmPassword')}
+                isValidating={isFieldValidating('confirmPassword')}
                 required
                 autoComplete="new-password"
               />
@@ -632,7 +664,7 @@ export function SignUpForm({
               className="w-full"
               loading={isLoading}
               loadingText={String(tAuth('signUp.loadingButton'))}
-              disabled={isLoading || hasAnyErrors}
+              disabled={isLoading || hasAnyErrors || !validationSummary.canSubmit}
             >
               {String(tAuth('signUp.submitButton'))}
             </LoadingButton>
@@ -650,6 +682,16 @@ export function SignUpForm({
           </div>
         </form>
       </FormCard>
+      </main>
+
+      {/* Success Animation */}
+      <SuccessAnimation
+        show={showSuccess}
+        title="¡Cuenta creada!"
+        message="Revisa tu email para confirmar tu cuenta"
+        onComplete={() => setShowSuccess(false)}
+        duration={4000}
+      />
     </div>
   );
 }

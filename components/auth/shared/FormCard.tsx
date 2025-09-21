@@ -28,17 +28,17 @@ export function FormCard({
 }: FormCardProps) {
   return (
     <Card className={cn("w-full", className)}>
-      <CardHeader className={cn("space-y-1", headerClassName)}>
-        <CardTitle className="text-2xl font-bold tracking-tight">
+      <CardHeader className={cn("space-y-1 text-center sm:text-left", headerClassName)}>
+        <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight">
           {title}
         </CardTitle>
         {description && (
-          <CardDescription className="text-muted-foreground">
+          <CardDescription className="text-muted-foreground text-sm sm:text-base">
             {description}
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className={cn("space-y-4", contentClassName)}>
+      <CardContent className={cn("space-y-4 sm:space-y-6", contentClassName)}>
         {children}
       </CardContent>
     </Card>
