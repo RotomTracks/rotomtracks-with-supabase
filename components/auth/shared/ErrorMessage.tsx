@@ -45,7 +45,7 @@ export function ErrorMessage({
       });
       contextualSuggestions.push({
         text: "¿Olvidaste tu contraseña?",
-        action: () => window.location.href = '/auth/forgot-password',
+        action: () => window.location.href = '/auth/login',
         actionText: "Recuperar contraseña"
       });
     }

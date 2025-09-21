@@ -201,7 +201,6 @@ export const PROTECTED_ROUTES = {
     '/auth/login',
     '/auth/sign-up',
     '/auth/sign-up-success',
-    '/auth/forgot-password',
     '/auth/confirm',
     '/auth/error',
     '/tournaments/search',

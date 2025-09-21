@@ -36,7 +36,7 @@ export function UpdatePasswordForm({
       
       if (error || !user) {
         setSessionValid(false);
-        router.push(`/auth/forgot-password?error=no_session&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
+        router.push(`/auth/login?error=no_session&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
       } else {
         setSessionValid(true);
       }
@@ -84,7 +84,7 @@ export function UpdatePasswordForm({
       // If session is invalid, redirect to forgot password
       if (errorMessage.includes(tAuth('errors.sessionExpired'))) {
         setTimeout(() => {
-          router.push(`/auth/forgot-password?error=session_expired&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
+          router.push(`/auth/login?error=session_expired&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
         }, 2000);
       }
     } finally {

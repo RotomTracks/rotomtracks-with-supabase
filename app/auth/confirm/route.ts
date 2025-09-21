@@ -65,10 +65,10 @@ export async function GET(request: NextRequest) {
       // Handle specific error cases
       if (type === 'recovery') {
         // For recovery errors, redirect to forgot password with error message
-        const forgotPasswordUrl = new URL('/auth/forgot-password', request.url)
-        forgotPasswordUrl.searchParams.set('error', 'expired_token')
-        forgotPasswordUrl.searchParams.set('message', 'El enlace de recuperación ha expirado. Solicita uno nuevo.')
-        return NextResponse.redirect(forgotPasswordUrl)
+        const loginUrl = new URL('/auth/login', request.url)
+        loginUrl.searchParams.set('error', 'expired_token')
+        loginUrl.searchParams.set('message', 'El enlace de recuperación ha expirado. Solicita uno nuevo.')
+        return NextResponse.redirect(loginUrl)
       }
     }
   }

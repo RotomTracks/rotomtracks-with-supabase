@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { ForgotPasswordDialog } from "./forgot-password-dialog";
+import { useSearchParams } from "next/navigation";
 
 interface LoginFormProps {
   className?: string;
@@ -29,6 +30,17 @@ export function LoginForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Check for error messages from URL parameters
+  useEffect(() => {
+    const urlError = searchParams.get('error');
+    const urlMessage = searchParams.get('message');
+    
+    if (urlError && urlMessage) {
+      setErrors({ url: urlMessage });
+    }
+  }, [searchParams]);
 
   const handleInputChange = (field: keyof LoginFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -151,6 +163,12 @@ export function LoginForm({
             {errors.submit && (
               <div className="text-sm text-red-600 text-center" role="alert">
                 {errors.submit}
+              </div>
+            )}
+
+            {errors.url && (
+              <div className="text-sm text-amber-600 text-center bg-amber-50 p-3 rounded-md border border-amber-200" role="alert">
+                {errors.url}
               </div>
             )}
 

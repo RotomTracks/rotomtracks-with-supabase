@@ -146,7 +146,7 @@ function MyComponent() {
         },
         {
           text: "Forgot your password?",
-          action: () => router.push('/auth/forgot-password'),
+          action: () => router.push('/auth/login'),
           actionText: "Reset password"
         }
       ]}

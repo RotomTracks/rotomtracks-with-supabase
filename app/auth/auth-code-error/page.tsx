@@ -49,7 +49,7 @@ export default function AuthCodeErrorPage() {
                   </Button>
                 </Link>
                 
-                <Link href="/auth/forgot-password" className="w-full">
+                <Link href="/auth/login" className="w-full">
                   <Button variant="outline" className="w-full">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Request New Confirmation
