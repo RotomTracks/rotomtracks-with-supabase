@@ -111,8 +111,29 @@ export const common = {
     networkError: "Error de conexión",
     serverError: "Error del servidor",
     unknownError: "Error desconocido",
+    unexpectedError: "Ocurrió un error inesperado",
     tryAgain: "Inténtalo de nuevo",
-    contactSupport: "Contacta soporte"
+    contactSupport: "Contacta soporte",
+    accountCreated: "¡Cuenta creada exitosamente! Por favor revisa tu email para confirmar tu cuenta."
+  },
+
+  // UI interactions
+  ui: {
+    showPassword: "Mostrar contraseña",
+    hidePassword: "Ocultar contraseña",
+    showConfirmPassword: "Mostrar confirmar contraseña",
+    hideConfirmPassword: "Ocultar confirmar contraseña",
+    edit: "Editar",
+    copy: "Copiar datos",
+    copied: "¡Copiado!",
+    copyError: "Error al copiar al portapapeles"
+  },
+
+  // Account types
+  account: {
+    playerAccount: "Cuenta de Jugador",
+    organizerAccount: "Cuenta de Organizador",
+    organizerApproved: "Cuenta de Organizador Aprobada"
   },
 
   // Pagination
@@ -155,5 +176,21 @@ export const common = {
     uploadError: "Error al subir archivo",
     invalidType: "Tipo de archivo no válido",
     fileTooLarge: "Archivo demasiado grande"
+  },
+
+  // Validation messages
+  validation: {
+    required: "Este campo es requerido",
+    firstNameRequired: "El nombre es requerido",
+    firstNameMinLength: "El nombre debe tener al menos 2 caracteres",
+    lastNameRequired: "El apellido es requerido",
+    lastNameMinLength: "El apellido debe tener al menos 2 caracteres",
+    playerIdRequired: "El Player ID es requerido",
+    playerIdMinLength: "El Player ID debe tener al menos 3 caracteres",
+    birthYearRequired: "El año de nacimiento es requerido",
+    birthYearInvalid: "El año de nacimiento debe ser un año válido entre 1900 y el año actual",
+    organizationNameRequired: "El nombre de la organización es requerido al solicitar rol de organizador",
+    invalidUrl: "Por favor ingresa una URL válida",
+    invalidProtocol: "La URL debe comenzar con http:// o https://"
   }
 } as const;

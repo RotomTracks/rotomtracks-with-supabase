@@ -111,8 +111,29 @@ export const common = {
     networkError: "Network error",
     serverError: "Server error",
     unknownError: "Unknown error",
+    unexpectedError: "An unexpected error occurred",
     tryAgain: "Try again",
-    contactSupport: "Contact support"
+    contactSupport: "Contact support",
+    accountCreated: "Account created successfully! Please check your email to confirm your account."
+  },
+
+  // UI interactions
+  ui: {
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    showConfirmPassword: "Show confirm password",
+    hideConfirmPassword: "Hide confirm password",
+    edit: "Edit",
+    copy: "Copy data",
+    copied: "Copied!",
+    copyError: "Error copying to clipboard"
+  },
+
+  // Account types
+  account: {
+    playerAccount: "Player Account",
+    organizerAccount: "Organizer Account",
+    organizerApproved: "Approved Organizer Account"
   },
 
   // Pagination
@@ -155,5 +176,21 @@ export const common = {
     uploadError: "Error uploading file",
     invalidType: "Invalid file type",
     fileTooLarge: "File too large"
+  },
+
+  // Validation messages
+  validation: {
+    required: "This field is required",
+    firstNameRequired: "First name is required",
+    firstNameMinLength: "First name must be at least 2 characters",
+    lastNameRequired: "Last name is required",
+    lastNameMinLength: "Last name must be at least 2 characters",
+    playerIdRequired: "Player ID is required",
+    playerIdMinLength: "Player ID must be at least 3 characters",
+    birthYearRequired: "Birth year is required",
+    birthYearInvalid: "Birth year must be a valid year between 1900 and current year",
+    organizationNameRequired: "Organization name is required when requesting organizer role",
+    invalidUrl: "Please enter a valid URL",
+    invalidProtocol: "URL must start with http:// or https://"
   }
 } as const;

@@ -20,7 +20,7 @@ export function SignUpForm({
   className,
   ...props
 }: SignUpFormProps & React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth } = useTypedTranslation();
+  const { tAuth, tCommon } = useTypedTranslation();
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     password: "",
@@ -86,10 +86,10 @@ export function SignUpForm({
         setErrors({ submit: error.message });
       } else {
         // Show success message or redirect
-        alert("Account created successfully! Please check your email to confirm your account.");
+        alert(tCommon('messages.accountCreated'));
       }
     } catch (error) {
-      setErrors({ submit: "An unexpected error occurred" });
+      setErrors({ submit: tCommon('messages.unexpectedError') });
     } finally {
       setLoading(false);
     }
@@ -152,7 +152,7 @@ export function SignUpForm({
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? tCommon('ui.hidePassword') : tCommon('ui.showPassword')}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -189,7 +189,7 @@ export function SignUpForm({
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  aria-label={showConfirmPassword ? tCommon('ui.hideConfirmPassword') : tCommon('ui.showConfirmPassword')}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />

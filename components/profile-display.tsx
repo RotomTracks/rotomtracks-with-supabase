@@ -17,7 +17,7 @@ import {
   Info
 } from "lucide-react";
 import { Avatar } from "./ui/avatar";
-import { useFormatting } from "@/lib/i18n";
+import { useFormatting, useTypedTranslation } from "@/lib/i18n";
 
 interface ProfileDisplayProps {
   profile: {
@@ -45,6 +45,7 @@ export function ProfileDisplay({
 }: ProfileDisplayProps) {
   const [copySuccess, setCopySuccess] = useState(false);
   const { formatLongDate } = useFormatting();
+  const { tCommon } = useTypedTranslation();
   const isOrganizer = profile.user_role === UserRole.ORGANIZER;
 
   // Función para copiar datos básicos al portapapeles
@@ -61,7 +62,7 @@ export function ProfileDisplay({
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Error al copiar al portapapeles:', err);
+      console.error(tCommon('ui.copyError'), err);
     }
   };
   
@@ -155,7 +156,7 @@ export function ProfileDisplay({
           {showEditButton && onEdit && (
             <Button onClick={onEdit} variant="outline">
               <Edit className="w-4 h-4 mr-2" />
-              Editar
+              {tCommon('ui.edit')}
             </Button>
           )}
         </div>
@@ -181,12 +182,12 @@ export function ProfileDisplay({
             {copySuccess ? (
               <>
                 <CheckCircle className="w-4 h-4" />
-                ¡Copiado!
+                {tCommon('ui.copied')}
               </>
             ) : (
               <>
                 <Copy className="w-4 h-4" />
-                Copiar datos
+                {tCommon('ui.copy')}
               </>
             )}
           </Button>
@@ -294,7 +295,7 @@ export function ProfileDisplay({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-green-600" />
-                Cuenta de Jugador
+                {tCommon('account.playerAccount')}
               </h3>
               <div className="group relative">
                 <button className="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">

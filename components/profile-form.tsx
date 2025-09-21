@@ -12,6 +12,7 @@ import { validatePlayerId, ValidationMessages } from "@/lib/utils/validation";
 import { UserRole } from "@/lib/types/tournament";
 
 import { OrganizerRequestModal } from "./organizer-request-modal";
+import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
 
 interface ProfileFormProps {
@@ -58,6 +59,7 @@ export function ProfileForm({
   
   const supabase = createClient();
   const router = useRouter();
+  const { tCommon } = useTypedTranslation();
 
 
 
@@ -66,16 +68,16 @@ export function ProfileForm({
 
     // Validar nombre
     if (!formData.first_name.trim()) {
-      newErrors.first_name = "El nombre es requerido";
+      newErrors.first_name = tCommon('validation.firstNameRequired');
     } else if (formData.first_name.trim().length < 2) {
-      newErrors.first_name = "El nombre debe tener al menos 2 caracteres";
+      newErrors.first_name = tCommon('validation.firstNameMinLength');
     }
 
     // Validar apellidos
     if (!formData.last_name.trim()) {
-      newErrors.last_name = "Los apellidos son requeridos";
+      newErrors.last_name = tCommon('validation.lastNameRequired');
     } else if (formData.last_name.trim().length < 2) {
-      newErrors.last_name = "Los apellidos deben tener al menos 2 caracteres";
+      newErrors.last_name = tCommon('validation.lastNameMinLength');
     }
 
     // Validar Player ID
@@ -87,31 +89,31 @@ export function ProfileForm({
 
     // Validar año de nacimiento
     if (!formData.birth_year) {
-      newErrors.birth_year = "El año de nacimiento es requerido";
+      newErrors.birth_year = tCommon('validation.birthYearRequired');
     } else {
       const year = parseInt(formData.birth_year.toString(), 10);
       const currentYear = new Date().getFullYear();
       if (isNaN(year) || year < 1900 || year > currentYear) {
-        newErrors.birth_year = `El año debe estar entre 1900 y ${currentYear}`;
+        newErrors.birth_year = tCommon('validation.birthYearInvalid');
       }
     }
 
     // Validar campos específicos de organizador
     if (formData.user_role === UserRole.ORGANIZER) {
       if (!formData.organization_name.trim()) {
-        newErrors.organization_name = "El nombre de la liga/tienda es requerido para organizadores";
+        newErrors.organization_name = tCommon('validation.organizationNameRequired');
       } else if (formData.organization_name.trim().length < 3) {
-        newErrors.organization_name = "El nombre de la liga/tienda debe tener al menos 3 caracteres";
+        newErrors.organization_name = tCommon('validation.firstNameMinLength'); // Reutilizamos la validación de longitud mínima
       }
 
       if (formData.pokemon_league_url && formData.pokemon_league_url.trim()) {
         try {
           const url = new URL(formData.pokemon_league_url.trim());
           if (!url.protocol.startsWith('http')) {
-            newErrors.pokemon_league_url = "La URL debe comenzar con http:// o https://";
+            newErrors.pokemon_league_url = tCommon('validation.invalidProtocol');
           }
         } catch {
-          newErrors.pokemon_league_url = "La URL no tiene un formato válido";
+          newErrors.pokemon_league_url = tCommon('validation.invalidUrl');
         }
       }
     }
@@ -396,7 +398,7 @@ export function ProfileForm({
               <div className="space-y-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-sm font-medium text-green-700 dark:text-green-300 mb-2">
                   <CheckCircle className="w-4 h-4" />
-                  Cuenta de Organizador Aprobada
+                  {tCommon('account.organizerApproved')}
                 </div>
                 
                 <div>
