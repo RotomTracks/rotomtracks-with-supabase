@@ -5,24 +5,7 @@ import { Calendar, MapPin, Users, Trophy, Clock, ArrowRight } from 'lucide-react
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
-
-interface Tournament {
-  id: string;
-  name: string;
-  tournament_type: string;
-  city: string;
-  country: string;
-  start_date: string;
-  end_date?: string;
-  status: string;
-  current_players: number;
-  max_players?: number;
-  registration_open: boolean;
-  organizer_id: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Tournament } from '@/lib/types/tournament';
 
 interface UpcomingTournamentsProps {
   userLocation?: string;
@@ -175,7 +158,7 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
         {tournaments.map((tournament) => (
           <TournamentCard 
             key={tournament.id} 
-            tournament={tournament}
+            tournament={{...tournament, official_tournament_id: tournament.id} as Tournament}
             viewMode="grid"
             userRole="authenticated"
           />

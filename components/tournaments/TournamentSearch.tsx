@@ -75,19 +75,25 @@ export function TournamentSearch({
     localStorage.setItem('tournament-recent-searches', JSON.stringify(updated));
   };
 
-  // Handle search input changes
+  // Handle search input changes with adaptive debouncing
   useEffect(() => {
+    // Adaptive debouncing: shorter delay for longer queries
+    const delay = query.length <= 3 ? 400 : query.length <= 6 ? 250 : 150;
+    
     const timeoutId = setTimeout(() => {
       if (query.length >= 2) {
         getSuggestions(query);
         setShowSuggestions(true);
+      } else if (query.length === 0 && recentSearches.length > 0) {
+        // Show recent searches when input is empty
+        setShowSuggestions(true);
       } else {
         setShowSuggestions(false);
       }
-    }, 300);
+    }, delay);
 
     return () => clearTimeout(timeoutId);
-  }, [query, getSuggestions]);
+  }, [query, getSuggestions, recentSearches.length]);
 
   // Handle clicks outside to close suggestions
   useEffect(() => {
@@ -230,6 +236,16 @@ export function TournamentSearch({
               }
             }}
             className="pl-10 pr-10 py-3 text-lg"
+            aria-expanded={showSuggestions}
+            aria-haspopup="listbox"
+            aria-autocomplete="list"
+            aria-describedby="search-suggestions"
+            role="combobox"
+            aria-activedescendant={
+              selectedSuggestionIndex >= 0 
+                ? `suggestion-${selectedSuggestionIndex}` 
+                : undefined
+            }
           />
           {/* Clear button */}
           {query && (
@@ -256,12 +272,22 @@ export function TournamentSearch({
 
         {/* Suggestions and Results Dropdown */}
         {(showSuggestions || tournaments.length > 0 || (!loading && !suggestionsLoading && query.length >= 2)) && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+          <div 
+            id="search-suggestions"
+            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto"
+            role="listbox"
+            aria-label="Search suggestions and results"
+          >
             {/* Loading State */}
             {(suggestionsLoading || loading) && (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-gray-500" role="status" aria-live="polite">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                {suggestionsLoading ? 'Buscando sugerencias...' : 'Buscando torneos...'}
+                <span className="sr-only">
+                  {suggestionsLoading ? 'Cargando sugerencias' : 'Buscando torneos'}
+                </span>
+                <span aria-hidden="true">
+                  {suggestionsLoading ? 'Buscando sugerencias...' : 'Buscando torneos...'}
+                </span>
               </div>
             )}
 
@@ -336,14 +362,18 @@ export function TournamentSearch({
                             {recentSearches.map((search, index) => (
                               <button
                                 key={`recent-${index}`}
+                                id={`suggestion-${index}`}
                                 onClick={() => handleSuggestionClick({ id: `recent-${search}`, name: search, category: 'recent' })}
                                 className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 flex items-center gap-3 ${
-                                  selectedSuggestionIndex === index ? 'bg-blue-50' : ''
+                                  selectedSuggestionIndex === index ? 'bg-blue-50 ring-2 ring-blue-200' : ''
                                 }`}
+                                role="option"
+                                aria-selected={selectedSuggestionIndex === index}
                               >
                                 <Search className="h-4 w-4 text-gray-400" />
                                 <div className="flex-1">
                                   <div className="font-medium">{search}</div>
+                                  <div className="text-xs text-gray-500">Búsqueda reciente</div>
                                 </div>
                               </button>
                             ))}
@@ -360,30 +390,54 @@ export function TournamentSearch({
                             )}
                             {suggestions.map((suggestion, index) => {
                               const adjustedIndex = query.length < 2 ? recentSearches.length + index : index;
+                              const getCategoryLabel = (category: string) => {
+                                switch (category) {
+                                  case 'tournament': return 'Torneo';
+                                  case 'location': return 'Ubicación';
+                                  case 'type': return 'Tipo';
+                                  default: return category;
+                                }
+                              };
+                              
                               return (
                                 <button
                                   key={suggestion.id}
+                                  id={`suggestion-${adjustedIndex}`}
                                   onClick={() => handleSuggestionClick(suggestion)}
-                                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3 ${
-                                    selectedSuggestionIndex === adjustedIndex ? 'bg-blue-50' : ''
+                                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 flex items-center gap-3 transition-colors ${
+                                    selectedSuggestionIndex === adjustedIndex ? 'bg-blue-50 ring-2 ring-blue-200' : ''
                                   }`}
+                                  role="option"
+                                  aria-selected={selectedSuggestionIndex === adjustedIndex}
                                 >
                                   {suggestion.category === 'tournament' && <Trophy className="h-4 w-4 text-blue-600" />}
                                   {suggestion.category === 'location' && <MapPin className="h-4 w-4 text-green-600" />}
                                   {suggestion.category === 'type' && <Calendar className="h-4 w-4 text-purple-600" />}
                                   
-                                  <div className="flex-1">
-                                    <div className="font-medium">{suggestion.name}</div>
-                                    {suggestion.location && (
-                                      <div className="text-sm text-gray-500">{suggestion.location}</div>
-                                    )}
-                                    {suggestion.type && (
-                                      <div className="text-sm text-gray-500">{suggestion.type}</div>
-                                    )}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">{suggestion.name}</div>
+                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                      <span>{getCategoryLabel(suggestion.category)}</span>
+                                      {suggestion.location && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="truncate">{suggestion.location}</span>
+                                        </>
+                                      )}
+                                      {suggestion.type && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="truncate">{suggestion.type}</span>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                   
                                   {suggestion.category === 'tournament' && suggestion.status && (
-                                    <Badge variant={suggestion.status === 'upcoming' ? 'default' : 'secondary'}>
+                                    <Badge 
+                                      variant={suggestion.status === 'upcoming' ? 'default' : 'secondary'}
+                                      className="shrink-0"
+                                    >
                                       {suggestion.status === 'upcoming' ? 'Próximo' : 'En curso'}
                                     </Badge>
                                   )}
@@ -393,9 +447,13 @@ export function TournamentSearch({
                           </>
                         ) : (
                           /* No suggestions found */
-                          query.length >= 2 && (
-                            <div className="p-4 text-center text-gray-500">
-                              No se encontraron sugerencias
+                          query.length >= 2 && !suggestionsLoading && (
+                            <div className="p-6 text-center text-gray-500">
+                              <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                              <p className="font-medium">No se encontraron sugerencias</p>
+                              <p className="text-sm text-gray-400 mt-1">
+                                Intenta con términos más generales
+                              </p>
                             </div>
                           )
                         )}

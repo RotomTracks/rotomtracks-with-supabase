@@ -1,22 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { TournamentType } from '@/lib/types/tournament';
-import { z } from 'zod';
-
-// Validation schema for tournament updates
-const updateTournamentSchema = z.object({
-  name: z.string().min(1).optional(),
-  tournament_type: z.nativeEnum(TournamentType).optional(),
-  city: z.string().min(1).optional(),
-  country: z.string().min(1).optional(),
-  state: z.string().optional(),
-  start_date: z.string().datetime().optional(),
-  end_date: z.string().datetime().optional(),
-  max_players: z.number().positive().optional(),
-  status: z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']).optional(),
-  registration_open: z.boolean().optional(),
-  description: z.string().optional(),
-});
 
 // GET /api/tournaments/[id] - Get tournament details
 export async function GET(
@@ -27,7 +10,7 @@ export async function GET(
     const supabase = await createClient();
     const { id } = await params;
 
-    // Fetch tournament with related data
+    // Get tournament details with organizer information
     const { data: tournament, error } = await supabase
       .from('tournaments')
       .select(`
@@ -36,54 +19,6 @@ export async function GET(
           first_name,
           last_name,
           organization_name
-        ),
-        tournament_participants(
-          id,
-          user_id,
-          player_name,
-          player_id,
-          registration_date,
-          status,
-          user_profiles(
-            first_name,
-            last_name
-          )
-        ),
-        tournament_results(
-          id,
-          participant_id,
-          wins,
-          losses,
-          draws,
-          byes,
-          final_standing,
-          points,
-          tournament_participants(
-            player_name,
-            player_id
-          )
-        ),
-        tournament_matches(
-          id,
-          round_number,
-          table_number,
-          outcome,
-          match_status,
-          player1:tournament_participants!tournament_matches_player1_id_fkey(
-            player_name,
-            player_id
-          ),
-          player2:tournament_participants!tournament_matches_player2_id_fkey(
-            player_name,
-            player_id
-          )
-        ),
-        tournament_files(
-          id,
-          file_name,
-          file_type,
-          file_size,
-          created_at
         )
       `)
       .eq('id', id)
@@ -104,7 +39,16 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ tournament });
+    // Check if user has permission to view this tournament
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // For now, allow anyone to view tournament details
+    // In the future, we might want to restrict access to private tournaments
+    
+    return NextResponse.json({
+      tournament,
+      message: 'Tournament retrieved successfully'
+    });
 
   } catch (error) {
     console.error('Unexpected error in GET /api/tournaments/[id]:', error);
@@ -133,21 +77,20 @@ export async function PUT(
       );
     }
 
-    // Check if tournament exists and user is the organizer
-    const { data: tournament, error: fetchError } = await supabase
+    // Get tournament to check ownership
+    const { data: tournament, error: tournamentError } = await supabase
       .from('tournaments')
       .select('organizer_id')
       .eq('id', id)
       .single();
 
-    if (fetchError) {
-      if (fetchError.code === 'PGRST116') {
+    if (tournamentError) {
+      if (tournamentError.code === 'PGRST116') {
         return NextResponse.json(
           { error: 'Tournament not found' },
           { status: 404 }
         );
       }
-      
       return NextResponse.json(
         { error: 'Failed to fetch tournament' },
         { status: 500 }
@@ -164,14 +107,16 @@ export async function PUT(
 
     // Parse and validate request body
     const body = await request.json();
-    const validatedData = updateTournamentSchema.parse(body);
-
+    
+    // Remove fields that shouldn't be updated directly
+    const { id: _, organizer_id, created_at, ...updateData } = body;
+    
     // Update tournament
     const { data: updatedTournament, error: updateError } = await supabase
       .from('tournaments')
       .update({
-        ...validatedData,
-        updated_at: new Date().toISOString(),
+        ...updateData,
+        updated_at: new Date().toISOString()
       })
       .eq('id', id)
       .select(`
@@ -198,13 +143,6 @@ export async function PUT(
     });
 
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation error', details: error.issues },
-        { status: 400 }
-      );
-    }
-
     console.error('Unexpected error in PUT /api/tournaments/[id]:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -231,21 +169,20 @@ export async function DELETE(
       );
     }
 
-    // Check if tournament exists and user is the organizer
-    const { data: tournament, error: fetchError } = await supabase
+    // Get tournament to check ownership
+    const { data: tournament, error: tournamentError } = await supabase
       .from('tournaments')
-      .select('organizer_id, status, current_players')
+      .select('organizer_id, status')
       .eq('id', id)
       .single();
 
-    if (fetchError) {
-      if (fetchError.code === 'PGRST116') {
+    if (tournamentError) {
+      if (tournamentError.code === 'PGRST116') {
         return NextResponse.json(
           { error: 'Tournament not found' },
           { status: 404 }
         );
       }
-      
       return NextResponse.json(
         { error: 'Failed to fetch tournament' },
         { status: 500 }
@@ -260,15 +197,15 @@ export async function DELETE(
       );
     }
 
-    // Check if tournament can be deleted (no participants or not started)
-    if (tournament.current_players > 0 && tournament.status !== 'upcoming') {
+    // Prevent deletion of ongoing or completed tournaments
+    if (tournament.status === 'ongoing' || tournament.status === 'completed') {
       return NextResponse.json(
-        { error: 'Cannot delete tournament with participants that has already started' },
+        { error: 'Cannot delete ongoing or completed tournaments' },
         { status: 400 }
       );
     }
 
-    // Delete tournament (cascade will handle related records)
+    // Delete tournament (this will cascade to related records)
     const { error: deleteError } = await supabase
       .from('tournaments')
       .delete()

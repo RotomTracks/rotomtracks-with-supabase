@@ -1,96 +1,82 @@
+import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { TournamentManagement } from '@/components/tournaments/TournamentManagement';
+import TournamentManagementClient from '@/components/tournaments/TournamentManagementClient';
 
-// Forzar renderizado dinámico
-export const dynamic = 'force-dynamic';
-
-interface ManagePageProps {
-  params: Promise<{
-    id: string;
-  }>;
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function ManagePage({ params }: ManagePageProps) {
+async function getTournamentData(tournamentId: string, userId: string) {
   const supabase = await createClient();
-  const { id } = await params;
-  
-  // Check authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    redirect('/auth/login');
-  }
 
   // Get tournament details
   const { data: tournament, error: tournamentError } = await supabase
     .from('tournaments')
-    .select(`
-      *,
-      tournament_files(
-        id,
-        file_name,
-        file_type,
-        file_size,
-        created_at
-      )
-    `)
-    .eq('id', id)
+    .select('*')
+    .eq('id', tournamentId)
     .single();
 
   if (tournamentError || !tournament) {
-    redirect('/tournaments');
+    return null;
   }
 
   // Check if user is the organizer
-  if (tournament.organizer_id !== user.id) {
-    redirect(`/tournaments/${id}`);
+  if (tournament.organizer_id !== userId) {
+    return null;
   }
 
-  // Get tournament statistics
-  const [
-    { count: participantsCount },
-    { count: matchesCount },
-    { count: resultsCount }
-  ] = await Promise.all([
-    supabase
-      .from('tournament_participants')
-      .select('*', { count: 'exact', head: true })
-      .eq('tournament_id', id),
-    supabase
-      .from('tournament_matches')
-      .select('*', { count: 'exact', head: true })
-      .eq('tournament_id', id),
-    supabase
-      .from('tournament_results')
-      .select('*', { count: 'exact', head: true })
-      .eq('tournament_id', id)
-  ]);
+  // Get participants
+  const { data: participants, error: participantsError } = await supabase
+    .from('tournament_participants')
+    .select(`
+      id,
+      player_name,
+      player_id,
+      player_birthdate,
+      email,
+      phone,
+      status,
+      registration_date,
+      tdf_userid,
+      registration_source,
+      emergency_contact,
+      emergency_phone
+    `)
+    .eq('tournament_id', tournamentId)
+    .order('registration_date', { ascending: true });
 
-  const stats = {
-    participants: participantsCount || 0,
-    matches: matchesCount || 0,
-    results: resultsCount || 0,
-    files: tournament.tournament_files?.length || 0,
-  };
+  if (participantsError) {
+    console.error('Error fetching participants:', participantsError);
+    return { tournament, participants: [] };
+  }
+
+  return { tournament, participants: participants || [] };
+}
+
+export default async function TournamentManagePage({ params }: PageProps) {
+  const { id: tournamentId } = await params;
+  const supabase = await createClient();
+
+  // Check authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    redirect('/auth/signin');
+  }
+
+  // Get tournament data
+  const data = await getTournamentData(tournamentId, user.id);
+  
+  if (!data) {
+    notFound();
+  }
+
+  const { tournament, participants } = data;
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Gestión de Torneo
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Administra archivos, procesa datos y genera reportes
-          </p>
-        </div>
-
-        <TournamentManagement
-          tournament={tournament}
-          files={tournament.tournament_files || []}
-          stats={stats}
-        />
-      </div>
-    </div>
+    <TournamentManagementClient 
+      tournament={tournament}
+      participants={participants}
+    />
   );
 }

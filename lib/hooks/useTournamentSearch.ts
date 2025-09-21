@@ -61,6 +61,7 @@ export function useTournamentSearch(): UseTournamentSearchReturn {
   
   const lastSearchParams = useRef<TournamentSearchParams>({});
   const abortController = useRef<AbortController | null>(null);
+  const suggestionsCache = useRef<Map<string, { data: SearchSuggestion[]; timestamp: number }>>(new Map());
 
   const search = useCallback(async (params: TournamentSearchParams) => {
     // Cancel previous request
@@ -154,17 +155,45 @@ export function useTournamentSearch(): UseTournamentSearchReturn {
       return;
     }
 
+    // Check cache first (5 minute TTL)
+    const cacheKey = query.toLowerCase().trim();
+    const cached = suggestionsCache.current.get(cacheKey);
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp) < 5 * 60 * 1000) {
+      setSuggestions(cached.data);
+      return;
+    }
+
     setSuggestionsLoading(true);
 
     try {
-      const response = await fetch(`/api/tournaments/search?query=${encodeURIComponent(query)}&suggestions=true`);
+      const response = await fetch(`/api/tournaments/search?query=${encodeURIComponent(query)}&suggestions=true&limit=8`);
 
       if (!response.ok) {
         throw new Error(`Suggestions failed: ${response.statusText}`);
       }
 
       const data = await response.json();
-      setSuggestions(data.suggestions || []);
+      const suggestions = data.suggestions || [];
+      
+      // Cache the results
+      suggestionsCache.current.set(cacheKey, {
+        data: suggestions,
+        timestamp: now
+      });
+      
+      // Clean old cache entries (keep max 50 entries)
+      if (suggestionsCache.current.size > 50) {
+        const entries = Array.from(suggestionsCache.current.entries());
+        entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
+        suggestionsCache.current.clear();
+        entries.slice(0, 30).forEach(([key, value]) => {
+          suggestionsCache.current.set(key, value);
+        });
+      }
+      
+      setSuggestions(suggestions);
 
     } catch (err: any) {
       console.error('Suggestions error:', err);
