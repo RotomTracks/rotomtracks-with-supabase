@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -8,8 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AlertCircle, Mail, RefreshCw } from "lucide-react";
+import { useTypedTranslation } from "@/lib/i18n";
 
 export default function AuthCodeErrorPage() {
+  const { tCommon } = useTypedTranslation();
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md">
@@ -20,45 +24,37 @@ export default function AuthCodeErrorPage() {
                 <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
               </div>
               <CardTitle className="text-2xl">
-                Confirmation Failed
+                {tCommon('pages.authError.title')}
               </CardTitle>
               <CardDescription>
-                There was a problem confirming your account
+                {tCommon('pages.authError.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
                 <p>
-                  The confirmation link may have expired or been used already.
+                  {tCommon('pages.authError.expired')}
                 </p>
-                <p>
-                  This can happen if:
-                </p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>The link is older than 24 hours</li>
-                  <li>You&apos;ve already confirmed your account</li>
-                  <li>The link was corrupted during forwarding</li>
-                </ul>
               </div>
 
               <div className="space-y-3">
                 <Link href="/auth/login" className="w-full">
                   <Button className="w-full">
                     <Mail className="w-4 h-4 mr-2" />
-                    Try Signing In
+                    {tCommon('navigation.login')}
                   </Button>
                 </Link>
                 
                 <Link href="/auth/login" className="w-full">
                   <Button variant="outline" className="w-full">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Request New Confirmation
+                    {tCommon('pages.authError.requestNewConfirmation')}
                   </Button>
                 </Link>
                 
                 <Link href="/" className="w-full">
                   <Button variant="ghost" className="w-full">
-                    Back to Home
+                    {tCommon('buttons.backToHome')}
                   </Button>
                 </Link>
               </div>

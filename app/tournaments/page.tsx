@@ -218,6 +218,6 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
 }
 
 export const metadata = {
-  title: 'Torneos - RotomTracks',
+  title: 'Tournaments - RotomTracks',
   description: 'Encuentra y participa en torneos de Pokémon TCG, VGC y GO en España y Latinoamérica',
 };

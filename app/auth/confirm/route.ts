@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         // For recovery errors, redirect to forgot password with error message
         const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('error', 'expired_token')
-        loginUrl.searchParams.set('message', 'El enlace de recuperación ha expirado. Solicita uno nuevo.')
+        loginUrl.searchParams.set('message', 'The recovery link has expired. Please request a new one.')
         return NextResponse.redirect(loginUrl)
       }
     }

@@ -40,7 +40,15 @@ export const common = {
     continue: "Continue",
     finish: "Finish",
     confirm: "Confirm",
-    retry: "Retry"
+    retry: "Retry",
+    reload: "Reload",
+    reloadPage: "Reload page",
+    continueWithoutAuth: "Continue without authentication",
+    understood: "Understood",
+    goBack: "Go Back",
+    backToHome: "Back to Home",
+    backToTournaments: "Back to Tournaments",
+    requestNew: "Request New"
   },
 
   // Status and states
@@ -192,5 +200,52 @@ export const common = {
     organizationNameRequired: "Organization name is required when requesting organizer role",
     invalidUrl: "Please enter a valid URL",
     invalidProtocol: "URL must start with http:// or https://"
+  },
+
+  // Page specific
+  pages: {
+    home: {
+      loading: "Loading Rotom Tracks...",
+      loadingTooLong: "The application is taking longer than expected to load...",
+      connectionError: "Connection error: {{error}}",
+      loadingAuth: "Loading authentication..."
+    },
+    profile: {
+      title: "My Profile",
+      updateProfile: "Update Profile",
+      completeProfile: "Complete Profile"
+    },
+    tournaments: {
+      title: "Tournaments"
+    },
+    unauthorized: {
+      organizerRequired: {
+        title: "Organizer Access Required",
+        description: "This feature is only available to tournament organizers.",
+        suggestion: "If you need to organize tournaments, please update your account type in your profile settings."
+      },
+      playerRequired: {
+        title: "Player Access Required", 
+        description: "This feature is only available to registered players.",
+        suggestion: "Please make sure your account is set up as a player account."
+      },
+      accessDenied: {
+        title: "Access Denied",
+        description: "You don't have permission to access this page.",
+        suggestion: "Please check your account permissions or contact support if you believe this is an error."
+      }
+    },
+    authError: {
+      title: "Authentication Error",
+      description: "There was a problem with your authentication link.",
+      expired: "The confirmation link has expired. Please request a new one.",
+      invalid: "The confirmation link is invalid or has already been used.",
+      requestNewConfirmation: "Request New Confirmation"
+    },
+    debug: {
+      title: "Supabase Diagnostic",
+      description: "Debug your Supabase connection and configuration",
+      helpText: "This diagnostic tool helps identify connection issues with Supabase. If you see errors, check your environment variables and network connection."
+    }
   }
 } as const;

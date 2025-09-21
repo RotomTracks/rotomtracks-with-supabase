@@ -192,5 +192,11 @@ export const auth = {
   // Profile
   profile: {
     noPlayerId: "No Player ID"
+  },
+
+  // Buttons
+  buttons: {
+    cancel: "Cancel",
+    understood: "Understood"
   }
 } as const;

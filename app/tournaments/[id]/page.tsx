@@ -108,7 +108,7 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
             <Link href="/tournaments">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver a Torneos
+                {tCommon('buttons.backToTournaments')}
               </Button>
             </Link>
             <div>

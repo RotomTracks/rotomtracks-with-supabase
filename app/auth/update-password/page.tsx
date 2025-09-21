@@ -10,7 +10,7 @@ export default async function Page() {
   
   if (error || !user) {
     // No active session, redirect to forgot password page
-    redirect('/auth/login?error=no_session&message=Debes solicitar un enlace de recuperación primero.');
+    redirect('/auth/login?error=no_session&message=You must request a recovery link first.');
   }
 
   return (

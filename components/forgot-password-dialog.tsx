@@ -117,7 +117,7 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
                 disabled={isLoading}
                 className="flex-1"
               >
-                Cancelar
+                {tAuth('buttons.cancel')}
               </Button>
               <Button
                 type="submit"
@@ -150,7 +150,7 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={handleCloseSuccess}>
-              Entendido
+              {tAuth('buttons.understood')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

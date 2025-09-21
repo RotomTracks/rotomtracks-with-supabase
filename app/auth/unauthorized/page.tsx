@@ -12,9 +12,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Shield, Building2, Trophy, ArrowLeft, Home } from "lucide-react";
 import { Suspense } from "react";
+import { useTypedTranslation } from "@/lib/i18n";
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();
+  const { tCommon } = useTypedTranslation();
   const reason = searchParams.get("reason");
   const redirectTo = searchParams.get("redirectTo");
 
@@ -23,27 +25,27 @@ function UnauthorizedContent() {
       case "organizer_required":
         return {
           icon: <Building2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />,
-          title: "Organizer Access Required",
-          description: "This feature is only available to tournament organizers.",
-          suggestion: "If you need to organize tournaments, please update your account type in your profile settings.",
+          title: tCommon('pages.unauthorized.organizerRequired.title'),
+          description: tCommon('pages.unauthorized.organizerRequired.description'),
+          suggestion: tCommon('pages.unauthorized.organizerRequired.suggestion'),
           bgColor: "bg-blue-100 dark:bg-blue-900/20",
           borderColor: "border-blue-200 dark:border-blue-800"
         };
       case "player_required":
         return {
           icon: <Trophy className="w-8 h-8 text-green-600 dark:text-green-400" />,
-          title: "Player Access Required",
-          description: "This feature is only available to registered players.",
-          suggestion: "Please make sure your account is set up as a player account.",
+          title: tCommon('pages.unauthorized.playerRequired.title'),
+          description: tCommon('pages.unauthorized.playerRequired.description'),
+          suggestion: tCommon('pages.unauthorized.playerRequired.suggestion'),
           bgColor: "bg-green-100 dark:bg-green-900/20",
           borderColor: "border-green-200 dark:border-green-800"
         };
       default:
         return {
           icon: <Shield className="w-8 h-8 text-red-600 dark:text-red-400" />,
-          title: "Access Denied",
-          description: "You don't have permission to access this page.",
-          suggestion: "Please check your account permissions or contact support if you believe this is an error.",
+          title: tCommon('pages.unauthorized.accessDenied.title'),
+          description: tCommon('pages.unauthorized.accessDenied.description'),
+          suggestion: tCommon('pages.unauthorized.accessDenied.suggestion'),
           bgColor: "bg-red-100 dark:bg-red-900/20",
           borderColor: "border-red-200 dark:border-red-800"
         };
@@ -113,7 +115,7 @@ function UnauthorizedContent() {
                   <Link href="/" className="w-full">
                     <Button variant="outline" className="w-full">
                       <ArrowLeft className="w-4 h-4 mr-2" />
-                      Go Back
+                      {tCommon('buttons.goBack')}
                     </Button>
                   </Link>
                 )}
@@ -121,7 +123,7 @@ function UnauthorizedContent() {
                 <Link href="/" className="w-full">
                   <Button variant="ghost" className="w-full">
                     <Home className="w-4 h-4 mr-2" />
-                    Back to Home
+                    {tCommon('buttons.backToHome')}
                   </Button>
                 </Link>
               </div>

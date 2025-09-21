@@ -40,7 +40,15 @@ export const common = {
     continue: "Continuar",
     finish: "Finalizar",
     confirm: "Confirmar",
-    retry: "Reintentar"
+    retry: "Reintentar",
+    reload: "Recargar",
+    reloadPage: "Recargar página",
+    continueWithoutAuth: "Continuar sin autenticación",
+    understood: "Entendido",
+    goBack: "Volver",
+    backToHome: "Volver al Inicio",
+    backToTournaments: "Volver a Torneos",
+    requestNew: "Solicitar Nuevo"
   },
 
   // Status and states
@@ -192,5 +200,52 @@ export const common = {
     organizationNameRequired: "El nombre de la organización es requerido al solicitar rol de organizador",
     invalidUrl: "Por favor ingresa una URL válida",
     invalidProtocol: "La URL debe comenzar con http:// o https://"
+  },
+
+  // Page specific
+  pages: {
+    home: {
+      loading: "Cargando Rotom Tracks...",
+      loadingTooLong: "La aplicación está tardando más de lo esperado en cargar...",
+      connectionError: "Error de conexión: {{error}}",
+      loadingAuth: "Cargando autenticación..."
+    },
+    profile: {
+      title: "Mi Perfil",
+      updateProfile: "Actualizar Perfil",
+      completeProfile: "Completar Perfil"
+    },
+    tournaments: {
+      title: "Torneos"
+    },
+    unauthorized: {
+      organizerRequired: {
+        title: "Acceso de Organizador Requerido",
+        description: "Esta función solo está disponible para organizadores de torneos.",
+        suggestion: "Si necesitas organizar torneos, por favor actualiza tu tipo de cuenta en la configuración de tu perfil."
+      },
+      playerRequired: {
+        title: "Acceso de Jugador Requerido",
+        description: "Esta función solo está disponible para jugadores registrados.",
+        suggestion: "Por favor asegúrate de que tu cuenta esté configurada como cuenta de jugador."
+      },
+      accessDenied: {
+        title: "Acceso Denegado",
+        description: "No tienes permisos para acceder a esta página.",
+        suggestion: "Por favor verifica los permisos de tu cuenta o contacta soporte si crees que esto es un error."
+      }
+    },
+    authError: {
+      title: "Error de Autenticación",
+      description: "Hubo un problema con tu enlace de autenticación.",
+      expired: "El enlace de confirmación ha expirado. Por favor solicita uno nuevo.",
+      invalid: "El enlace de confirmación es inválido o ya ha sido usado.",
+      requestNewConfirmation: "Solicitar Nueva Confirmación"
+    },
+    debug: {
+      title: "Diagnóstico de Supabase",
+      description: "Depura tu conexión y configuración de Supabase",
+      helpText: "Esta herramienta de diagnóstico ayuda a identificar problemas de conexión con Supabase. Si ves errores, verifica tus variables de entorno y conexión de red."
+    }
   }
 } as const;
