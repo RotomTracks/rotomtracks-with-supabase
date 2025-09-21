@@ -162,7 +162,6 @@ export interface UserProfile {
   last_name?: string;
   player_id?: string;
   birth_year?: number;
-  profile_image_url?: string;
   user_role: UserRole;
   organization_name?: string;
   created_at: string;

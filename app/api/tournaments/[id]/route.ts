@@ -35,8 +35,7 @@ export async function GET(
         organizer:user_profiles!tournaments_organizer_id_fkey(
           first_name,
           last_name,
-          organization_name,
-          profile_image_url
+          organization_name
         ),
         tournament_participants(
           id,
@@ -47,8 +46,7 @@ export async function GET(
           status,
           user_profiles(
             first_name,
-            last_name,
-            profile_image_url
+            last_name
           )
         ),
         tournament_results(

@@ -6,13 +6,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChevronDown, User, Trophy, LogOut, Building2 } from "lucide-react";
 import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
+import { Avatar } from "./ui/avatar";
 
 interface UserProfile {
   id: string;
   first_name?: string;
   last_name?: string;
   player_id?: string;
-  profile_image_url?: string;
   user_role?: string;
 }
 
@@ -82,25 +82,18 @@ export function UserMenu({ user }: UserMenuProps) {
     await signOut();
   };
 
-  const firstLetter = user.email ? user.email.charAt(0).toUpperCase() : "U";
-
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg overflow-hidden">
-          {userProfile?.profile_image_url ? (
-            <img 
-              src={userProfile.profile_image_url} 
-              alt="Avatar" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            firstLetter
-          )}
-        </div>
+        <Avatar 
+          firstName={userProfile?.first_name}
+          lastName={userProfile?.last_name}
+          email={user.email}
+          size="md"
+        />
         <ChevronDown 
           className={`w-4 h-4 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""

@@ -21,7 +21,7 @@ async function setupStorage() {
   try {
     console.log('Setting up Supabase Storage...');
 
-    // Verificar si el bucket profile-images existe
+    // Verificar buckets existentes (excluyendo profile-images que ya no se usa)
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
     if (listError) {
@@ -31,40 +31,34 @@ async function setupStorage() {
 
     console.log('Existing buckets:', buckets.map(b => b.name));
 
-    const profileImagesBucket = buckets.find(bucket => bucket.name === 'profile-images');
+    // Note: profile-images bucket has been removed as part of UI cleanup
+    console.log('Profile images functionality has been removed from the application');
 
-    if (!profileImagesBucket) {
-      console.log('Creating profile-images bucket...');
+    // Setup other required buckets (tournament-files, tournament-reports)
+    const requiredBuckets = [
+      { name: 'tournament-files', public: false },
+      { name: 'tournament-reports', public: true }
+    ];
+
+    for (const bucketConfig of requiredBuckets) {
+      const existingBucket = buckets.find(bucket => bucket.name === bucketConfig.name);
       
-      const { data, error } = await supabase.storage.createBucket('profile-images', {
-        public: true,
-        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-        fileSizeLimit: 5242880 // 5MB
-      });
+      if (!existingBucket) {
+        console.log(`Creating ${bucketConfig.name} bucket...`);
+        
+        const { data, error } = await supabase.storage.createBucket(bucketConfig.name, {
+          public: bucketConfig.public,
+          fileSizeLimit: 10485760 // 10MB
+        });
 
-      if (error) {
-        console.error('Error creating bucket:', error);
-        return;
+        if (error) {
+          console.error(`Error creating ${bucketConfig.name} bucket:`, error);
+        } else {
+          console.log(`${bucketConfig.name} bucket created successfully:`, data);
+        }
+      } else {
+        console.log(`${bucketConfig.name} bucket already exists`);
       }
-
-      console.log('Bucket created successfully:', data);
-    } else {
-      console.log('profile-images bucket already exists');
-    }
-
-    // Verificar políticas de acceso
-    console.log('Checking storage policies...');
-    
-    // Esta consulta requiere permisos de administrador
-    const { data: policies, error: policiesError } = await supabase
-      .from('storage.policies')
-      .select('*')
-      .eq('bucket_id', 'profile-images');
-
-    if (policiesError) {
-      console.log('Could not check policies (this is normal if you don\'t have admin access)');
-    } else {
-      console.log('Current policies:', policies);
     }
 
     console.log('Storage setup completed!');

@@ -40,8 +40,7 @@ port = 54325
 file_size_limit = "50MiB"
 buckets = [
   { name = "tournament-files", public = false },
-  { name = "tournament-reports", public = true },
-  { name = "profile-images", public = true }
+  { name = "tournament-reports", public = true }
 ]
 
 [edge_runtime]

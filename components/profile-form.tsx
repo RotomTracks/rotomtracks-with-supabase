@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card } from "./ui/card";
-import { User, Camera, Save, ArrowLeft, Building2, Trophy, AlertCircle, CheckCircle } from "lucide-react";
+import { User, Save, ArrowLeft, Building2, Trophy, AlertCircle, CheckCircle } from "lucide-react";
 import { validatePlayerId, ValidationMessages } from "@/lib/utils/validation";
 import { UserRole } from "@/lib/types/tournament";
 
@@ -25,7 +25,6 @@ interface ProfileFormProps {
     last_name?: string;
     player_id?: string;
     birth_year?: number;
-    profile_image_url?: string;
     user_role?: string;
     organization_name?: string;
     pokemon_league_url?: string;
@@ -52,8 +51,6 @@ export function ProfileForm({
     pokemon_league_url: initialProfile?.pokemon_league_url || "",
   });
   
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState(initialProfile?.profile_image_url || "");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,81 +59,7 @@ export function ProfileForm({
   const supabase = createClient();
   const router = useRouter();
 
-  // Preview de la imagen seleccionada
-  useEffect(() => {
-    if (profileImage) {
-      const url = URL.createObjectURL(profileImage);
-      setPreviewUrl(url);
-      return () => URL.revokeObjectURL(url);
-    }
-  }, [profileImage]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfileImage(file);
-    }
-  };
-
-  const uploadImage = async (file: File): Promise<string | null> => {
-    try {
-      console.log('Uploading image:', file.name, 'Size:', file.size);
-      
-      // Validar el archivo
-      if (file.size > 1 * 1024 * 1024) { // 1MB
-        throw new Error('El archivo es demasiado grande. Máximo 1MB.');
-      }
-      
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error('Tipo de archivo no permitido. Use JPEG, PNG, WebP o GIF.');
-      }
-      
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
-      
-      // Eliminar imagen anterior si existe
-      if (previewUrl && previewUrl.includes('supabase')) {
-        try {
-          const oldPath = previewUrl.split('/').pop();
-          if (oldPath) {
-            const oldFileName = `${user.id}/${oldPath}`;
-            await supabase.storage
-              .from('profile-images')
-              .remove([oldFileName]);
-          }
-        } catch (deleteError) {
-          console.log('Could not delete old image:', deleteError);
-        }
-      }
-      
-      const { data, error } = await supabase.storage
-        .from('profile-images')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
-
-      if (error) {
-        console.error('Storage upload error:', error);
-        throw error;
-      }
-
-      console.log('Image uploaded successfully:', data);
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(fileName);
-
-      console.log('Public URL generated:', publicUrl);
-      
-      return publicUrl;
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      setMessage(error.message || 'Error al subir la imagen. Inténtalo de nuevo.');
-      return null;
-    }
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -210,16 +133,6 @@ export function ProfileForm({
     setErrors({});
 
     try {
-      let imageUrl = previewUrl;
-
-      // Subir nueva imagen si se seleccionó una
-      if (profileImage) {
-        const uploadedUrl = await uploadImage(profileImage);
-        if (uploadedUrl) {
-          imageUrl = uploadedUrl;
-        }
-      }
-
       // Datos básicos del perfil
       const profileData: any = {
         user_id: user.id,
@@ -229,7 +142,6 @@ export function ProfileForm({
         birth_year: formData.birth_year ? parseInt(formData.birth_year.toString()) : null,
         user_role: formData.user_role,
         organization_name: formData.user_role === UserRole.ORGANIZER ? formData.organization_name.trim() : null,
-        profile_image_url: imageUrl,
         updated_at: new Date().toISOString(),
       };
 
@@ -316,59 +228,6 @@ export function ProfileForm({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Sección de imagen de perfil */}
-        <Card className="p-6">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                {previewUrl ? (
-                  <img 
-                    src={previewUrl} 
-                    alt="Imagen de perfil" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      console.error('Error loading profile image:', previewUrl);
-                      console.error('Image error event:', e);
-                      // Mostrar el icono de usuario si la imagen falla
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                    onLoad={() => {
-                      console.log('Profile image loaded successfully:', previewUrl);
-                    }}
-                  />
-                ) : null}
-                {!previewUrl && (
-                  <User className="w-12 h-12 text-gray-400" />
-                )}
-                {/* Fallback icon que se muestra si la imagen falla */}
-                <User className="w-12 h-12 text-gray-400 hidden" />
-              </div>
-              <label className="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full cursor-pointer transition-colors">
-                <Camera className="w-4 h-4" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Imagen de Perfil
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Haz clic en el icono de cámara para cambiar tu imagen
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Formatos: JPEG, PNG, WebP, GIF • Máximo: 1MB
-              </p>
-
-            </div>
-          </div>
-        </Card>
-
         {/* Información personal */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">

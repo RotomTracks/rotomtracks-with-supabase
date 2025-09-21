@@ -73,7 +73,6 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
         birth_year: profileData.birth_year,
         user_role: profileData.user_role || UserRole.PLAYER,
         organization_name: profileData.organization_name,
-        profile_image_url: profileData.profile_image_url,
       };
 
       const { data, error: createError } = await supabase

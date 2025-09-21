@@ -17,6 +17,7 @@ import {
   Copy,
   Info
 } from "lucide-react";
+import { Avatar } from "./ui/avatar";
 
 interface ProfileDisplayProps {
   profile: {
@@ -25,7 +26,6 @@ interface ProfileDisplayProps {
     last_name?: string;
     player_id?: string;
     birth_year?: number;
-    profile_image_url?: string;
     user_role?: string;
     organization_name?: string;
     pokemon_league_url?: string;
@@ -90,17 +90,12 @@ export function ProfileDisplay({
       <Card className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-              {profile.profile_image_url ? (
-                <img 
-                  src={profile.profile_image_url} 
-                  alt="Imagen de perfil" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="w-8 h-8 text-gray-400" />
-              )}
-            </div>
+            <Avatar 
+              firstName={profile.first_name}
+              lastName={profile.last_name}
+              email={userEmail}
+              size="xl"
+            />
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {profile.first_name && profile.last_name 

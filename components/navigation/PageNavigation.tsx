@@ -26,7 +26,7 @@ export interface PageNavigationProps {
 export function PageNavigation({
   title,
   description,
-  showBackButton = true,
+  showBackButton = false,
   backButtonText = "Volver",
   backButtonHref,
   breadcrumbs = [],

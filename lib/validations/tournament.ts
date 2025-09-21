@@ -134,7 +134,6 @@ export const UserProfileSchema = z.object({
   last_name: z.string().min(2, 'Apellidos deben tener al menos 2 caracteres').max(50).optional(),
   player_id: PlayerIdSchema.optional(),
   birth_year: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
-  profile_image_url: UrlSchema,
   user_role: UserRoleSchema,
   organization_name: z.string().min(3).max(255).optional(),
   pokemon_league_url: UrlSchema,
