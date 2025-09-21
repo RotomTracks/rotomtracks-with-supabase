@@ -77,7 +77,7 @@ export function SmartFileUpload({
       } else {
         setError(result.message || 'Error al crear torneo');
       }
-    } catch (error) {
+    } catch {
       setError('Error al crear torneo');
     }
   }, [selectedFile, onTournamentCreated]);

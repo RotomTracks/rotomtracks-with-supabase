@@ -4,7 +4,8 @@ import { hasRequiredEnvVars, getSupabaseConfig, getClientOptions } from "./confi
 import { 
   requiresAuthentication, 
   requiresOrganizerRole, 
-  requiresPlayerRole, 
+  requiresPlayerRole,
+  requiresAdminRole,
   isPublicRoute 
 } from "../auth/roles";
 import { UserRole } from "../types/tournament";
@@ -106,6 +107,17 @@ export async function updateSession(request: NextRequest) {
       userProfile = profile;
     } catch (error) {
       console.error('Error fetching user profile in middleware:', error);
+    }
+
+    // Check admin-only routes (highest priority)
+    if (requiresAdminRole(pathname)) {
+      if (!userProfile || userProfile.user_role !== UserRole.ADMIN) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/auth/unauthorized";
+        url.searchParams.set("reason", "admin_required");
+        url.searchParams.set("redirectTo", pathname);
+        return NextResponse.redirect(url);
+      }
     }
 
     // Check organizer-only routes

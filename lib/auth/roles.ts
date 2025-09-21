@@ -72,6 +72,15 @@ export async function isPlayer(userId: string): Promise<boolean> {
 }
 
 /**
+ * Checks if a user is an admin
+ * @param userId - The user ID to check
+ * @returns boolean indicating if user is an admin
+ */
+export async function isAdmin(userId: string): Promise<boolean> {
+  return await hasRole(userId, UserRole.ADMIN);
+}
+
+/**
  * Gets the current authenticated user
  * @returns User object or null if not authenticated
  */
@@ -144,6 +153,14 @@ export async function currentUserIsPlayer(): Promise<boolean> {
 }
 
 /**
+ * Checks if the current user is an admin
+ * @returns boolean indicating if current user is an admin
+ */
+export async function currentUserIsAdmin(): Promise<boolean> {
+  return await currentUserHasRole(UserRole.ADMIN);
+}
+
+/**
  * Checks if a user can manage a specific tournament
  * @param userId - The user ID to check
  * @param tournamentOrganizerId - The organizer ID of the tournament
@@ -155,8 +172,29 @@ export async function canManageTournament(userId: string, tournamentOrganizerId:
     return true;
   }
   
-  // Additional logic could be added here for admin roles, etc.
+  // Admins can manage any tournament
+  if (await isAdmin(userId)) {
+    return true;
+  }
+  
   return false;
+}
+
+/**
+ * Checks if a user has admin privileges (can perform admin actions)
+ * @param userId - The user ID to check
+ * @returns boolean indicating if user has admin privileges
+ */
+export async function hasAdminPrivileges(userId: string): Promise<boolean> {
+  return await isAdmin(userId);
+}
+
+/**
+ * Checks if the current user has admin privileges
+ * @returns boolean indicating if current user has admin privileges
+ */
+export async function currentUserHasAdminPrivileges(): Promise<boolean> {
+  return await currentUserIsAdmin();
 }
 
 /**
@@ -193,6 +231,14 @@ export const PROTECTED_ROUTES = {
   // Routes that require player role (if any specific to players)
   PLAYER_ONLY: [
     // Add player-specific routes here if needed
+  ],
+  
+  // Routes that require admin role
+  ADMIN_ONLY: [
+    '/admin',
+    '/admin/dashboard',
+    '/admin/organizer-requests',
+    '/admin/settings',
   ],
   
   // Public routes that don't require authentication
@@ -237,6 +283,17 @@ export function requiresOrganizerRole(pathname: string): boolean {
  */
 export function requiresPlayerRole(pathname: string): boolean {
   return PROTECTED_ROUTES.PLAYER_ONLY.some(route => 
+    pathname.startsWith(route) || pathname === route
+  );
+}
+
+/**
+ * Checks if a route requires admin role
+ * @param pathname - The route pathname to check
+ * @returns boolean indicating if route requires admin role
+ */
+export function requiresAdminRole(pathname: string): boolean {
+  return PROTECTED_ROUTES.ADMIN_ONLY.some(route => 
     pathname.startsWith(route) || pathname === route
   );
 }

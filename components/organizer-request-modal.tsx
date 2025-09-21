@@ -58,23 +58,35 @@ export function OrganizerRequestModal({
     if (isOpen && user.id) {
       const fetchExistingRequest = async () => {
         try {
-          const { data } = await supabase
-            .from("organizer_requests")
-            .select("*")
-            .eq("user_id", user.id)
-            .single();
-          
-          setExistingRequest(data);
-          setShowForm(!data); // Mostrar formulario solo si no hay solicitud existente
+          const response = await fetch('/api/organizer-requests', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            setExistingRequest(result.data);
+            setShowForm(false); // No mostrar formulario si hay solicitud existente
+          } else if (response.status === 404) {
+            // No hay solicitud existente
+            setExistingRequest(null);
+            setShowForm(true);
+          } else {
+            // Otro error
+            console.error("Error fetching existing request:", await response.text());
+            setShowForm(true);
+          }
         } catch (error) {
           console.error("Error fetching existing request:", error);
-          setShowForm(true); // Mostrar formulario si hay error (probablemente no existe)
+          setShowForm(true); // Mostrar formulario si hay error de red
         }
       };
 
       fetchExistingRequest();
     }
-  }, [isOpen, user.id, supabase]);
+  }, [isOpen, user.id]);
 
   // Resetear estado cuando se cierra el modal
   useEffect(() => {
@@ -152,28 +164,48 @@ export function OrganizerRequestModal({
 
     try {
       const requestData = {
-        user_id: user.id,
         organization_name: formData.organization_name.trim(),
-        business_email: formData.business_email?.trim() || null,
-        phone_number: formData.phone_number?.trim() || null,
-        address: formData.address?.trim() || null,
-        pokemon_league_url: formData.pokemon_league_url?.trim() || null,
-        experience_description: formData.experience_description?.trim(),
-        status: 'pending',
+        business_email: formData.business_email?.trim() || undefined,
+        phone_number: formData.phone_number?.trim() || undefined,
+        address: formData.address?.trim() || undefined,
+        pokemon_league_url: formData.pokemon_league_url?.trim() || undefined,
+        experience_description: formData.experience_description?.trim() || undefined,
       };
 
-      const { data, error } = await supabase
-        .from("organizer_requests")
-        .insert([requestData])
-        .select()
-        .single();
+      const response = await fetch('/api/organizer-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
 
-      if (error) {
-        throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle API error response
+        if (result.code === 'DUPLICATE_ORGANIZER_REQUEST') {
+          setMessage("Ya tienes una solicitud pendiente. Solo puedes tener una solicitud activa a la vez.");
+        } else if (result.code === 'VALIDATION_ERROR') {
+          setMessage(result.message || "Los datos proporcionados no son válidos");
+          // Handle field-specific errors if available
+          if (result.details?.issues) {
+            const fieldErrors: Record<string, string> = {};
+            result.details.issues.forEach((issue: any) => {
+              if (issue.path?.length > 0) {
+                fieldErrors[issue.path[0]] = issue.message;
+              }
+            });
+            setErrors(fieldErrors);
+          }
+        } else {
+          setMessage(result.message || "Error al enviar la solicitud. Inténtalo de nuevo.");
+        }
+        return;
       }
 
       setMessage("¡Solicitud enviada correctamente! Recibirás una respuesta en tu email.");
-      setExistingRequest(data);
+      setExistingRequest(result.data);
       setShowForm(false);
       
       if (onRequestSubmitted) {
@@ -187,12 +219,7 @@ export function OrganizerRequestModal({
 
     } catch (error: any) {
       console.error('Error submitting organizer request:', error);
-      
-      if (error.code === '23505') {
-        setMessage("Ya tienes una solicitud pendiente. Solo puedes tener una solicitud activa a la vez.");
-      } else {
-        setMessage("Error al enviar la solicitud. Inténtalo de nuevo.");
-      }
+      setMessage("Error al enviar la solicitud. Inténtalo de nuevo.");
     } finally {
       setIsLoading(false);
     }

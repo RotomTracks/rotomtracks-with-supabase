@@ -37,7 +37,8 @@ export enum MatchOutcome {
 
 export enum UserRole {
   PLAYER = 'player',
-  ORGANIZER = 'organizer'
+  ORGANIZER = 'organizer',
+  ADMIN = 'admin'
 }
 
 export enum OrganizerRequestStatus {
@@ -45,6 +46,15 @@ export enum OrganizerRequestStatus {
   APPROVED = 'approved',
   REJECTED = 'rejected',
   UNDER_REVIEW = 'under_review'
+}
+
+export enum AdminActionType {
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  UNDER_REVIEW = 'under_review',
+  NOTES_ADDED = 'notes_added',
+  STATUS_CHANGED = 'status_changed',
+  REQUEST_VIEWED = 'request_viewed'
 }
 
 export enum FileType {
@@ -306,6 +316,51 @@ export interface UpdateOrganizerRequest {
   experience_description?: string;
 }
 
+// Admin Activity Log
+export interface AdminActivity {
+  id: string;
+  admin_id: string;
+  admin_name: string;
+  action: AdminActionType;
+  request_id: string;
+  organization_name: string;
+  timestamp: string;
+  notes?: string;
+  previous_status?: OrganizerRequestStatus;
+  new_status?: OrganizerRequestStatus;
+}
+
+// Admin Dashboard Metrics
+export interface AdminDashboardMetrics {
+  totalRequests: number;
+  pendingRequests: number;
+  approvedRequests: number;
+  rejectedRequests: number;
+  underReviewRequests: number;
+  recentActivity: AdminActivity[];
+}
+
+// Extended Organizer Request with Admin Fields
+export interface AdminOrganizerRequest extends OrganizerRequest {
+  user_profile: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    created_at: string;
+  };
+  admin_notes?: string;
+  reviewed_by?: string;
+  reviewed_at?: string;
+  review_history: AdminActivity[];
+}
+
+// Request Update Payload
+export interface UpdateOrganizerRequestPayload {
+  status: OrganizerRequestStatus;
+  admin_notes?: string;
+  reviewed_by: string;
+}
+
 // Tournament Processing Request
 export interface ProcessTournamentRequest {
   tournament_id: string;
@@ -411,9 +466,15 @@ export enum ErrorCodes {
   TOURNAMENT_FULL = 'TOURNAMENT_FULL',
   DUPLICATE_REGISTRATION = 'DUPLICATE_REGISTRATION',
   DUPLICATE_TOURNAMENT_ID = 'DUPLICATE_TOURNAMENT_ID',
+  DUPLICATE_ORGANIZER_REQUEST = 'DUPLICATE_ORGANIZER_REQUEST',
   INVALID_FILE_FORMAT = 'INVALID_FILE_FORMAT',
   PROCESSING_ERROR = 'PROCESSING_ERROR',
-  UPLOAD_ERROR = 'UPLOAD_ERROR'
+  UPLOAD_ERROR = 'UPLOAD_ERROR',
+  // Admin-specific error codes
+  ADMIN_ACCESS_REQUIRED = 'ADMIN_ACCESS_REQUIRED',
+  INVALID_REQUEST_STATUS = 'INVALID_REQUEST_STATUS',
+  REQUEST_ALREADY_PROCESSED = 'REQUEST_ALREADY_PROCESSED',
+  ADMIN_NOTES_TOO_LONG = 'ADMIN_NOTES_TOO_LONG'
 }
 
 // Tournament XML Processing Types (for migrating Python logic)

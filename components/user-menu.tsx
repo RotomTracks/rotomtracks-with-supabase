@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { ChevronDown, User, Trophy, LogOut, Building2, Calendar, Users } from "lucide-react";
+import { ChevronDown, User, Trophy, LogOut, Building2, Calendar, Users, Shield } from "lucide-react";
 import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
 import { Avatar } from "./ui/avatar";
@@ -39,7 +39,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [tournamentStats, setTournamentStats] = useState<TournamentStats>({ total: 0, upcoming: 0, organizing: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
-  const { signOut } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const supabase = createClient();
   const { tCommon, tAuth } = useTypedTranslation();
 
@@ -134,13 +134,15 @@ export function UserMenu({ user }: UserMenuProps) {
             </p>
             {userProfile?.user_role && (
               <div className="flex items-center gap-1 mt-1">
-                {userProfile.user_role === 'organizer' ? (
+                {userProfile.user_role === 'admin' ? (
+                  <Shield className="w-3 h-3 text-red-500" />
+                ) : userProfile.user_role === 'organizer' ? (
                   <Building2 className="w-3 h-3 text-blue-500" />
                 ) : (
                   <Trophy className="w-3 h-3 text-green-500" />
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                  {userProfile.user_role}
+                  {userProfile.user_role === 'admin' ? 'Administrador' : userProfile.user_role}
                 </span>
               </div>
             )}
@@ -154,6 +156,18 @@ export function UserMenu({ user }: UserMenuProps) {
             <User className="w-4 h-4" />
             {tCommon("buttons.view")} {tCommon("navigation.profile")}
           </Link>
+
+          {/* Admin Panel Link - Only show for admin users */}
+          {isAdmin && (
+            <Link 
+              href="/admin/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 font-medium"
+            >
+              <Shield className="w-4 h-4" />
+              Panel de Administración
+            </Link>
+          )}
 
 
 

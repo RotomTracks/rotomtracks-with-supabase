@@ -55,9 +55,15 @@ export const ERROR_CONFIGS: Record<ErrorCodes, { statusCode: number; severity: E
   [ErrorCodes.TOURNAMENT_FULL]: { statusCode: 400, severity: 'info' },
   [ErrorCodes.DUPLICATE_REGISTRATION]: { statusCode: 409, severity: 'warning' },
   [ErrorCodes.DUPLICATE_TOURNAMENT_ID]: { statusCode: 409, severity: 'warning' },
+  [ErrorCodes.DUPLICATE_ORGANIZER_REQUEST]: { statusCode: 409, severity: 'warning' },
   [ErrorCodes.INVALID_FILE_FORMAT]: { statusCode: 400, severity: 'warning' },
   [ErrorCodes.PROCESSING_ERROR]: { statusCode: 500, severity: 'error' },
-  [ErrorCodes.UPLOAD_ERROR]: { statusCode: 500, severity: 'error' }
+  [ErrorCodes.UPLOAD_ERROR]: { statusCode: 500, severity: 'error' },
+  // Admin-specific error codes
+  [ErrorCodes.ADMIN_ACCESS_REQUIRED]: { statusCode: 403, severity: 'warning' },
+  [ErrorCodes.INVALID_REQUEST_STATUS]: { statusCode: 400, severity: 'warning' },
+  [ErrorCodes.REQUEST_ALREADY_PROCESSED]: { statusCode: 409, severity: 'warning' },
+  [ErrorCodes.ADMIN_NOTES_TOO_LONG]: { statusCode: 400, severity: 'warning' }
 };
 
 // Standard error messages in Spanish
@@ -69,9 +75,15 @@ export const ERROR_MESSAGES: Record<ErrorCodes, string> = {
   [ErrorCodes.TOURNAMENT_FULL]: 'El torneo está lleno',
   [ErrorCodes.DUPLICATE_REGISTRATION]: 'Ya existe una inscripción con estos datos',
   [ErrorCodes.DUPLICATE_TOURNAMENT_ID]: 'Ya existe un torneo con este ID oficial',
+  [ErrorCodes.DUPLICATE_ORGANIZER_REQUEST]: 'Ya tienes una solicitud de organizador pendiente',
   [ErrorCodes.INVALID_FILE_FORMAT]: 'El formato del archivo no es válido',
   [ErrorCodes.PROCESSING_ERROR]: 'Error al procesar la solicitud',
-  [ErrorCodes.UPLOAD_ERROR]: 'Error al subir el archivo'
+  [ErrorCodes.UPLOAD_ERROR]: 'Error al subir el archivo',
+  // Admin-specific error messages
+  [ErrorCodes.ADMIN_ACCESS_REQUIRED]: 'Se requiere acceso de administrador para esta acción',
+  [ErrorCodes.INVALID_REQUEST_STATUS]: 'Estado de solicitud inválido',
+  [ErrorCodes.REQUEST_ALREADY_PROCESSED]: 'Esta solicitud ya ha sido procesada',
+  [ErrorCodes.ADMIN_NOTES_TOO_LONG]: 'Las notas del administrador son demasiado largas'
 };
 
 /**
@@ -427,6 +439,47 @@ export async function validateUserRole(
   if (profile.user_role !== requiredRole) {
     return handleForbiddenError(
       `Esta acción requiere rol de ${requiredRole}`,
+      requestId
+    );
+  }
+
+  return { profile };
+}
+
+/**
+ * Validates admin role for admin-only operations
+ */
+export async function validateAdminRole(
+  supabase: SupabaseClient,
+  userId: string,
+  requestId?: string
+): Promise<{ profile: Record<string, unknown> } | NextResponse<APIErrorResponse>> {
+  const { data: profile, error } = await supabase
+    .from('user_profiles')
+    .select('user_role, first_name, last_name')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    return handleSupabaseError(error, 'búsqueda de perfil de administrador', requestId);
+  }
+
+  if (!profile) {
+    return createErrorResponse(
+      ErrorCodes.NOT_FOUND,
+      'Perfil de usuario no encontrado',
+      undefined,
+      undefined,
+      requestId
+    );
+  }
+
+  if (profile.user_role !== 'admin') {
+    return createErrorResponse(
+      ErrorCodes.ADMIN_ACCESS_REQUIRED,
+      'Se requiere acceso de administrador para esta acción',
+      undefined,
+      undefined,
       requestId
     );
   }

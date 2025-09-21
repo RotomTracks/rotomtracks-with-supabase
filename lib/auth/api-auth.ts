@@ -99,7 +99,8 @@ export async function requireRole(request: NextRequest, requiredRole: UserRole):
   if (auth.profile.user_role !== requiredRole) {
     const roleNames = {
       [UserRole.ORGANIZER]: 'organizer',
-      [UserRole.PLAYER]: 'player'
+      [UserRole.PLAYER]: 'player',
+      [UserRole.ADMIN]: 'admin'
     };
     
     return NextResponse.json(

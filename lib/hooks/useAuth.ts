@@ -13,8 +13,10 @@ interface UseAuthReturn {
   isAuthenticated: boolean;
   isOrganizer: boolean;
   isPlayer: boolean;
+  isAdmin: boolean;
   hasRole: (role: UserRole) => boolean;
   canManageTournament: (organizerId: string) => boolean;
+  hasAdminPrivileges: () => boolean;
   refreshAuth: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -102,13 +104,19 @@ export function useAuth(): UseAuthReturn {
   const isAuthenticated = !!user;
   const isOrganizer = profile?.user_role === UserRole.ORGANIZER;
   const isPlayer = profile?.user_role === UserRole.PLAYER;
+  const isAdmin = profile?.user_role === UserRole.ADMIN;
   
   const hasRole = (role: UserRole): boolean => {
     return profile?.user_role === role;
   };
 
   const canManageTournament = (organizerId: string): boolean => {
-    return isAuthenticated && user?.id === organizerId;
+    // Admins can manage any tournament, organizers can manage their own
+    return isAuthenticated && (isAdmin || user?.id === organizerId);
+  };
+
+  const hasAdminPrivileges = (): boolean => {
+    return isAuthenticated && isAdmin;
   };
 
   useEffect(() => {
@@ -134,8 +142,10 @@ export function useAuth(): UseAuthReturn {
     isAuthenticated,
     isOrganizer,
     isPlayer,
+    isAdmin,
     hasRole,
     canManageTournament,
+    hasAdminPrivileges,
     refreshAuth,
     signOut,
   };

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { OrganizerRequestModal } from "./organizer-request-modal";
@@ -26,18 +25,26 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
   const [request, setRequest] = useState<OrganizerRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchRequest = async () => {
       try {
-        const { data } = await supabase
-          .from("organizer_requests")
-          .select("*")
-          .eq("user_id", userId)
-          .single();
-        
-        setRequest(data);
+        const response = await fetch('/api/organizer-requests', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setRequest(result.data);
+        } else if (response.status === 404) {
+          // No request found
+          setRequest(null);
+        } else {
+          console.error("Error fetching organizer request:", await response.text());
+        }
       } catch (error) {
         console.error("Error fetching organizer request:", error);
       } finally {
@@ -46,7 +53,7 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
     };
 
     fetchRequest();
-  }, [userId, supabase]);
+  }, [userId]);
 
   const getStatusIcon = (status: RequestStatus) => {
     switch (status) {
