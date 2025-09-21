@@ -1,14 +1,17 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { getSupabaseConfig, getClientOptions } from "./config";
 
 export function createClient() {
+  const config = getSupabaseConfig();
+  const options = getClientOptions();
+
   return createBrowserClient(
-    process.env.NEXT_PUBLIC_DATABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_CLIENT_AUTH || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    config.url,
+    config.anonKey,
     {
+      ...options,
       auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
+        ...options.auth,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       },
     }

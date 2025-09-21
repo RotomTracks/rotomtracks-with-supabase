@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { hasEnvVars } from "../utils";
+import { hasRequiredEnvVars, getSupabaseConfig, getClientOptions } from "./config";
 import { 
   requiresAuthentication, 
   requiresOrganizerRole, 
@@ -16,16 +16,28 @@ export async function updateSession(request: NextRequest) {
 
   // If the env vars are not set, skip middleware check. You can remove this
   // once you setup the project.
-  if (!hasEnvVars) {
+  if (!hasRequiredEnvVars()) {
+    console.warn('Supabase environment variables not configured, skipping auth middleware');
     return supabaseResponse;
   }
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
+  const config = getSupabaseConfig();
+  const options = getClientOptions();
+  
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_DATABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_CLIENT_AUTH || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    config.url,
+    config.anonKey,
     {
+      ...options,
+      global: {
+        ...options.global,
+        headers: {
+          ...options.global.headers,
+          'X-Client-Info': 'rotomtracks-middleware',
+        },
+      },
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -51,8 +63,19 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  let user = null;
+  try {
+    const { data, error } = await supabase.auth.getClaims();
+    if (error) {
+      console.error('Auth error in middleware:', error);
+      // Continue without user for now
+    } else {
+      user = data?.claims;
+    }
+  } catch (error) {
+    console.error('Failed to get auth claims in middleware:', error);
+    // Continue without user for now
+  }
   const pathname = request.nextUrl.pathname;
 
   // Check if route is public (doesn't require authentication)

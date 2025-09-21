@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getSupabaseConfig, getClientOptions } from "./config";
 
 /**
  * Especially important if using Fluid compute: Don't put this client in a
@@ -8,11 +9,21 @@ import { cookies } from "next/headers";
  */
 export async function createClient() {
   const cookieStore = await cookies();
+  const config = getSupabaseConfig();
+  const options = getClientOptions();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_DATABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_CLIENT_AUTH || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    config.url,
+    config.anonKey,
     {
+      ...options,
+      global: {
+        ...options.global,
+        headers: {
+          ...options.global.headers,
+          'X-Client-Info': 'rotomtracks-server',
+        },
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll();

@@ -11,6 +11,7 @@ import { validateLoginForm, type LoginFormData } from "@/lib/utils/validation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { ForgotPasswordDialog } from "./forgot-password-dialog";
 
 interface LoginFormProps {
   className?: string;
@@ -111,12 +112,7 @@ export function LoginForm({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">{tAuth('login.passwordLabel')}</Label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-primary underline-offset-4 hover:underline"
-                >
-                  {tAuth('login.forgotPassword')}
-                </Link>
+                <ForgotPasswordDialog />
               </div>
               <div className="relative">
                 <Input
