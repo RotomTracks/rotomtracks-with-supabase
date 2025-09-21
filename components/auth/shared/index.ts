@@ -17,7 +17,7 @@ export { useScreenReaderAnnouncements } from './useScreenReaderAnnouncements';
 
 // Types
 export type {
-  ValidationSummary,
+  ValidationSummaryData,
   FieldState,
   ErrorSuggestion,
   UseRealTimeValidationOptions,

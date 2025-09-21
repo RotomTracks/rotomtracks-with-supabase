@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { ProfileForm } from "@/components/profile-form";
 import { ProfileDisplay } from "@/components/profile-display";
 import { Card } from "@/components/ui/card";

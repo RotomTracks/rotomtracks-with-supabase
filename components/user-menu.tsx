@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { ChevronDown, User, Trophy, LogOut, Building2 } from "lucide-react";
 import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";

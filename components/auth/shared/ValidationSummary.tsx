@@ -3,7 +3,7 @@
 import { CheckCircle, AlertCircle, Clock, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ValidationSummary {
+interface ValidationSummaryData {
   totalFields: number;
   validFields: number;
   invalidFields: number;
@@ -14,26 +14,26 @@ interface ValidationSummary {
 }
 
 interface ValidationSummaryProps {
-  summary: ValidationSummary;
+  summary: ValidationSummaryData;
   className?: string;
   showProgress?: boolean;
   showDetails?: boolean;
 }
 
-export function ValidationSummary({ 
-  summary, 
+export function ValidationSummary({
+  summary,
   className,
   showProgress = true,
-  showDetails = false
+  showDetails = false,
 }: ValidationSummaryProps) {
-  const { 
-    totalFields, 
-    validFields, 
-    invalidFields, 
-    untouchedFields, 
-    completionPercentage, 
-    hasErrors, 
-    canSubmit 
+  const {
+    totalFields,
+    validFields,
+    invalidFields,
+    untouchedFields,
+    completionPercentage,
+    hasErrors,
+    canSubmit,
   } = summary;
 
   if (totalFields === 0) return null;
@@ -61,21 +61,27 @@ export function ValidationSummary({
 
   const getStatusMessage = () => {
     if (canSubmit) return "Formulario completo y listo para enviar";
-    if (hasErrors) return `${invalidFields} campo${invalidFields !== 1 ? 's' : ''} con errores`;
-    if (completionPercentage > 0) return `${validFields} de ${totalFields} campos completados`;
+    if (hasErrors)
+      return `${invalidFields} campo${
+        invalidFields !== 1 ? "s" : ""
+      } con errores`;
+    if (completionPercentage > 0)
+      return `${validFields} de ${totalFields} campos completados`;
     return "Completa los campos para continuar";
   };
 
   return (
-    <div className={cn(
-      "rounded-lg border p-3 sm:p-4 transition-all duration-200",
-      canSubmit 
-        ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" 
-        : hasErrors 
+    <div
+      className={cn(
+        "rounded-lg border p-3 sm:p-4 transition-all duration-200",
+        canSubmit
+          ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
+          : hasErrors
           ? "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
           : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800",
-      className
-    )}>
+        className
+      )}
+    >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className={cn("flex-shrink-0", getStatusColor())}>
@@ -109,14 +115,14 @@ export function ValidationSummary({
             )}
           </div>
         </div>
-        
+
         {showProgress && (
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className={cn("text-sm font-medium", getStatusColor())}>
               {completionPercentage}%
             </span>
             <div className="w-16 sm:w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
+              <div
                 className={cn(
                   "h-full transition-all duration-300 ease-out",
                   getProgressColor()

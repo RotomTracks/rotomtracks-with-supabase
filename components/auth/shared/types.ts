@@ -1,5 +1,5 @@
 // Authentication component types
-export interface ValidationSummary {
+export interface ValidationSummaryData {
   totalFields: number;
   validFields: number;
   invalidFields: number;
@@ -44,5 +44,6 @@ export interface UseScreenReaderAnnouncementsOptions {
   clearDelay?: number;
 }
 
-// Re-export validation types from utils
-export type { ValidationResult } from '@/lib/utils/validation';
+// Import and re-export validation types from utils
+import type { ValidationResult } from '@/lib/utils/validation';
+export type { ValidationResult };

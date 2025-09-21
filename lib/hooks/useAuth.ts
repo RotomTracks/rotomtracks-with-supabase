@@ -16,6 +16,7 @@ interface UseAuthReturn {
   hasRole: (role: UserRole) => boolean;
   canManageTournament: (organizerId: string) => boolean;
   refreshAuth: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 export function useAuth(): UseAuthReturn {
@@ -69,6 +70,17 @@ export function useAuth(): UseAuthReturn {
     await fetchUserAndProfile();
   };
 
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+    } catch (err) {
+      console.error('Error signing out:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sign out');
+    }
+  };
+
   // Helper functions
   const isAuthenticated = !!user;
   const isOrganizer = profile?.user_role === UserRole.ORGANIZER;
@@ -108,6 +120,7 @@ export function useAuth(): UseAuthReturn {
     hasRole,
     canManageTournament,
     refreshAuth,
+    signOut,
   };
 }
 

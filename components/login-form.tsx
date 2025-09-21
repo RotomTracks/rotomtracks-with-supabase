@@ -1,261 +1,185 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { FormCard, FormField, LoadingButton, ErrorMessage, ValidationSummary, SuccessAnimation, SkipLinks } from "@/components/auth/shared";
-import { useFormAccessibility } from "@/components/auth/shared/useFormAccessibility";
-import { useRealTimeValidation } from "@/components/auth/shared/useRealTimeValidation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/client";
 import { useTypedTranslation } from "@/lib/i18n";
 import { validateLoginForm, type LoginFormData } from "@/lib/utils/validation";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
+
+interface LoginFormProps {
+  className?: string;
+}
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: LoginFormProps & React.ComponentPropsWithoutRef<"div">) {
   const { tAuth } = useTypedTranslation();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
-    password: ""
+    password: "",
   });
-  const [generalError, setGeneralError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Real-time validation hook
-  const {
-    getFieldError,
-    getFieldSuccess,
-    isFieldValidating,
-    handleFieldChange,
-    handleFieldBlur,
-    validateAllFields,
-    clearAllErrors,
-    hasAnyErrors,
-    validationSummary
-  } = useRealTimeValidation<LoginFormData>({
-    validateFn: validateLoginForm,
-    debounceMs: 500, // Slightly longer debounce for login
-    validateOnChange: true,
-    validateOnBlur: true,
-    showSuccessStates: true,
-    enableProgressiveValidation: true,
-  });
-
-  const { formRef, ariaLiveMessage } = useFormAccessibility({
-    errors: Object.fromEntries(
-      Object.keys(formData).map(key => [key, getFieldError(key)])
-    ),
-    isSubmitting: isLoading,
-  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (field: keyof LoginFormData, value: string) => {
-    const newFormData = { ...formData, [field]: value };
-    setFormData(newFormData);
-    
-    // Handle real-time validation
-    handleFieldChange(field, value, newFormData);
-    
-    // Clear general error when user starts typing
-    if (generalError) {
-      setGeneralError(null);
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
     }
   };
 
-  const handleInputBlur = (field: keyof LoginFormData) => {
-    handleFieldBlur(field, formData[field], formData);
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setGeneralError(null);
-    clearAllErrors();
-
-    // Final validation before submission
-    const validation = validateAllFields(formData);
+    // Validate form
+    const validation = validateLoginForm(formData);
     if (!validation.isValid) {
+      setErrors(validation.errors);
       return;
     }
 
-    const supabase = createClient();
-    setIsLoading(true);
+    setLoading(true);
+    setErrors({});
 
     try {
+      const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
-        password: formData.password,
+        password: formData.password, 
       });
-      
+
       if (error) {
-        // Handle specific Supabase errors
-        switch (error.message) {
-          case 'Invalid login credentials':
-            setGeneralError(tAuth('errors.invalidCredentials'));
-            break;
-          case 'Email not confirmed':
-            setGeneralError(tAuth('errors.emailNotConfirmed'));
-            break;
-          case 'Too many requests':
-            setGeneralError(tAuth('errors.tooManyRequests'));
-            break;
-          default:
-            setGeneralError(error.message || tAuth('errors.generic'));
-        }
-        return;
+        setErrors({ submit: error.message });
+      } else {
+        // Redirect will be handled by the auth state change
+        window.location.href = "/dashboard";
       }
-      
-      // Show success animation before redirect
-      setShowSuccess(true);
-      
-      setTimeout(() => {
-        // Check for custom redirect parameter, default to profile
-        const redirectTo = searchParams.get('redirect') || '/profile';
-        router.push(redirectTo);
-      }, 1500);
-    } catch (error: unknown) {
-      setGeneralError(
-        error instanceof Error 
-          ? error.message 
-          : tAuth('errors.networkError')
-      );
+    } catch (error) {
+      setErrors({ submit: "An unexpected error occurred" });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <SkipLinks />
-      
-      <main id="main-content" role="main">
-        <FormCard
-          title={tAuth('login.title')}
-          description={tAuth('login.description')}
-          className="max-w-md mx-auto"
-        >
-        <form 
-          ref={formRef}
-          onSubmit={handleLogin} 
-          className="space-y-6"
-          noValidate
-          aria-label="Formulario de inicio de sesión"
-          id="form-section"
-          role="form"
-        >
-          {/* Screen reader announcement for form status */}
-          <div 
-            role="status" 
-            aria-live="polite" 
-            aria-atomic="true" 
-            className="sr-only"
-          >
-            {ariaLiveMessage}
-            {generalError && `Error: ${generalError}`}
-          </div>
-
-          {generalError && (
-            <ErrorMessage 
-              title="Error de inicio de sesión"
-              message={generalError} 
-              onDismiss={() => setGeneralError(null)}
-              onRetry={() => {
-                setGeneralError(null);
-                clearAllErrors();
-              }}
-            />
-          )}
-
-          {/* Validation Summary */}
-          {(formData.email || formData.password) && (
-            <ValidationSummary 
-              summary={validationSummary}
-              showProgress={true}
-              showDetails={false}
-            />
-          )}
-          
-          <FormField
-            id="email"
-            label={tAuth('login.emailLabel')}
-            type="email"
-            placeholder={tAuth('login.emailPlaceholder')}
-            value={formData.email}
-            onChange={(value) => handleInputChange('email', value)}
-            onBlur={() => handleInputBlur('email')}
-            error={getFieldError('email')}
-            success={getFieldSuccess('email')}
-            isValidating={isFieldValidating('email')}
-            required
-            autoComplete="email"
-            className="space-y-3"
-            helpText={!formData.email && !getFieldError('email') && !isFieldValidating('email') ? tAuth('login.emailHelp') : undefined}
-          />
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{tAuth('login.passwordLabel')}</span>
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm text-primary underline-offset-4 hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-1"
-                tabIndex={0}
-              >
-                {tAuth('login.forgotPassword')}
-              </Link>
+    <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
+      <Card>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">
+            {tAuth('login.title')}
+          </CardTitle>
+          <CardDescription className="text-center">
+            {tAuth('login.description')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{tAuth('login.emailLabel')}</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={tAuth('login.emailPlaceholder')}
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className={cn(
+                  "transition-colors",
+                  errors.email && "border-red-500 focus:border-red-500"
+                )}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "email-error" : undefined}
+              />
+              {errors.email && (
+                <p id="email-error" className="text-sm text-red-600" role="alert">
+                  {errors.email}
+                </p>
+              )}
             </div>
-            <FormField
-              id="password"
-              label=""
-              type="password"
-              placeholder={tAuth('login.passwordPlaceholder')}
-              value={formData.password}
-              onChange={(value) => handleInputChange('password', value)}
-              onBlur={() => handleInputBlur('password')}
-              error={getFieldError('password')}
-              success={getFieldSuccess('password')}
-              isValidating={isFieldValidating('password')}
-              required
-              autoComplete="current-password"
-            />
-          </div>
-          
-          <LoadingButton
-            type="submit"
-            className="w-full mt-6"
-            loading={isLoading}
-            loadingText={tAuth('login.loadingButton')}
-            disabled={isLoading || hasAnyErrors || !validationSummary.canSubmit}
-            aria-describedby={generalError ? "login-error" : undefined}
-          >
-            {tAuth('login.submitButton')}
-          </LoadingButton>
-        </form>
-        
-        <div className="mt-6 pt-4 border-t border-border">
-          <div className="text-center text-sm text-muted-foreground">
-            {tAuth('login.signUpLink')}{" "}
-            <Link 
-              href="/auth/sign-up" 
-              className="text-primary underline-offset-4 hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-1"
-              tabIndex={0}
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{tAuth('login.passwordLabel')}</Label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm text-primary underline-offset-4 hover:underline"
+                >
+                  {tAuth('login.forgotPassword')}
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={tAuth('login.passwordPlaceholder')}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={cn(
+                    "pr-10 transition-colors",
+                    errors.password && "border-red-500 focus:border-red-500"
+                  )}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p id="password-error" className="text-sm text-red-600" role="alert">
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {errors.submit && (
+              <div className="text-sm text-red-600 text-center" role="alert">
+                {errors.submit}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? tAuth('login.loadingButton') : tAuth('login.submitButton')}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm">
+            <span className="text-muted-foreground">
+              {tAuth('login.signUpLink')}{" "}
+            </span>
+            <Link
+              href="/auth/sign-up"
+              className="text-primary underline-offset-4 hover:underline font-medium"
             >
               {tAuth('login.signUpLinkText')}
             </Link>
           </div>
-        </div>
-      </FormCard>
-      </main>
-
-      {/* Success Animation */}
-      <SuccessAnimation
-        show={showSuccess}
-        title="¡Bienvenido!"
-        message="Iniciando sesión..."
-        onComplete={() => setShowSuccess(false)}
-      />
+        </CardContent>
+      </Card>
     </div>
   );
 }

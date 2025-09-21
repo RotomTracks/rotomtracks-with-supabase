@@ -1,9 +1,8 @@
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { ValidationResult } from '@/lib/utils/validation';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { 
   UseRealTimeValidationOptions, 
   FieldState, 
-  ValidationSummary 
+  ValidationSummaryData 
 } from './types';
 import { VALIDATION_DEBOUNCE_MS } from './constants';
 
@@ -19,7 +18,7 @@ export function useRealTimeValidation<T extends Record<string, any>>({
 }: UseRealTimeValidationOptions<T>) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fieldStates, setFieldStates] = useState<Record<string, FieldState>>({});
-  const [validationSummary, setValidationSummary] = useState<ValidationSummary>({
+  const [validationSummary, setValidationSummary] = useState<ValidationSummaryData>({
     totalFields: 0,
     validFields: 0,
     invalidFields: 0,

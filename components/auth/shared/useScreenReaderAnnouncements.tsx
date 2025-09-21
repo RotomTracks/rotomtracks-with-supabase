@@ -10,7 +10,7 @@ export function useScreenReaderAnnouncements({
   clearDelay = SR_ANNOUNCEMENT_DELAY.MEDIUM
 }: UseScreenReaderAnnouncementsOptions = {}) {
   const [announcement, setAnnouncement] = useState<string>('');
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const announce = useCallback((message: string, options?: { 
     politeness?: 'polite' | 'assertive';
@@ -41,16 +41,18 @@ export function useScreenReaderAnnouncements({
   }, []);
 
   // Component for rendering the announcement
-  const AnnouncementRegion = useCallback(({ className }: { className?: string }) => (
-    <div
-      role="status"
-      aria-live={politeness}
-      aria-atomic="true"
-      className={`sr-only ${className || ''}`}
-    >
-      {announcement}
-    </div>
-  ), [announcement, politeness]);
+  const AnnouncementRegion = useCallback(({ className }: { className?: string }) => {
+    return (
+      <div
+        role="status"
+        aria-live={politeness}
+        aria-atomic="true"
+        className={`sr-only ${className || ''}`}
+      >
+        {announcement}
+      </div>
+    );
+  }, [announcement, politeness]);
 
   return {
     announce,

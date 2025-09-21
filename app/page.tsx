@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { HomeContent } from "@/components/home/HomeContent";
 import { HomeNavigation } from "@/components/home/HomeNavigation";
 import { HomeFooter } from "@/components/home/HomeFooter";

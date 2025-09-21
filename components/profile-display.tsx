@@ -6,7 +6,6 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { OrganizerRequestStatus } from "./organizer-request-status";
 import { 
-  User, 
   Building2, 
   Trophy, 
   IdCard,

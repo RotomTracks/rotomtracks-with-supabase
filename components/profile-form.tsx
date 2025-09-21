@@ -7,7 +7,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card } from "./ui/card";
-import { User, Save, ArrowLeft, Building2, Trophy, AlertCircle, CheckCircle } from "lucide-react";
+import { Save, ArrowLeft, Building2, Trophy, AlertCircle, CheckCircle } from "lucide-react";
 import { validatePlayerId, ValidationMessages } from "@/lib/utils/validation";
 import { UserRole } from "@/lib/types/tournament";
 
