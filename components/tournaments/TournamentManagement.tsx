@@ -1,10 +1,15 @@
 'use client';
 
+// React
 import { useState } from 'react';
+
+// UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+
+// Icons
 import { 
   Upload, 
   FileText, 
@@ -17,13 +22,27 @@ import {
   Users,
   Trophy
 } from 'lucide-react';
+
+// Local Components
 import { FileUpload } from './FileUpload';
 import { SmartFileUpload } from './SmartFileUpload';
 import { ProcessingStatus } from './ProcessingStatus';
 import { FileWatcher } from './FileWatcher';
 import { TournamentStatusManager } from './TournamentStatusManager';
-import type { Tournament } from '@/lib/types/tournament';
+
+// Types
+import type { Tournament, TournamentStatus, UserRole } from '@/lib/types/tournament';
+
+// Hooks
 import { useTypedTranslation } from '@/lib/i18n';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager as StatusManager,
+  getStatusColor,
+  getStatusText
+} from '@/lib/utils/tournament-status';
 
 interface TournamentFile {
   id: string;
@@ -44,13 +63,24 @@ interface TournamentManagementProps {
   tournament: Tournament & { tournament_files?: TournamentFile[] };
   files: TournamentFile[];
   stats: TournamentStats;
+  userRole?: UserRole;
 }
 
-export function TournamentManagement({ tournament, files, stats }: TournamentManagementProps) {
+export function TournamentManagement({ 
+  tournament, 
+  files, 
+  stats, 
+  userRole = 'organizer' 
+}: TournamentManagementProps) {
+  // Hooks
   const { tTournaments } = useTypedTranslation();
+  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
+  
+  // State
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Event handlers
   const handleFileUpload = (fileId: string, fileName: string) => {
     setSelectedFileId(fileId);
     setRefreshKey(prev => prev + 1);
@@ -64,32 +94,13 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
     setRefreshKey(prev => prev + 1);
   };
 
+  // Utility functions
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const getTournamentStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'ongoing': return 'bg-blue-100 text-blue-800';
-      case 'upcoming': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
   };
 
   return (
@@ -107,7 +118,7 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
                 </span>
                 <span className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(tournament.start_date).toLocaleDateString('es-ES')}</span>
+                  <span>{formatDate(tournament.start_date, 'short')}</span>
                 </span>
                 <span className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
@@ -115,32 +126,32 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
                 </span>
               </CardDescription>
             </div>
-            <Badge className={getTournamentStatusColor(tournament.status)}>
-              {tournament.status}
+            <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+              {getStatusText(tournament.status as TournamentStatus)}
             </Badge>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-blue-600">{stats.participants}</div>
-              <div className="text-sm text-gray-600">{tTournaments('management.participants')}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{tTournaments('management.participants')}</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <Trophy className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-green-600">{stats.matches}</div>
-              <div className="text-sm text-gray-600">{tTournaments('management.matches')}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{tTournaments('management.matches')}</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
               <BarChart3 className="h-8 w-8 text-purple-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-purple-600">{stats.results}</div>
-              <div className="text-sm text-gray-600">{tTournaments('management.results')}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{tTournaments('management.results')}</div>
             </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
+            <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
               <FileText className="h-8 w-8 text-orange-600 mx-auto mb-2" />
               <div className="text-2xl font-bold text-orange-600">{stats.files}</div>
-              <div className="text-sm text-gray-600">{tTournaments('management.files')}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{tTournaments('management.files')}</div>
             </div>
           </div>
         </CardContent>
@@ -179,7 +190,7 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
             matchesCount={stats.matches}
             completedMatches={stats.matches} // This should be calculated from actual completed matches
             onStatusUpdate={handleStatusUpdate}
-            userRole="organizer"
+            userRole={userRole}
           />
         </TabsContent>
 
@@ -231,19 +242,19 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
                   {files.map((file) => (
                     <div
                       key={file.id}
-                      className={`flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer ${
-                        selectedFileId === file.id ? 'border-blue-500 bg-blue-50' : ''
+                      className={`flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${
+                        selectedFileId === file.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''
                       }`}
                       onClick={() => setSelectedFileId(file.id)}
                     >
                       <div className="flex items-center space-x-3">
                         <FileText className="h-5 w-5 text-gray-400" />
                         <div>
-                          <p className="font-medium text-gray-900">{file.file_name}</p>
-                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{file.file_name}</p>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
                             <span>{formatFileSize(file.file_size)}</span>
                             <span>•</span>
-                            <span>Subido: {formatDate(file.created_at)}</span>
+                            <span>Subido: {formatDateTime(file.created_at)}</span>
                             <Badge variant="outline" className="text-xs">
                               {file.file_type.toUpperCase()}
                             </Badge>
@@ -266,7 +277,7 @@ export function TournamentManagement({ tournament, files, stats }: TournamentMan
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>No hay archivos subidos aún</p>
                   <p className="text-sm">Usa la pestaña &quot;Subir Archivos&quot; para añadir archivos TDF</p>

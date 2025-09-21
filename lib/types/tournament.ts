@@ -54,6 +54,29 @@ export enum FileType {
   XML = 'xml'
 }
 
+// File Upload Status for UI consistency
+export enum FileUploadStatus {
+  PENDING = 'pending',
+  UPLOADING = 'uploading',
+  COMPLETED = 'completed',
+  ERROR = 'error'
+}
+
+// Loading states for UI consistency
+export enum LoadingState {
+  IDLE = 'idle',
+  LOADING = 'loading',
+  SUCCESS = 'success',
+  ERROR = 'error'
+}
+
+// Validation states
+export enum ValidationState {
+  VALID = 'valid',
+  INVALID = 'invalid',
+  PENDING = 'pending'
+}
+
 // Core Tournament Interface
 export interface Tournament {
   id: string;
@@ -609,3 +632,120 @@ export interface UserContextValue {
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
+
+// Formatted Error Interface for consistent error handling
+export interface FormattedError {
+  code: string;
+  message: string;
+  field?: string;
+  severity: 'info' | 'warning' | 'error';
+  action?: {
+    label: string;
+    handler: () => void;
+  };
+}
+
+// TDF-specific types for better TDF-Web integration
+export interface TDFParticipant {
+  id: string;
+  tournament_id: string;
+  user_id: string;
+  player_name: string;
+  player_id: string;
+  player_birthdate?: string; // For TDF compatibility
+  tdf_userid?: string; // TDF-specific user ID
+  registration_date: string;
+  registration_source: 'web' | 'tdf';
+  status: ParticipantStatus;
+}
+
+// Extended Tournament interface with TDF metadata
+export interface TournamentWithTDF extends Tournament {
+  tdf_metadata?: Record<string, any>;
+  original_tdf_file_path?: string;
+  has_tdf_data: boolean;
+}
+
+// TDF Conversion utilities types
+export interface TDFConversionResult {
+  success: boolean;
+  data?: any;
+  errors: string[];
+  warnings: string[];
+}
+
+// Status configuration for UI components
+export interface StatusDisplayConfig {
+  label: string;
+  color: string;
+  bgColor: string;
+  textColor: string;
+  borderColor: string;
+  icon: string;
+  badgeVariant: 'default' | 'secondary' | 'outline' | 'destructive';
+}
+
+// File upload with progress tracking
+export interface FileUploadProgress {
+  file: File;
+  status: FileUploadStatus;
+  progress: number;
+  error?: string;
+  uploadedAt?: string;
+}
+
+// Tournament capacity information
+export interface TournamentCapacityInfo {
+  current: number;
+  max?: number;
+  hasLimit: boolean;
+  isFull: boolean;
+  spotsLeft?: number;
+  capacityPercentage: number;
+  capacityText: string;
+}
+
+// Date formatting options
+export interface DateFormatOptions {
+  style: 'short' | 'medium' | 'long';
+  includeTime?: boolean;
+  relative?: boolean;
+  locale?: string;
+}
+
+// Tournament filtering options
+export interface TournamentFilterOptions {
+  query?: string;
+  type?: TournamentType;
+  status?: TournamentStatus;
+  city?: string;
+  country?: string;
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+// Component state types for better type safety
+export type ComponentLoadingState = LoadingState;
+export type ComponentValidationState = ValidationState;
+
+// Re-export commonly used types for easier imports
+// Note: FileUploadStatus is defined in this file as an enum
+
+// Type guards for runtime type checking
+export const isTournamentStatus = (value: string): value is TournamentStatus => {
+  return Object.values(TournamentStatus).includes(value as TournamentStatus);
+};
+
+export const isParticipantStatus = (value: string): value is ParticipantStatus => {
+  return Object.values(ParticipantStatus).includes(value as ParticipantStatus);
+};
+
+export const isTournamentType = (value: string): value is TournamentType => {
+  return Object.values(TournamentType).includes(value as TournamentType);
+};
+
+export const isFileUploadStatus = (value: string): value is FileUploadStatus => {
+  return Object.values(FileUploadStatus).includes(value as FileUploadStatus);
+};

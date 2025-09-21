@@ -1,11 +1,16 @@
 'use client';
 
+// React
 import { useState } from 'react';
+
+// UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Icons
 import { 
   Trophy, 
   Users, 
@@ -20,11 +25,33 @@ import {
   Target,
   Award
 } from 'lucide-react';
+
+// Local Components
 import { ParticipantsList } from './ParticipantsList';
 import { TournamentStandings } from './TournamentStandings';
 import { MatchHistory } from './MatchHistory';
-import type { Tournament, TournamentParticipant, TournamentResult, TournamentMatch } from '@/lib/types/tournament';
-import { ParticipantStatus } from '@/lib/types/tournament';
+import RealTimePlayerCount from './RealTimePlayerCount';
+import TournamentActivityFeed from './TournamentActivityFeed';
+
+// Types
+import type { 
+  Tournament, 
+  TournamentParticipant, 
+  TournamentResult, 
+  TournamentMatch,
+  TournamentStatus,
+  ParticipantStatus,
+  UserRole
+} from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  getStatusColor,
+  getStatusText,
+  STATUS_TRANSLATIONS
+} from '@/lib/utils/tournament-status';
 
 interface TournamentFile {
   id: string;
@@ -52,7 +79,7 @@ interface TournamentDetailsProps {
   files: TournamentFile[];
   reports: TournamentReport[];
   organizer?: Organizer;
-  userRole: 'organizer' | 'participant' | 'viewer';
+  userRole: UserRole | 'organizer' | 'participant' | 'viewer';
   userId?: string;
 }
 
@@ -67,45 +94,11 @@ export function TournamentDetails({
   userRole,
   userId
 }: TournamentDetailsProps) {
+  // State
   const [selectedTab, setSelectedTab] = useState('overview');
 
-  const getTournamentStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'ongoing': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'upcoming': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getTournamentStatusText = (status: string) => {
-    switch (status) {
-      case 'completed': return 'Completado';
-      case 'ongoing': return 'En Curso';
-      case 'upcoming': return 'Próximo';
-      case 'cancelled': return 'Cancelado';
-      default: return status;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  // Use centralized formatting utilities
+  const { formatDate, formatTime, formatDateTime } = useTournamentFormatting();
 
   // Calculate tournament statistics
   const stats = {
@@ -146,7 +139,7 @@ export function TournamentDetails({
                 </div>
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatDate(tournament.start_date)}</span>
+                  <span>{formatDate(tournament.start_date, 'long')}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
@@ -161,8 +154,8 @@ export function TournamentDetails({
               </div>
             </div>
 
-            <Badge className={getTournamentStatusColor(tournament.status)}>
-              {getTournamentStatusText(tournament.status)}
+            <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+              {getStatusText(tournament.status as TournamentStatus)}
             </Badge>
           </div>
         </CardHeader>
@@ -217,6 +210,25 @@ export function TournamentDetails({
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
+          {/* Real-time Components */}
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <RealTimePlayerCount 
+              tournamentId={tournament.id}
+              initialCount={tournament.current_players}
+              initialMax={tournament.max_players}
+              initialRegistrationOpen={tournament.registration_open}
+              initialStatus={tournament.status}
+              compact={false}
+            />
+            
+            <div className="md:col-span-2">
+              <TournamentActivityFeed 
+                tournamentId={tournament.id}
+                maxItems={8}
+              />
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tournament Information */}
             <Card>
@@ -225,37 +237,37 @@ export function TournamentDetails({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">ID Oficial:</span>
+                  <span className="text-gray-600 dark:text-gray-400">ID Oficial:</span>
                   <span className="font-mono text-sm">{tournament.official_tournament_id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Tipo:</span>
-                  <span>{tournament.tournament_type}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Tipo:</span>
+                  <span className="font-medium">{tournament.tournament_type.replace(/_/g, ' ')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Estado:</span>
-                  <Badge variant="outline" className={getTournamentStatusColor(tournament.status)}>
-                    {getTournamentStatusText(tournament.status)}
+                  <span className="text-gray-600 dark:text-gray-400">Estado:</span>
+                  <Badge variant="outline" className={getStatusColor(tournament.status as TournamentStatus)}>
+                    {getStatusText(tournament.status as TournamentStatus)}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Fecha de Inicio:</span>
-                  <span>{formatDate(tournament.start_date)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Fecha de Inicio:</span>
+                  <span className="font-medium">{formatDate(tournament.start_date, 'long')}</span>
                 </div>
                 {tournament.end_date && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Fecha de Fin:</span>
-                    <span>{formatDate(tournament.end_date)}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Fecha de Fin:</span>
+                    <span className="font-medium">{formatDate(tournament.end_date, 'long')}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Ubicación:</span>
-                  <span>{tournament.city}, {tournament.country}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Ubicación:</span>
+                  <span className="font-medium">{tournament.city}, {tournament.country}</span>
                 </div>
                 {tournament.state && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Estado/Provincia:</span>
-                    <span>{tournament.state}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Estado/Provincia:</span>
+                    <span className="font-medium">{tournament.state}</span>
                   </div>
                 )}
               </CardContent>
@@ -268,33 +280,33 @@ export function TournamentDetails({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Participantes:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Total Participantes:</span>
                   <span className="font-semibold">{stats.totalParticipants}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Participantes Activos:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Participantes Activos:</span>
                   <span className="font-semibold text-green-600">{stats.activeParticipants}</span>
                 </div>
                 {stats.droppedParticipants > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Abandonaron:</span>
+                    <span className="text-gray-600 dark:text-gray-400">Abandonaron:</span>
                     <span className="font-semibold text-red-600">{stats.droppedParticipants}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Partidas:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Total Partidas:</span>
                   <span className="font-semibold">{stats.totalMatches}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Partidas Completadas:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Partidas Completadas:</span>
                   <span className="font-semibold text-blue-600">{stats.completedMatches}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Rondas Jugadas:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Rondas Jugadas:</span>
                   <span className="font-semibold">{stats.totalRounds}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Resultados Disponibles:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Resultados Disponibles:</span>
                   <span className={`font-semibold ${stats.hasResults ? 'text-green-600' : 'text-gray-400'}`}>
                     {stats.hasResults ? 'Sí' : 'No'}
                   </span>
@@ -310,7 +322,7 @@ export function TournamentDetails({
                 <CardTitle>Descripción</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 whitespace-pre-wrap">{tournament.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{tournament.description}</p>
               </CardContent>
             </Card>
           )}
@@ -366,7 +378,7 @@ export function TournamentDetails({
                         <FileText className="h-5 w-5 text-blue-600" />
                         <div>
                           <p className="font-medium">Reporte del Torneo</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Generado: {formatDateTime(report.created_at)}
                           </p>
                         </div>
@@ -421,7 +433,7 @@ export function TournamentDetails({
                         <FileText className="h-5 w-5 text-gray-400" />
                         <div>
                           <p className="font-medium">{file.file_name}</p>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                             <Badge variant="outline" className="text-xs">
                               {file.file_type.toUpperCase()}
                             </Badge>
@@ -447,8 +459,8 @@ export function TournamentDetails({
             <Card>
               <CardContent className="text-center py-8">
                 <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-500">No hay reportes disponibles aún</p>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-gray-500 dark:text-gray-400">No hay reportes disponibles aún</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
                   Los reportes se generarán automáticamente cuando se procesen los datos del torneo
                 </p>
               </CardContent>

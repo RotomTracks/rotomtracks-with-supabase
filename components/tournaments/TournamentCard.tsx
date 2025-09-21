@@ -1,8 +1,11 @@
 'use client';
 
+// UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+
+// Icons
 import { 
   Calendar, 
   MapPin, 
@@ -11,63 +14,53 @@ import {
   UserPlus,
   Eye
 } from 'lucide-react';
-import Link from 'next/link';
-import { useFormatting } from '@/lib/i18n';
 
-interface Tournament {
-  id: string;
-  name: string;
-  tournament_type: string;
-  city: string;
-  country: string;
-  start_date: string;
-  end_date?: string;
-  status: string;
-  current_players: number;
-  max_players?: number;
-  registration_open: boolean;
-  organizer_id: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
-}
+// Next.js
+import Link from 'next/link';
+
+// Types
+import { 
+  Tournament, 
+  TournamentStatus, 
+  ParticipantStatus,
+  TournamentType,
+  UserRole 
+} from '@/lib/types/tournament';
+
+// Utilities
+import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { 
+  TournamentStatusManager,
+  getStatusColor,
+  getStatusText,
+  getTournamentTypeIcon
+} from '@/lib/utils/tournament-status';
 
 interface TournamentCardProps {
-  tournament: Tournament;
-  viewMode: 'grid' | 'list';
-  userRole: 'authenticated' | 'guest';
+  tournament: Tournament & {
+    user_role?: 'participant' | 'organizer';
+    registration_status?: ParticipantStatus;
+  };
+  viewMode?: 'grid' | 'list';
+  userRole: UserRole | 'authenticated' | 'guest';
+  showActions?: boolean;
+  className?: string;
 }
 
-export function TournamentCard({ tournament, viewMode, userRole }: TournamentCardProps) {
-  const { formatShortDate, formatTime } = useFormatting();
+export function TournamentCard({ 
+  tournament, 
+  viewMode = 'grid', 
+  userRole, 
+  showActions = true,
+  className = ''
+}: TournamentCardProps) {
+  // Use centralized formatting utilities
+  const { formatShortDate, formatTime } = useTournamentFormatting();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800 border-green-200';
-      case 'ongoing': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'upcoming': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // Get tournament type icon using centralized utility
+  const tournamentIcon = getTournamentTypeIcon(tournament.tournament_type as TournamentType);
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'completed': return 'Completado';
-      case 'ongoing': return 'En Curso';
-      case 'upcoming': return 'Próximo';
-      case 'cancelled': return 'Cancelado';
-      default: return status;
-    }
-  };
-
-  const getTournamentTypeIcon = (type: string) => {
-    if (type.toLowerCase().includes('vgc')) return '🎮';
-    if (type.toLowerCase().includes('tcg')) return '🃏';
-    if (type.toLowerCase().includes('go')) return '📱';
-    return '🏆';
-  };
-
+  // Utility functions
   const getCapacityColor = (current: number, max?: number) => {
     if (!max) return 'text-gray-600';
     const percentage = (current / max) * 100;
@@ -76,8 +69,20 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
     return 'text-green-600';
   };
 
-  const isUpcoming = tournament.status === 'upcoming';
-  const isOngoing = tournament.status === 'ongoing';
+  const getRegistrationStatusBadge = (status?: ParticipantStatus) => {
+    if (!status) return null;
+    
+    const config = TournamentStatusManager.getParticipantStatusConfig(status);
+    return (
+      <Badge variant="outline" className={config.color}>
+        {config.icon} {config.label}
+      </Badge>
+    );
+  };
+
+  // Tournament state checks
+  const isUpcoming = tournament.status === TournamentStatus.UPCOMING;
+  const isOngoing = tournament.status === TournamentStatus.ONGOING;
   const canRegister = tournament.registration_open && isUpcoming;
 
   if (viewMode === 'list') {
@@ -89,12 +94,12 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-lg">{getTournamentTypeIcon(tournament.tournament_type)}</span>
+                    <span className="text-lg">{tournamentIcon}</span>
                     <h3 className="text-lg font-semibold text-gray-900 truncate">
                       {tournament.name}
                     </h3>
-                    <Badge className={getStatusColor(tournament.status)}>
-                      {getStatusText(tournament.status)}
+                    <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+                      {getStatusText(tournament.status as TournamentStatus)}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{tournament.tournament_type}</p>
@@ -148,13 +153,15 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
     );
   }
 
+
+
   // Grid view
   return (
-    <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
+    <Card className={`hover:shadow-lg transition-shadow h-full flex flex-col ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2 min-w-0 flex-1">
-            <span className="text-xl">{getTournamentTypeIcon(tournament.tournament_type)}</span>
+            <span className="text-xl">{tournamentIcon}</span>
             <div className="min-w-0 flex-1">
               <CardTitle className="text-lg line-clamp-2">
                 {tournament.name}
@@ -164,9 +171,12 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
               </CardDescription>
             </div>
           </div>
-          <Badge className={getStatusColor(tournament.status)}>
-            {getStatusText(tournament.status)}
-          </Badge>
+          <div className="flex flex-col gap-1">
+            <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+              {getStatusText(tournament.status as TournamentStatus)}
+            </Badge>
+            {tournament.registration_status && getRegistrationStatusBadge(tournament.registration_status)}
+          </div>
         </div>
       </CardHeader>
       
@@ -212,20 +222,31 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
           </p>
         </div>
         
-        <div className="flex items-center space-x-2 mt-4 pt-4 border-t">
-          {canRegister && userRole === 'authenticated' && (
-            <Button size="sm" className="flex-1">
-              <UserPlus className="h-4 w-4 mr-1" />
-              Registrarse
-            </Button>
-          )}
-          <Link href={`/tournaments/${tournament.id}`} className="flex-1">
-            <Button size="sm" variant="outline" className="w-full">
-              <Eye className="h-4 w-4 mr-1" />
-              Ver Detalles
-            </Button>
-          </Link>
-        </div>
+        {showActions && (
+          <div className="flex items-center space-x-2 mt-4 pt-4 border-t">
+            {canRegister && (userRole === 'authenticated' || userRole === 'participant') && !tournament.registration_status && (
+              <Button size="sm" className="flex-1">
+                <UserPlus className="h-4 w-4 mr-1" />
+                Registrarse
+              </Button>
+            )}
+            
+            {tournament.user_role === 'organizer' && (
+              <Link href={`/tournaments/${tournament.id}/manage`} className="flex-1">
+                <Button size="sm" className="w-full">
+                  Gestionar
+                </Button>
+              </Link>
+            )}
+            
+            <Link href={`/tournaments/${tournament.id}`} className={tournament.user_role === 'organizer' ? '' : 'flex-1'}>
+              <Button size="sm" variant="outline" className="w-full">
+                <Eye className="h-4 w-4 mr-1" />
+                Ver Detalles
+              </Button>
+            </Link>
+          </div>
+        )}
         
         {canRegister && (
           <div className="mt-2">

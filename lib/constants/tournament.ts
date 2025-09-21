@@ -131,56 +131,71 @@ export const SEARCH_CONFIG = {
   debounceMs: 300,
 } as const;
 
-// Tournament Status Colors
+// Tournament Status Colors - Updated to use centralized status management
+// These are kept for backward compatibility but should use TournamentStatusManager
 export const STATUS_COLORS = {
   upcoming: {
     bg: 'bg-blue-100 dark:bg-blue-900/20',
     text: 'text-blue-800 dark:text-blue-300',
     border: 'border-blue-200 dark:border-blue-800',
+    full: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
   },
   ongoing: {
     bg: 'bg-green-100 dark:bg-green-900/20',
     text: 'text-green-800 dark:text-green-300',
     border: 'border-green-200 dark:border-green-800',
+    full: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
   },
   completed: {
     bg: 'bg-gray-100 dark:bg-gray-900/20',
     text: 'text-gray-800 dark:text-gray-300',
     border: 'border-gray-200 dark:border-gray-800',
+    full: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
   },
   cancelled: {
     bg: 'bg-red-100 dark:bg-red-900/20',
     text: 'text-red-800 dark:text-red-300',
     border: 'border-red-200 dark:border-red-800',
+    full: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
   },
 } as const;
 
-// Tournament Type Colors
+// Tournament Type Colors - Updated to include full classes and icons
 export const TYPE_COLORS = {
   purple: {
     bg: 'bg-purple-100 dark:bg-purple-900/20',
     text: 'text-purple-800 dark:text-purple-300',
     border: 'border-purple-200 dark:border-purple-800',
+    full: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
+    icon: '🎴',
   },
   blue: {
     bg: 'bg-blue-100 dark:bg-blue-900/20',
     text: 'text-blue-800 dark:text-blue-300',
     border: 'border-blue-200 dark:border-blue-800',
+    full: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+    icon: '⚔️',
   },
   green: {
     bg: 'bg-green-100 dark:bg-green-900/20',
     text: 'text-green-800 dark:text-green-300',
     border: 'border-green-200 dark:border-green-800',
+    full: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+    icon: '🏆',
   },
   red: {
     bg: 'bg-red-100 dark:bg-red-900/20',
     text: 'text-red-800 dark:text-red-300',
     border: 'border-red-200 dark:border-red-800',
+    full: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+    icon: '🎮',
   },
   yellow: {
     bg: 'bg-yellow-100 dark:bg-yellow-900/20',
     text: 'text-yellow-800 dark:text-yellow-300',
     border: 'border-yellow-200 dark:border-yellow-800',
+    full: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+    icon: '📱',
   },
 } as const;
 
@@ -323,6 +338,47 @@ export const ANIMATION_DURATIONS = {
   fast: 150,
   normal: 300,
   slow: 500,
+} as const;
+
+// Date Format Constants
+export const DATE_FORMATS = {
+  TDF: 'MM/DD/YYYY', // TDF file format
+  DISPLAY_SHORT: 'DD/MM/YYYY', // Short display format
+  DISPLAY_LONG: 'DD de MMMM de YYYY', // Long display format
+  ISO: 'YYYY-MM-DDTHH:mm:ss.sssZ', // ISO format
+  API: 'YYYY-MM-DD', // API date format
+} as const;
+
+// TDF Constants
+export const TDF_CONSTANTS = {
+  DATE_FORMAT: /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/,
+  TOURNAMENT_ID_FORMAT: /^\d{2}-\d{2}-\d{6}$/,
+  PLAYER_ID_FORMAT: /^\d{1,7}$/,
+  ENCODING: 'UTF-8',
+  VERSION: '1.80',
+  SUPPORTED_GAMETYPES: ['TRADING_CARD_GAME', 'VIDEO_GAME', 'GO'],
+  SUPPORTED_MODES: ['PRERELEASE', 'LEAGUECHALLENGE', 'TCG1DAY', 'VGCPREMIER', 'GOPREMIER'],
+} as const;
+
+// Status Translation Constants
+export const STATUS_LABELS = {
+  TOURNAMENT: {
+    upcoming: 'Próximo',
+    ongoing: 'En Curso',
+    completed: 'Completado',
+    cancelled: 'Cancelado',
+  },
+  PARTICIPANT: {
+    registered: 'Registrado',
+    checked_in: 'Confirmado',
+    dropped: 'Retirado',
+  },
+  FILE: {
+    pending: 'Pendiente',
+    uploading: 'Subiendo',
+    completed: 'Completado',
+    error: 'Error',
+  },
 } as const;
 
 // Breakpoints (matching Tailwind CSS)
