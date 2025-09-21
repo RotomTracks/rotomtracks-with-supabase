@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { TournamentDetails } from '@/components/tournaments/TournamentDetails';
+import { BackToTournamentsButton } from '@/components/tournaments/BackToTournamentsButton';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
 import { Button } from '@/components/ui/button';
-import { Settings, ArrowLeft } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface TournamentPageProps {
@@ -105,12 +106,7 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
         {/* Header with navigation */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
-            <Link href="/tournaments">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {tCommon('buttons.backToTournaments')}
-              </Button>
-            </Link>
+            <BackToTournamentsButton />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
                 {tournament.name}

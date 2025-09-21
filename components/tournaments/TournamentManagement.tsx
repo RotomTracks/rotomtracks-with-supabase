@@ -77,7 +77,7 @@ export function TournamentManagement({
   
   // State
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [, setRefreshKey] = useState(0);
 
   // Event handlers
   const handleFileUpload = (fileId: string, _fileName: string) => {

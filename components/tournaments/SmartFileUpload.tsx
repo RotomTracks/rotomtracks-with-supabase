@@ -106,7 +106,7 @@ export function SmartFileUpload({
       } else {
         setError(result.message || 'Error al actualizar torneo');
       }
-    } catch (error) {
+    } catch {
       setError('Error al actualizar torneo');
     }
   }, [selectedFile, onTournamentUpdated]);

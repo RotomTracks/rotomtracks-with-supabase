@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AlertCircle, Mail, RefreshCw } from "lucide-react";
 import { useTypedTranslation } from "@/lib/i18n";
+import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
 
 export default function AuthCodeErrorPage() {
   const { tCommon } = useTypedTranslation();
@@ -52,11 +53,7 @@ export default function AuthCodeErrorPage() {
                   </Button>
                 </Link>
                 
-                <Link href="/" className="w-full">
-                  <Button variant="ghost" className="w-full">
-                    {tCommon('buttons.backToHome')}
-                  </Button>
-                </Link>
+                <BackToHomeButton />
               </div>
 
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center">

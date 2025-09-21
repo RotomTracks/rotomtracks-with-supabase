@@ -13,6 +13,8 @@ import { useSearchParams } from "next/navigation";
 import { Shield, Building2, Trophy, ArrowLeft, Home } from "lucide-react";
 import { Suspense } from "react";
 import { useTypedTranslation } from "@/lib/i18n";
+import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
+import { GoBackButton } from "@/components/auth/GoBackButton";
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();
@@ -112,20 +114,10 @@ function UnauthorizedContent() {
                 </Link>
                 
                 {redirectTo && (
-                  <Link href="/" className="w-full">
-                    <Button variant="outline" className="w-full">
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      {tCommon('buttons.goBack')}
-                    </Button>
-                  </Link>
+                  <GoBackButton href={redirectTo} />
                 )}
                 
-                <Link href="/" className="w-full">
-                  <Button variant="ghost" className="w-full">
-                    <Home className="w-4 h-4 mr-2" />
-                    {tCommon('buttons.backToHome')}
-                  </Button>
-                </Link>
+                <BackToHomeButton />
               </div>
 
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
