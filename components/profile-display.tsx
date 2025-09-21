@@ -17,6 +17,7 @@ import {
   Info
 } from "lucide-react";
 import { Avatar } from "./ui/avatar";
+import { useFormatting } from "@/lib/i18n";
 
 interface ProfileDisplayProps {
   profile: {
@@ -43,6 +44,7 @@ export function ProfileDisplay({
   showEditButton = true 
 }: ProfileDisplayProps) {
   const [copySuccess, setCopySuccess] = useState(false);
+  const { formatLongDate } = useFormatting();
   const isOrganizer = profile.user_role === UserRole.ORGANIZER;
 
   // Función para copiar datos básicos al portapapeles
@@ -224,7 +226,7 @@ export function ProfileDisplay({
                 Miembro desde
               </label>
               <p className="text-gray-900 dark:text-white">
-                {new Date(profile.created_at).toLocaleDateString('es-ES')}
+                {formatLongDate(profile.created_at)}
               </p>
             </div>
           )}

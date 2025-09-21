@@ -6,6 +6,8 @@
 // Export the main hooks
 export { useTypedTranslation } from './hooks/useTypedTranslation';
 export { useLanguage } from './hooks/useLanguage';
+export { useFormatting } from './hooks/useFormatting';
+export { useOptimizedTranslation } from './hooks/useOptimizedTranslation';
 
 // Export types
 export type { LocaleData, TranslationNamespace, SupportedLanguage } from './types';
@@ -16,3 +18,14 @@ export { SUPPORTED_LANGUAGES, LANGUAGE_METADATA, DEFAULT_LANGUAGE } from './type
 // Export locale data
 export { default as enLocale } from './locales/en';
 export { default as esLocale } from './locales/es';
+
+// Export formatting utilities
+export * from './utils/formatting';
+
+// Export optimization utilities
+export * from './utils/cache';
+export * from './utils/lazy-loader';
+
+// Export development tools (only in development)
+export * from './utils/dev-tools';
+export { TranslationDevTools } from './components/TranslationDevTools';

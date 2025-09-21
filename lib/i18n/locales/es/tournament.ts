@@ -116,5 +116,20 @@ export const tournament = {
     noTournamentsAvailable: 'No hay torneos disponibles en este momento',
     tryAdjustingFilters: 'Intenta ajustar los filtros de búsqueda',
     clearFilters: 'Limpiar filtros'
+  },
+  processing: {
+    title: 'Procesamiento de Torneo',
+    description: 'Procesa archivos TDF para generar resultados y reportes HTML',
+    status: {
+      pending: 'Pendiente',
+      processing: 'Procesando',
+      completed: 'Completado',
+      failed: 'Fallido'
+    },
+    progress: '{{progress}}% completado',
+    noFileSelected: 'No hay archivo seleccionado para procesar',
+    startProcessingError: 'Error al iniciar procesamiento',
+    connectionError: 'Error de conexión',
+    cancelProcessingError: 'Error al cancelar procesamiento'
   }
 };

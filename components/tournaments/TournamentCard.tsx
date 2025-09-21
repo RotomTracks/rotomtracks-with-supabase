@@ -12,6 +12,7 @@ import {
   Eye
 } from 'lucide-react';
 import Link from 'next/link';
+import { useFormatting } from '@/lib/i18n';
 
 interface Tournament {
   id: string;
@@ -38,20 +39,7 @@ interface TournamentCardProps {
 }
 
 export function TournamentCard({ tournament, viewMode, userRole }: TournamentCardProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('es-ES', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const { formatShortDate, formatTime } = useFormatting();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -116,7 +104,7 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
-                  <span>{formatDate(tournament.start_date)}</span>
+                  <span>{formatShortDate(tournament.start_date)}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
@@ -186,7 +174,7 @@ export function TournamentCard({ tournament, viewMode, userRole }: TournamentCar
         <div className="space-y-3 flex-1">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <Calendar className="h-4 w-4" />
-            <span>{formatDate(tournament.start_date)} • {formatTime(tournament.start_date)}</span>
+            <span>{formatShortDate(tournament.start_date)} • {formatTime(tournament.start_date)}</span>
           </div>
           
           <div className="flex items-center space-x-2 text-sm text-gray-600">

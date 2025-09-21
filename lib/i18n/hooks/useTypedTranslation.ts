@@ -6,6 +6,8 @@ import { useCallback } from 'react';
 import { useLanguage } from './useLanguage';
 import enLocale from '../locales/en';
 import esLocale from '../locales/es';
+import { getCachedTranslation, setCachedTranslation } from '../utils/cache';
+import { logMissingTranslation, trackTranslationUsage, validateTranslationKey } from '../utils/dev-tools';
 
 /**
  * Type-safe translation function that always returns a string
@@ -32,10 +34,34 @@ export function useTypedTranslation() {
     return path.split('.').reduce((current, key) => current?.[key], obj);
   };
 
-  // Main translation function with automatic string conversion
+  // Main translation function with automatic string conversion, caching, and dev tools
   const translate = useCallback<TypedTranslationFunction>(
     (key: string, params?: Record<string, string | number>) => {
+      // Validate key in development
+      if (process.env.NODE_ENV === 'development') {
+        const validation = validateTranslationKey(key);
+        if (!validation.isValid) {
+          console.warn(`🌐 Invalid translation key "${key}":`, validation.errors);
+        }
+        if (validation.warnings.length > 0) {
+          console.warn(`🌐 Translation key warnings for "${key}":`, validation.warnings);
+        }
+      }
+
+      // Check cache first
+      const cachedResult = getCachedTranslation(language, key, params);
+      if (cachedResult !== null) {
+        trackTranslationUsage(language, key, params);
+        return cachedResult;
+      }
+      
       const value = getNestedValue(currentLocale, key);
+      
+      // Log missing translation in development
+      if (value === undefined && process.env.NODE_ENV === 'development') {
+        logMissingTranslation(language, key, params);
+      }
+      
       let result = value || key;
       
       // Handle interpolation
@@ -45,9 +71,17 @@ export function useTypedTranslation() {
         });
       }
       
-      return Array.isArray(result) ? result.join(', ') : String(result);
+      const finalResult = Array.isArray(result) ? result.join(', ') : String(result);
+      
+      // Cache the result
+      setCachedTranslation(language, key, finalResult, params);
+      
+      // Track usage in development
+      trackTranslationUsage(language, key, params);
+      
+      return finalResult;
     },
-    [currentLocale]
+    [currentLocale, language]
   );
 
 

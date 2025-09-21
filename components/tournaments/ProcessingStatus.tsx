@@ -18,6 +18,7 @@ import {
   X
 } from 'lucide-react';
 import { backgroundJobManager, type ProcessingJob, type JobProgress } from '@/lib/utils/background-jobs';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface ProcessingStatusProps {
   tournamentId: string;
@@ -30,6 +31,7 @@ export function ProcessingStatus({
   fileId, 
   onProcessingComplete 
 }: ProcessingStatusProps) {
+  const { tCommon, tTournaments } = useTypedTranslation();
   const [jobs, setJobs] = useState<ProcessingJob[]>([]);
   const [activeJob, setActiveJob] = useState<ProcessingJob | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -62,7 +64,7 @@ export function ProcessingStatus({
     updateData?: boolean;
   } = {}) => {
     if (!fileId) {
-      setError('No hay archivo seleccionado para procesar');
+      setError(tTournaments('processing.noFileSelected'));
       return;
     }
 
@@ -121,11 +123,11 @@ export function ProcessingStatus({
         setActiveJob(newJob);
         
       } else {
-        setError(data.message || 'Error al iniciar procesamiento');
+        setError(data.message || tTournaments('processing.startProcessingError'));
         setIsProcessing(false);
       }
     } catch (error) {
-      setError('Error de conexión');
+      setError(tTournaments('processing.connectionError'));
       setIsProcessing(false);
     }
   }, [tournamentId, fileId, onProcessingComplete, loadJobs]);
@@ -147,10 +149,10 @@ export function ProcessingStatus({
         setIsProcessing(false);
         loadJobs();
       } else {
-        setError(data.message || 'Error al cancelar procesamiento');
+        setError(data.message || tTournaments('processing.cancelProcessingError'));
       }
     } catch (error) {
-      setError('Error de conexión');
+      setError(tTournaments('processing.connectionError'));
     }
   }, [activeJob, tournamentId, loadJobs]);
 
@@ -197,10 +199,10 @@ export function ProcessingStatus({
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Play className="h-5 w-5" />
-            <span>Procesamiento de Torneo</span>
+            <span>{tTournaments('processing.title')}</span>
           </CardTitle>
           <CardDescription>
-            Procesa archivos TDF para generar resultados y reportes HTML
+            {tTournaments('processing.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -219,10 +221,7 @@ export function ProcessingStatus({
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(activeJob.status)}
                   <span className={`font-medium ${getStatusColor(activeJob.status)}`}>
-                    {activeJob.status === 'pending' && 'Pendiente'}
-                    {activeJob.status === 'processing' && 'Procesando'}
-                    {activeJob.status === 'completed' && 'Completado'}
-                    {activeJob.status === 'failed' && 'Fallido'}
+                    {tTournaments(`processing.status.${activeJob.status}`)}
                   </span>
                 </div>
                 
@@ -233,7 +232,7 @@ export function ProcessingStatus({
                     onClick={cancelProcessing}
                   >
                     <X className="h-4 w-4 mr-1" />
-                    Cancelar
+                    {tCommon('buttons.cancel')}
                   </Button>
                 )}
               </div>
@@ -242,7 +241,7 @@ export function ProcessingStatus({
                 <div className="space-y-2">
                   <Progress value={activeJob.progress} className="h-3" />
                   <p className="text-sm text-gray-600">
-                    {activeJob.progress}% completado
+                    {tTournaments('processing.progress', { progress: activeJob.progress })}
                   </p>
                 </div>
               )}
