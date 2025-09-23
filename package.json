@@ -3,11 +3,14 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:analyze": "next build && node scripts/analyze-css.js",
     "start": "next start",
     "lint": "next lint",
     "cleanup-data": "node scripts/cleanup-sample-data.js",
     "pre-deploy": "node scripts/pre-deploy-check.js",
-    "validate-translations": "node scripts/validate-translations.js"
+    "validate-translations": "node scripts/validate-translations.js",
+    "optimize-fonts": "node scripts/optimize-fonts.js",
+    "analyze-css": "node scripts/analyze-css.js"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
