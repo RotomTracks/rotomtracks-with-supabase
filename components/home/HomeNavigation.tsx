@@ -35,7 +35,7 @@ export function HomeNavigation({ user }: HomeNavigationProps) {
       </nav>
 
       {/* Mobile Navigation - Only show on small screens */}
-      <div className="lg:hidden">
+      <div className="block lg:hidden">
         <MobileNavigation user={user} />
       </div>
     </>
