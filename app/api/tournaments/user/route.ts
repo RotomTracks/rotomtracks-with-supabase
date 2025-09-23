@@ -15,7 +15,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const { user } = authResult;
 
   try {
-    console.log(`[${requestId}] Fetching tournaments for user: ${user.id}`);
     
     // Get tournaments the user organizes
     const { data: organizingTournaments, error: organizingError } = await supabase
@@ -28,7 +27,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
       console.error(`[${requestId}] Error fetching organizing tournaments:`, organizingError);
       // If table doesn't exist or has issues, return empty data instead of error
       if (organizingError.code === 'PGRST116' || organizingError.message?.includes('relation') || organizingError.message?.includes('does not exist')) {
-        console.log(`[${requestId}] Tournaments table not found, returning empty data`);
         const response = {
           success: true,
           data: {
@@ -47,7 +45,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
       return handleSupabaseError(organizingError, 'búsqueda de torneos organizados', requestId);
     }
 
-    console.log(`[${requestId}] Found ${organizingTournaments?.length || 0} organizing tournaments`);
 
     // Get tournaments the user participates in
     const { data: participatingTournaments, error: participatingError } = await supabase
@@ -64,13 +61,11 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
       console.error(`[${requestId}] Error fetching participating tournaments:`, participatingError);
       // If table doesn't exist or has issues, continue with empty data
       if (participatingError.code === 'PGRST116' || participatingError.message?.includes('relation') || participatingError.message?.includes('does not exist')) {
-        console.log(`[${requestId}] Tournament participants table not found, using empty data`);
       } else {
         return handleSupabaseError(participatingError, 'búsqueda de torneos participados', requestId);
       }
     }
 
-    console.log(`[${requestId}] Found ${participatingTournaments?.length || 0} participating tournaments`);
 
     // Transform organizing tournaments
     const transformedOrganizing = (organizingTournaments || []).map(tournament => ({
@@ -93,7 +88,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     // Combine all tournaments
     const allTournaments = [...transformedOrganizing, ...transformedParticipating];
 
-    console.log(`[${requestId}] Returning ${allTournaments.length} total tournaments (${transformedOrganizing.length} organizing, ${transformedParticipating.length} participating)`);
 
     return NextResponse.json({
       success: true,

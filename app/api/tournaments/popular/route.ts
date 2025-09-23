@@ -137,7 +137,6 @@ async function getTournamentTypeSuggestions(
       .in('status', ['upcoming', 'ongoing']);
 
     if (error) {
-      console.warn('Failed to fetch tournament type data, using fallback');
       return getFallbackTypeSuggestions(limit);
     }
 
@@ -193,7 +192,6 @@ async function getLocationSuggestions(
       .in('status', ['upcoming', 'ongoing']);
 
     if (error) {
-      console.warn('Failed to fetch location data, using fallback');
       return getFallbackLocationSuggestions(limit, userLocation);
     }
 
@@ -274,7 +272,6 @@ async function getTrendingSuggestions(
       .limit(20);
 
     if (error) {
-      console.warn('Failed to fetch trending data, using fallback');
       return getFallbackTrendingSuggestions(limit);
     }
 

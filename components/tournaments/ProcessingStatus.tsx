@@ -32,10 +32,6 @@ import { UserRole, LoadingState } from '@/lib/types/tournament';
 
 // Utilities
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
-import { 
-  TournamentStatusManager,
-  STATUS_TRANSLATIONS
-} from '@/lib/utils/tournament-status';
 
 interface ProcessingStatusProps {
   tournamentId: string;
@@ -50,12 +46,11 @@ export function ProcessingStatus({
   tournamentId, 
   fileId, 
   onProcessingComplete,
-  userRole = UserRole.ORGANIZER,
   loading = false,
   error: externalError = null
 }: ProcessingStatusProps) {
   // Hooks
-  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tTournaments } = useTypedTranslation();
   const { formatDateTime } = useTournamentFormatting();
   
   // State

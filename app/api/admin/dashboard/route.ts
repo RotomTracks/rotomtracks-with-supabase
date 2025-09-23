@@ -78,7 +78,6 @@ export const GET = withErrorHandling(async () => {
       console.warn('Error fetching request counts:', countsError);
       // If table doesn't exist, return empty data instead of error
       if (countsError.code === 'PGRST116' || countsError.message?.includes('relation') || countsError.message?.includes('does not exist')) {
-        console.log('Organizer requests table not found, returning empty data');
         const dashboardMetrics: AdminDashboardMetrics = {
           totalRequests: 0,
           pendingRequests: 0,
@@ -118,7 +117,6 @@ export const GET = withErrorHandling(async () => {
       console.warn('Error fetching recent activity:', activityError);
       // If table doesn't exist, continue with empty activity
       if (activityError.code === 'PGRST116' || activityError.message?.includes('relation') || activityError.message?.includes('does not exist')) {
-        console.log('Admin activity log table not found, using empty activity');
       }
     }
 

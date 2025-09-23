@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Shield, Building2, Trophy, ArrowLeft, Home } from "lucide-react";
+import { Shield, Building2, Trophy } from "lucide-react";
 import { Suspense } from "react";
 import { useTypedTranslation } from "@/lib/i18n";
 import { BackToHomeButton } from "@/components/auth/BackToHomeButton";

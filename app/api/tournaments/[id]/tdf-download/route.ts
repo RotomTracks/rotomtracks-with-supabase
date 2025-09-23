@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TDFGenerator, mapTournamentTypeToTDF, generateOrganizerPOPID } from '@/lib/tdf';
+import { formatTDFDate, formatTDFTimestamp } from '@/lib/tdf/utils';
+
+/**
+ * Generate a unique TDF user ID for players
+ */
+function generateTDFUserID(playerId: string): string {
+  // Generate a 7-digit user ID based on player ID or random number
+  if (playerId && playerId.length >= 7) {
+    return playerId.substring(0, 7);
+  }
+  
+  // Generate random 7-digit number
+  const randomId = Math.floor(1000000 + Math.random() * 9000000);
+  return randomId.toString();
+}
 
 // GET /api/tournaments/[id]/tdf-download - Generate and download TDF file with registered players
 export async function GET(
@@ -16,7 +31,11 @@ export async function GET(
     
     if (authError || !user) {
       return NextResponse.json(
-        { error: 'Authentication required' },
+        { 
+          error: 'Authentication required',
+          code: 'AUTH_REQUIRED',
+          message: 'You must be logged in to download TDF files'
+        },
         { status: 401 }
       );
     }
@@ -30,7 +49,11 @@ export async function GET(
 
     if (tournamentError || !tournament) {
       return NextResponse.json(
-        { error: 'Tournament not found' },
+        { 
+          error: 'Tournament not found',
+          code: 'TOURNAMENT_NOT_FOUND',
+          message: 'The requested tournament does not exist'
+        },
         { status: 404 }
       );
     }
@@ -38,7 +61,11 @@ export async function GET(
     // Check if user is the organizer
     if (tournament.organizer_id !== user.id) {
       return NextResponse.json(
-        { error: 'Only tournament organizers can download TDF files' },
+        { 
+          error: 'Access denied',
+          code: 'ACCESS_DENIED',
+          message: 'Only tournament organizers can download TDF files'
+        },
         { status: 403 }
       );
     }
@@ -67,16 +94,32 @@ export async function GET(
       );
     }
 
-    const mappedParticipants = participants.map((p: any) => ({
-      id: p.id,
-      tournament_id: tournamentId,
-      user_id: p.user_id || p.id || 'unknown',
-      player_name: p.player_name,
-      player_id: p.player_id || '',
-      player_birthdate: p.player_birthdate || '2000-01-01',
-      registration_date: p.registration_date,
-      status: p.status || 'registered'
-    }));
+    const mappedParticipants = participants.map((p: any) => {
+      // Generate TDF user ID if not exists
+      const tdfUserid = p.tdf_userid || generateTDFUserID(p.player_id || p.id);
+      
+      // Convert birthdate to TDF format (MM/DD/YYYY)
+      const birthdate = p.player_birthdate 
+        ? formatTDFDate(p.player_birthdate)
+        : '01/01/2000';
+      
+      // Convert registration date to TDF format
+        const creationDate = formatTDFTimestamp(p.registration_date || new Date().toISOString());
+      
+      return {
+        id: p.id,
+        tournament_id: tournamentId,
+        user_id: p.user_id || p.id || 'unknown',
+        player_name: p.player_name,
+        player_id: p.player_id || '',
+        player_birthdate: birthdate,
+        registration_date: p.registration_date,
+        status: p.status || 'registered',
+        tdf_userid: tdfUserid,
+        creation_date: creationDate,
+        last_modified_date: creationDate
+      };
+    });
 
     let generatedTDF;
 
@@ -163,13 +206,16 @@ function generateTDFFromScratch(tournament: any, participants: any[]) {
   const organizerName = tournament.organizer_name || 'Tournament Organizer';
   const organizerPopid = tournament.organizer_popid || generateOrganizerPOPID();
 
+  // Convert start date to TDF format (MM/DD/YYYY)
+  const startDate = formatTDFDate(tournament.start_date);
+
   const tournamentData = {
     name: tournament.name,
     id: tournament.official_tournament_id || tournament.id.substring(0, 8),
     city: tournament.city,
-    state: tournament.state,
+    state: tournament.state || '',
     country: tournament.country,
-    startDate: tournament.start_date,
+    startDate: startDate,
     organizer: {
       name: organizerName,
       popid: organizerPopid
@@ -268,16 +314,32 @@ export async function POST(
       );
     }
 
-    const tdfParticipants = participants.map((p: any) => ({
-      id: p.id,
-      tournament_id: tournamentId,
-      user_id: p.user_id || p.id || 'unknown',
-      player_name: p.player_name,
-      player_id: p.player_id || '',
-      player_birthdate: p.player_birthdate || '2000-01-01',
-      registration_date: p.registration_date,
-      status: p.status || 'registered'
-    }));
+    const tdfParticipants = participants.map((p: any) => {
+      // Generate TDF user ID if not exists
+      const tdfUserid = p.tdf_userid || generateTDFUserID(p.player_id || p.id);
+      
+      // Convert birthdate to TDF format (MM/DD/YYYY)
+      const birthdate = p.player_birthdate 
+        ? formatTDFDate(p.player_birthdate)
+        : '01/01/2000';
+      
+      // Convert registration date to TDF format
+        const creationDate = formatTDFTimestamp(p.registration_date || new Date().toISOString());
+      
+      return {
+        id: p.id,
+        tournament_id: tournamentId,
+        user_id: p.user_id || p.id || 'unknown',
+        player_name: p.player_name,
+        player_id: p.player_id || '',
+        player_birthdate: birthdate,
+        registration_date: p.registration_date,
+        status: p.status || 'registered',
+        tdf_userid: tdfUserid,
+        creation_date: creationDate,
+        last_modified_date: creationDate
+      };
+    });
 
     // Generate TDF with custom settings
     let generatedTDF;
@@ -299,8 +361,55 @@ export async function POST(
 
     // Apply custom settings if provided
     if (Object.keys(customSettings).length > 0) {
-      // TODO: Implement custom settings application
-      // This could include modifying round times, finals options, etc.
+      try {
+        // For now, we'll apply custom settings by modifying the XML content directly
+        // This is a simplified approach - in a full implementation, you'd want to parse the XML properly
+        
+        let modifiedXML = generatedTDF.xmlContent;
+        
+        // Apply custom tournament name if provided
+        if (customSettings.tournamentName) {
+          modifiedXML = modifiedXML.replace(
+            /<name>.*?<\/name>/,
+            `<name>${customSettings.tournamentName}</name>`
+          );
+        }
+        
+        // Apply custom location if provided
+        if (customSettings.location) {
+          modifiedXML = modifiedXML.replace(
+            /<city>.*?<\/city>/,
+            `<city>${customSettings.location}</city>`
+          );
+        }
+        
+        // Apply custom date if provided
+        if (customSettings.date) {
+          modifiedXML = modifiedXML.replace(
+            /<startdate>.*?<\/startdate>/,
+            `<startdate>${customSettings.date}</startdate>`
+          );
+        }
+        
+        // Apply custom round time if provided
+        if (customSettings.roundTime) {
+          modifiedXML = modifiedXML.replace(
+            /<roundtime>.*?<\/roundtime>/,
+            `<roundtime>${customSettings.roundTime}</roundtime>`
+          );
+        }
+        
+        // Update the generated TDF with modified XML
+        generatedTDF = {
+          ...generatedTDF,
+          xmlContent: modifiedXML
+        };
+        
+        console.log('Custom settings applied successfully');
+      } catch (error) {
+        console.warn('Failed to apply custom settings, using original TDF:', error);
+        // Continue with original TDF if custom settings application fails
+      }
     }
 
     const validation = TDFGenerator.validateGeneratedTDF(generatedTDF.xmlContent);

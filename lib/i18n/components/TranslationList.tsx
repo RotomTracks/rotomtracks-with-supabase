@@ -22,7 +22,7 @@ export function TranslationList({
   as: Component = 'ul',
   renderItem,
 }: TranslationListProps) {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tCommon } = useTypedTranslation();
   
   // Note: This component may need to be updated based on specific translation needs
   const translation = tCommon('common.loading'); // Placeholder - needs specific implementation

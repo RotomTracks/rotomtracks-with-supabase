@@ -18,11 +18,12 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/i18n';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function AdminSettingsContent() {
   const { tAdmin, tUI, tForms, tPages } = useTypedTranslation();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [settings, setSettings] = useState({
     siteName: 'RotomTracks',
     siteDescription: 'Plataforma de gestión de torneos Pokémon',
@@ -35,15 +36,63 @@ function AdminSettingsContent() {
     enableAnalytics: true
   });
 
+  // Load settings on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            const data = result.data;
+            setSettings({
+              siteName: data.site_name || 'RotomTracks',
+              siteDescription: data.site_description || 'Plataforma de gestión de torneos Pokémon',
+              maintenanceMode: data.maintenance_mode || false,
+              allowRegistration: data.allow_registration !== false,
+              requireEmailVerification: data.require_email_verification !== false,
+              maxTournamentsPerUser: data.max_tournaments_per_user || 10,
+              autoApproveOrganizers: data.auto_approve_organizers || false,
+              enableNotifications: data.enable_notifications !== false,
+              enableAnalytics: data.enable_analytics !== false
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
   const handleSave = async () => {
     setLoading(true);
     try {
-      // TODO: Implement settings save logic
-      console.log('Saving settings:', settings);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save settings');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        // Settings saved successfully
+        // You could add a toast notification here
+        console.log('Settings saved successfully');
+      }
     } catch (error) {
       console.error('Error saving settings:', error);
+      // You could add error handling UI here
     } finally {
       setLoading(false);
     }
@@ -63,6 +112,24 @@ function AdminSettingsContent() {
       enableAnalytics: true
     });
   };
+
+  if (initialLoading) {
+    return (
+      <AdminRoute>
+        <AdminLayout 
+          title={tAdmin('settings.title')} 
+          description={tAdmin('settings.description')}
+        >
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+              <p className="text-gray-600 dark:text-gray-400">{tUI('loading')}</p>
+            </div>
+          </div>
+        </AdminLayout>
+      </AdminRoute>
+    );
+  }
 
   return (
     <AdminRoute>

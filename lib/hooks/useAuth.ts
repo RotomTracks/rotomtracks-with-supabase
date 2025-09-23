@@ -34,62 +34,43 @@ export function useAuth(): UseAuthReturn {
       setLoading(true);
       setError(null);
 
-      // Get current user - no timeout for auth as it's usually fast
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError) {
-        console.warn('Auth error (non-critical):', userError);
-        // Don't throw for auth errors, just set user to null
-        setUser(null);
-        setProfile(null);
-        return;
-      }
-
-      setUser(currentUser);
-
-      // If user exists, fetch their profile with a reasonable timeout
-      if (currentUser) {
-        try {
-          const profilePromise = supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .single();
-
-          // Use a longer timeout for profile fetch as it's a database query
-          const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Profile request timed out')), 5000);
-          });
-
-          const { data: userProfile, error: profileError } = await Promise.race([
-            profilePromise,
-            timeoutPromise
-          ]) as any;
-
-          if (profileError && profileError.code !== 'PGRST116') {
-            // PGRST116 means no rows returned, which is fine for new users
-            console.warn('Profile error (non-critical):', profileError);
-            setProfile(null);
-          } else {
-            setProfile(userProfile || null);
-          }
-        } catch (profileTimeoutError) {
-          console.warn('Profile fetch timed out, continuing without profile:', profileTimeoutError);
-          setProfile(null);
-        }
-      } else {
-        setProfile(null);
-      }
-    } catch (err) {
-      console.error('Error fetching user and profile:', err);
-      // Only set error for critical failures, not timeouts
-      if (err instanceof Error && !err.message.includes('timed out')) {
-        setError(err.message);
-      }
-      // Set user to null and profile to null on error so the app can continue
+      // Set user to null initially for faster loading
       setUser(null);
       setProfile(null);
-    } finally {
+
+      // Immediately set loading to false to show buttons
+      setLoading(false);
+
+      // Get current user in background without blocking
+      supabase.auth.getUser()
+        .then(({ data: { user: currentUser }, error: userError }) => {
+          if (userError) {
+            console.warn('Auth error (non-critical):', userError);
+            return;
+          }
+
+          setUser(currentUser);
+
+          // If user exists, fetch their profile in the background
+          if (currentUser) {
+            supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('user_id', currentUser.id)
+              .single()
+              .then(({ data: userProfile, error: profileError }) => {
+                if (profileError && profileError.code !== 'PGRST116') {
+                  console.warn('Profile error (non-critical):', profileError);
+                } else {
+                  setProfile(userProfile || null);
+                }
+              })
+          }
+        });
+    } catch (err) {
+      console.error('Error in fetchUserAndProfile:', err);
+      setUser(null);
+      setProfile(null);
       setLoading(false);
     }
   };

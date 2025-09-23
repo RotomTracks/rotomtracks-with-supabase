@@ -132,7 +132,6 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
       console.warn('Error fetching organizer requests:', error);
       // If table doesn't exist, return empty data instead of error
       if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
-        console.log('Organizer requests table not found, returning empty data');
         const response: AdminOrganizerRequestsResponse = {
           data: [],
           pagination: {

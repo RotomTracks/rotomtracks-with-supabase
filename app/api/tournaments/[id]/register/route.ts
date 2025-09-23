@@ -157,8 +157,21 @@ export async function POST(
       }
     }
 
-    // Send confirmation email (TODO: implement email service)
-    // await sendRegistrationConfirmationEmail(participant, tournament);
+    // Send confirmation email
+    try {
+      const { emailService } = await import('@/lib/services/email');
+      await emailService.sendRegistrationConfirmation({
+        participantName: participant.player_name || participant.email,
+        tournamentName: tournament.name,
+        tournamentDate: new Date(tournament.start_date).toLocaleDateString('es-ES'),
+        tournamentLocation: tournament.location,
+        registrationStatus: isFull ? 'waitlist' : 'registered',
+        participantId: participant.id
+      });
+    } catch (emailError) {
+      console.warn('Failed to send registration confirmation email:', emailError);
+      // Don't fail the registration if email fails
+    }
 
     return NextResponse.json({
       data: {
