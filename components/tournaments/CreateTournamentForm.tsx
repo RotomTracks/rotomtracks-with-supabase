@@ -17,7 +17,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { TournamentType } from '@/lib/types/tournament';
-import { useTranslation } from '@/lib/i18n/hooks/useTranslation';
+import { useTypedTranslation } from '@/lib/i18n';
 import Link from 'next/link';
 
 interface CreateTournamentFormProps {
@@ -42,7 +42,7 @@ interface FormErrors {
 }
 
 export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
-  const { t } = useTranslation();
+  const { tTournaments, tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -225,21 +225,11 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
 
   return (
     <div className="space-y-6">
-      {/* Back button */}
-      <div>
-        <Link href="/dashboard">
-          <Button variant="outline" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Volver al Dashboard
-          </Button>
-        </Link>
-      </div>
-
       {/* General error */}
       {errors.general && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/30 bg-destructive/10">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-red-600">
+            <div className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-4 w-4" />
               <span className="text-sm">{errors.general}</span>
             </div>
@@ -251,7 +241,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
         {/* Basic Information */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <FileText className="h-5 w-5" />
               Información Básica
             </CardTitle>
@@ -262,29 +252,29 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <Label htmlFor="name">Nombre del Torneo *</Label>
+                <Label htmlFor="name" className="text-foreground">Nombre del Torneo *</Label>
                 <input
                   id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                    errors.name ? 'border-destructive/30' : 'border-border'
                   }`}
                   placeholder="ej: Regional Championship Madrid 2024"
                 />
                 {errors.name && (
-                  <p className="text-red-600 text-sm mt-1">{errors.name}</p>
+                  <p className="text-destructive text-sm mt-1">{errors.name}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="tournament_type">Tipo de Torneo *</Label>
+                <Label htmlFor="tournament_type" className="text-foreground">Tipo de Torneo *</Label>
                 <select
                   id="tournament_type"
                   value={formData.tournament_type}
                   onChange={(e) => handleInputChange('tournament_type', e.target.value as TournamentType)}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground border-border"
                 >
                   {tournamentTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -295,21 +285,21 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="official_tournament_id">ID Oficial del Torneo *</Label>
+                <Label htmlFor="official_tournament_id" className="text-foreground">ID Oficial del Torneo *</Label>
                 <input
                   id="official_tournament_id"
                   type="text"
                   value={formData.official_tournament_id}
                   onChange={(e) => handleInputChange('official_tournament_id', e.target.value)}
-                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.official_tournament_id ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                    errors.official_tournament_id ? 'border-destructive/30' : 'border-border'
                   }`}
                   placeholder="24-05-002583"
                 />
                 {errors.official_tournament_id && (
-                  <p className="text-red-600 text-sm mt-1">{errors.official_tournament_id}</p>
+                  <p className="text-destructive text-sm mt-1">{errors.official_tournament_id}</p>
                 )}
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-muted-foreground text-sm mt-1">
                   Formato: YY-MM-XXXXXX (año-mes-número secuencial)
                 </p>
               </div>
@@ -323,7 +313,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={3}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Descripción opcional del torneo..."
+                placeholder={tTournaments('createForm.descriptionPlaceholder')}
               />
             </div>
           </CardContent>
@@ -332,7 +322,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
         {/* Location */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <MapPin className="h-5 w-5" />
               Ubicación
             </CardTitle>
@@ -343,41 +333,41 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="city">Ciudad *</Label>
+                <Label htmlFor="city" className="text-foreground">Ciudad *</Label>
                 <input
                   id="city"
                   type="text"
                   value={formData.city}
                   onChange={(e) => handleInputChange('city', e.target.value)}
-                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.city ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                    errors.city ? 'border-destructive/30' : 'border-border'
                   }`}
-                  placeholder="Madrid"
+                  placeholder={tTournaments('createForm.cityPlaceholder')}
                 />
                 {errors.city && (
-                  <p className="text-red-600 text-sm mt-1">{errors.city}</p>
+                  <p className="text-destructive text-sm mt-1">{errors.city}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="state">Estado/Provincia</Label>
+                <Label htmlFor="state" className="text-foreground">Estado/Provincia</Label>
                 <input
                   id="state"
                   type="text"
                   value={formData.state}
                   onChange={(e) => handleInputChange('state', e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Comunidad de Madrid"
+                  className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground border-border"
+                  placeholder={tTournaments('createForm.statePlaceholder')}
                 />
               </div>
 
               <div>
-                <Label htmlFor="country">País *</Label>
+                <Label htmlFor="country" className="text-foreground">País *</Label>
                 <select
                   id="country"
                   value={formData.country}
                   onChange={(e) => handleInputChange('country', e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground border-border"
                 >
                   {countries.map((country) => (
                     <option key={country} value={country}>
@@ -393,7 +383,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
         {/* Date and Time */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Calendar className="h-5 w-5" />
               Fecha y Hora
             </CardTitle>
@@ -404,34 +394,34 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="start_date">Fecha y Hora de Inicio *</Label>
+                <Label htmlFor="start_date" className="text-foreground">Fecha y Hora de Inicio *</Label>
                 <input
                   id="start_date"
                   type="datetime-local"
                   value={formData.start_date}
                   onChange={(e) => handleInputChange('start_date', e.target.value)}
-                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.start_date ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                    errors.start_date ? 'border-destructive/30' : 'border-border'
                   }`}
                 />
                 {errors.start_date && (
-                  <p className="text-red-600 text-sm mt-1">{errors.start_date}</p>
+                  <p className="text-destructive text-sm mt-1">{errors.start_date}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="end_date">Fecha y Hora de Fin</Label>
+                <Label htmlFor="end_date" className="text-foreground">Fecha y Hora de Fin</Label>
                 <input
                   id="end_date"
                   type="datetime-local"
                   value={formData.end_date}
                   onChange={(e) => handleInputChange('end_date', e.target.value)}
-                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.end_date ? 'border-red-300' : 'border-gray-300'
+                  className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                    errors.end_date ? 'border-destructive/30' : 'border-border'
                   }`}
                 />
                 {errors.end_date && (
-                  <p className="text-red-600 text-sm mt-1">{errors.end_date}</p>
+                  <p className="text-destructive text-sm mt-1">{errors.end_date}</p>
                 )}
                 <p className="text-gray-500 text-sm mt-1">
                   Opcional - se puede actualizar después
@@ -444,7 +434,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
         {/* Participants */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Users className="h-5 w-5" />
               Participantes
             </CardTitle>
@@ -454,7 +444,7 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor="max_players">Número Máximo de Jugadores</Label>
+              <Label htmlFor="max_players" className="text-foreground">Número Máximo de Jugadores</Label>
               <input
                 id="max_players"
                 type="number"
@@ -462,13 +452,13 @@ export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
                 max="1000"
                 value={formData.max_players}
                 onChange={(e) => handleInputChange('max_players', e.target.value)}
-                className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.max_players ? 'border-red-300' : 'border-gray-300'
+                className={`w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground ${
+                  errors.max_players ? 'border-destructive/30' : 'border-border'
                 }`}
                 placeholder="128"
               />
               {errors.max_players && (
-                <p className="text-red-600 text-sm mt-1">{errors.max_players}</p>
+                <p className="text-destructive text-sm mt-1">{errors.max_players}</p>
               )}
               <p className="text-gray-500 text-sm mt-1">
                 Opcional - se puede actualizar después. Mínimo 4, máximo 1000.

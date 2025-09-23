@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface AdminRouteProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ interface AdminRouteProps {
 export function AdminRoute({ children, fallback }: AdminRouteProps) {
   const { isAdmin, loading, user } = useAuth();
   const router = useRouter();
+  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
   // Show loading state while checking auth
   if (loading) {
@@ -21,7 +23,7 @@ export function AdminRoute({ children, fallback }: AdminRouteProps) {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Verificando permisos de administrador...</p>
+          <p className="text-gray-600 dark:text-gray-400">{tAdmin('verifyingPermissions')}</p>
         </div>
       </div>
     );
@@ -46,12 +48,11 @@ export function AdminRoute({ children, fallback }: AdminRouteProps) {
           </div>
           
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Acceso Restringido
+            {tAdmin('accessRestricted')}
           </h2>
           
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Esta área está reservada para administradores del sistema. 
-            No tienes los permisos necesarios para acceder a esta sección.
+            {tAdmin('accessRestrictedDescription')}
           </p>
           
           <div className="flex gap-3 justify-center">
@@ -59,19 +60,19 @@ export function AdminRoute({ children, fallback }: AdminRouteProps) {
               variant="outline"
               onClick={() => router.push('/')}
             >
-              Volver al Inicio
+              {tUI('buttons.backToHome')}
             </Button>
             <Button
               onClick={() => router.push('/dashboard')}
             >
-              Ir al Dashboard
+              {tUI('buttons.goToDashboard')}
             </Button>
           </div>
           
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <Shield className="w-4 h-4" />
-              <span>Panel de Administración</span>
+              <span>{tAdmin('panel')}</span>
             </div>
           </div>
         </div>

@@ -59,7 +59,7 @@ export function ProfileForm({
   
   const supabase = createClient();
   const router = useRouter();
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
 
 

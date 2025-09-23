@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { UserMenu } from "./user-menu";
 
 export function AuthButtonClient() {
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -26,10 +26,10 @@ export function AuthButtonClient() {
   return (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
-        <Link href="/auth/login">{tCommon("navigation.login")}</Link>
+        <Link href="/auth/login">{tUI("navigation.login")}</Link>
       </Button>
       <Button asChild size="sm" variant={"default"}>
-        <Link href="/auth/sign-up">{tCommon("navigation.signUp")}</Link>
+        <Link href="/auth/sign-up">{tUI("navigation.signUp")}</Link>
       </Button>
     </div>
   );

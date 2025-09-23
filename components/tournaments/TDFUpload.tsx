@@ -269,27 +269,27 @@ export function TDFUpload({ onTournamentCreated, className = '' }: TDFUploadProp
               onClick={openFileDialog}
             >
               <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-foreground mb-2">
                 Arrastra tu archivo TDF aquí
               </h3>
-              <p className="text-gray-600 mb-4">
+            <p className="text-muted-foreground mb-4">
                 O haz clic para seleccionar un archivo
               </p>
               <Button variant="outline">
                 Seleccionar Archivo
               </Button>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Archivos soportados: .tdf (máximo 10MB)
               </p>
             </div>
           ) : (
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border border-border rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FileText className="h-8 w-8 text-blue-500" />
+                  <FileText className="h-8 w-8 text-primary" />
                   <div>
-                    <p className="font-medium text-gray-900">{state.file.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-foreground">{state.file.name}</p>
+                    <p className="text-sm text-muted-foreground">
                       {(state.file.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -298,7 +298,7 @@ export function TDFUpload({ onTournamentCreated, className = '' }: TDFUploadProp
                   variant="ghost"
                   size="sm"
                   onClick={removeFile}
-                  className="text-gray-500 hover:text-red-500"
+                  className="text-muted-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -321,8 +321,8 @@ export function TDFUpload({ onTournamentCreated, className = '' }: TDFUploadProp
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-              <span className="text-gray-700">Validando archivo TDF...</span>
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-foreground">Validando archivo TDF...</span>
             </div>
           </CardContent>
         </Card>
@@ -330,13 +330,13 @@ export function TDFUpload({ onTournamentCreated, className = '' }: TDFUploadProp
 
       {/* Error Display */}
       {state.error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-destructive/30 bg-destructive/10">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-red-600">
+            <div className="flex items-center gap-2 text-destructive">
               <AlertCircle className="h-5 w-5" />
               <span className="font-medium">Error</span>
             </div>
-            <p className="text-red-700 mt-2">{state.error}</p>
+            <p className="text-destructive mt-2">{state.error}</p>
           </CardContent>
         </Card>
       )}
@@ -356,49 +356,43 @@ export function TDFUpload({ onTournamentCreated, className = '' }: TDFUploadProp
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-600">Nombre</label>
-                <p className="text-gray-900">{state.summary.name}</p>
+                <label className="text-sm font-medium text-muted-foreground">Nombre</label>
+                <p className="text-foreground">{state.summary.name}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">ID Oficial</label>
-                <p className="text-gray-900">{state.summary.id}</p>
+                <label className="text-sm font-medium text-muted-foreground">ID Oficial</label>
+                <p className="text-foreground">{state.summary.id}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Tipo</label>
-                <p className="text-gray-900">{state.summary.type}</p>
+                <label className="text-sm font-medium text-muted-foreground">Tipo</label>
+                <p className="text-foreground">{state.summary.type}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Ubicación</label>
-                <p className="text-gray-900">{state.summary.location}</p>
+                <label className="text-sm font-medium text-muted-foreground">Ubicación</label>
+                <p className="text-foreground">{state.summary.location}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Fecha</label>
-                <p className="text-gray-900">{state.summary.date}</p>
+                <label className="text-sm font-medium text-muted-foreground">Fecha</label>
+                <p className="text-foreground">{state.summary.date}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600">Jugadores</label>
+                <label className="text-sm font-medium text-muted-foreground">Jugadores</label>
                 <div className="flex items-center gap-2">
-                  <p className="text-gray-900">{state.summary.playerCount}</p>
-                  {state.summary.isEmpty ? (
-                    <Badge variant="outline" className="text-green-600 border-green-200">
-                      Vacío - Listo para registro
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-blue-600 border-blue-200">
-                      Con jugadores
-                    </Badge>
-                  )}
+                  <p className="text-foreground">{state.summary.playerCount}</p>
+                  <Badge variant="secondary">
+                    {state.summary.isEmpty ? 'Vacío - Listo para registro' : 'Con jugadores'}
+                  </Badge>
                 </div>
               </div>
             </div>
 
             {state.summary.isEmpty && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-green-700">
+              <div className="bg-muted border border-border rounded-lg p-4">
+                <div className="flex items-center gap-2 text-foreground">
                   <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">Perfecto para registro online</span>
                 </div>
-                <p className="text-green-600 text-sm mt-1">
+                <p className="text-muted-foreground text-sm mt-1">
                   Este archivo TDF está vacío, ideal para que los jugadores se registren online.
                 </p>
               </div>

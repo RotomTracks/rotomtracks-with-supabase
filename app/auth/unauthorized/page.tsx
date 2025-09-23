@@ -18,7 +18,7 @@ import { GoBackButton } from "@/components/auth/GoBackButton";
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const reason = searchParams.get("reason");
   const redirectTo = searchParams.get("redirectTo");
 
@@ -27,27 +27,27 @@ function UnauthorizedContent() {
       case "organizer_required":
         return {
           icon: <Building2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />,
-          title: tCommon('pages.unauthorized.organizerRequired.title'),
-          description: tCommon('pages.unauthorized.organizerRequired.description'),
-          suggestion: tCommon('pages.unauthorized.organizerRequired.suggestion'),
+          title: tPages('unauthorized.organizerRequired.title'),
+          description: tPages('unauthorized.organizerRequired.description'),
+          suggestion: tPages('unauthorized.organizerRequired.suggestion'),
           bgColor: "bg-blue-100 dark:bg-blue-900/20",
           borderColor: "border-blue-200 dark:border-blue-800"
         };
       case "player_required":
         return {
           icon: <Trophy className="w-8 h-8 text-green-600 dark:text-green-400" />,
-          title: tCommon('pages.unauthorized.playerRequired.title'),
-          description: tCommon('pages.unauthorized.playerRequired.description'),
-          suggestion: tCommon('pages.unauthorized.playerRequired.suggestion'),
+          title: tPages('unauthorized.playerRequired.title'),
+          description: tPages('unauthorized.playerRequired.description'),
+          suggestion: tPages('unauthorized.playerRequired.suggestion'),
           bgColor: "bg-green-100 dark:bg-green-900/20",
           borderColor: "border-green-200 dark:border-green-800"
         };
       default:
         return {
           icon: <Shield className="w-8 h-8 text-red-600 dark:text-red-400" />,
-          title: tCommon('pages.unauthorized.accessDenied.title'),
-          description: tCommon('pages.unauthorized.accessDenied.description'),
-          suggestion: tCommon('pages.unauthorized.accessDenied.suggestion'),
+          title: tPages('unauthorized.accessDenied.title'),
+          description: tPages('unauthorized.accessDenied.description'),
+          suggestion: tPages('unauthorized.accessDenied.suggestion'),
           bgColor: "bg-red-100 dark:bg-red-900/20",
           borderColor: "border-red-200 dark:border-red-800"
         };

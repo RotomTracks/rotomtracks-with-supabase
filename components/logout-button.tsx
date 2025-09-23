@@ -7,7 +7,7 @@ import { useTypedTranslation } from "@/lib/i18n";
 
 export function LogoutButton() {
   const router = useRouter();
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
   const logout = async () => {
     const supabase = createClient();

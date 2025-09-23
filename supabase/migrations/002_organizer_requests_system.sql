@@ -1,6 +1,6 @@
 -- Migration: Organizer Request System
 -- Description: Implements approval system for organizer role requests
--- Date: 2025-01-27
+-- Date: 2024-12-23
 
 -- Create organizer requests table
 CREATE TABLE IF NOT EXISTS organizer_requests (

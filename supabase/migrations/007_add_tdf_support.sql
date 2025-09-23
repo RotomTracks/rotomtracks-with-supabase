@@ -1,20 +1,20 @@
--- Add TDF support to tournaments table
+-- Add TDF support
 ALTER TABLE tournaments 
 ADD COLUMN IF NOT EXISTS tdf_metadata JSONB,
 ADD COLUMN IF NOT EXISTS original_tdf_file_path VARCHAR(500);
 
--- Add TDF-specific fields to tournament_participants
+-- TDF fields for participants
 ALTER TABLE tournament_participants 
 ADD COLUMN IF NOT EXISTS player_birthdate DATE,
 ADD COLUMN IF NOT EXISTS tdf_userid VARCHAR(20),
 ADD COLUMN IF NOT EXISTS registration_source VARCHAR(20) DEFAULT 'web';
 
--- Create index for TDF user IDs
+-- TDF user ID index
 CREATE INDEX IF NOT EXISTS idx_tournament_participants_tdf_userid 
 ON tournament_participants(tdf_userid) 
 WHERE tdf_userid IS NOT NULL;
 
--- Create index for TDF metadata
+-- TDF metadata index
 CREATE INDEX IF NOT EXISTS idx_tournaments_tdf_metadata 
 ON tournaments USING GIN (tdf_metadata) 
 WHERE tdf_metadata IS NOT NULL;

@@ -1,3 +1,7 @@
+/**
+ * Spanish translations for tournament-related components
+ */
+
 export const tournament = {
   title: 'Torneo',
   name: 'Nombre del Torneo',
@@ -131,5 +135,95 @@ export const tournament = {
     startProcessingError: 'Error al iniciar procesamiento',
     connectionError: 'Error de conexión',
     cancelProcessingError: 'Error al cancelar procesamiento'
-  }
-};
+  },
+  // Trending tournaments
+  trending: {
+    regional: 'Campeonato Regional',
+    spring: 'Torneo de Primavera'
+  },
+  // Create tournament form
+  createForm: {
+    descriptionPlaceholder: 'Descripción opcional del torneo...',
+    cityPlaceholder: 'Madrid',
+    statePlaceholder: 'Comunidad de Madrid'
+  },
+  // Dashboard specific translations
+  dashboard: {
+    title: 'Dashboard de Torneos',
+    subtitle: {
+      organizer: 'Gestiona tus torneos organizados y participaciones',
+      player: 'Sigue tus participaciones en torneos'
+    },
+    stats: {
+      total: 'Total Torneos',
+      organizing: 'organizando',
+      participating: 'Participaciones activas',
+      upcoming: 'Próximos',
+      scheduled: 'Torneos programados',
+      participants: 'Participantes',
+      cities: 'Ciudades',
+      inYourTournaments: 'En tus torneos',
+      visited: 'Visitadas'
+    },
+    tabs: {
+      organizing: 'Organizando',
+      participating: 'Participando',
+      all: 'Todos',
+      organizingAria: 'Torneos que organizas',
+      participatingAria: 'Torneos en los que participas',
+      allAria: 'Lista de torneos'
+    },
+    search: {
+      placeholder: 'Buscar torneos...',
+      aria: 'Buscar torneos'
+    },
+    filter: {
+      status: {
+        aria: 'Filtrar por estado',
+        all: 'Todos los estados'
+      }
+    },
+    empty: {
+      organizing: {
+        title: 'No estás organizando torneos',
+        description: 'Crea tu primer torneo y comienza a gestionar participantes'
+      },
+      participating: {
+        title: 'No estás participando en torneos',
+        description: 'Busca torneos interesantes y regístrate para participar',
+        searchButton: 'Buscar Torneos'
+      },
+      all: {
+        title: 'No tienes torneos aún',
+        titleFiltered: 'No se encontraron torneos',
+        description: 'Crea tu primer torneo o regístrate en uno existente',
+        descriptionFiltered: 'Intenta ajustar los filtros de búsqueda'
+      }
+    },
+    role: {
+      organizing: 'Organizas',
+      participating: 'Participas'
+    }
+  },
+      error: {
+        loading: 'Error al cargar los torneos'
+      },
+      upcoming: {
+        title: 'Próximos Torneos',
+        subtitle: 'Encuentra torneos cerca de ti y regístrate',
+        inLocation: 'en {location}',
+        empty: {
+          title: 'No hay torneos próximos',
+          description: 'No hay torneos programados en este momento. ¡Vuelve pronto!',
+          descriptionWithLocation: 'No encontramos torneos próximos en {location}. Prueba expandir tu búsqueda.'
+        },
+        actions: {
+          viewAll: 'Ver todos los torneos',
+          create: 'Crear torneo'
+        },
+        error: {
+          title: 'Error al cargar torneos',
+          loading: 'Error al cargar torneos próximos'
+        }
+      }
+    };

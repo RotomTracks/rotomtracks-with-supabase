@@ -20,7 +20,7 @@ export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth } = useTypedTranslation();
+  const { tAuth, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

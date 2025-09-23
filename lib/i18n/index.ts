@@ -7,7 +7,6 @@
 export { useTypedTranslation } from './hooks/useTypedTranslation';
 export { useLanguage } from './hooks/useLanguage';
 export { useFormatting } from './hooks/useFormatting';
-export { useOptimizedTranslation } from './hooks/useOptimizedTranslation';
 
 // Export types
 export type { LocaleData, TranslationNamespace, SupportedLanguage } from './types';

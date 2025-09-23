@@ -14,7 +14,7 @@ import {
   Users,
   Target
 } from 'lucide-react';
-import { useTournamentStatus } from '@/hooks/use-tournament-status';
+import { useTournamentStatus } from '@/lib/hooks/use-tournament-status';
 
 interface TournamentStatusIndicatorProps {
   tournamentId: string;

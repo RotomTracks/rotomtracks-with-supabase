@@ -146,6 +146,27 @@ export function useTypedTranslation() {
     [translate]
   );
 
+  const tUI = useCallback<TypedTranslationFunction>(
+    (key: string, params?: Record<string, string | number>) => {
+      return translate(`ui.${key}`, params);
+    },
+    [translate]
+  );
+
+  const tAdmin = useCallback<TypedTranslationFunction>(
+    (key: string, params?: Record<string, string | number>) => {
+      return translate(`admin.${key}`, params);
+    },
+    [translate]
+  );
+
+  const tForms = useCallback<TypedTranslationFunction>(
+    (key: string, params?: Record<string, string | number>) => {
+      return translate(`forms.${key}`, params);
+    },
+    [translate]
+  );
+
   const tPages = useCallback<TypedTranslationFunction>(
     (key: string, params?: Record<string, string | number>) => {
       return translate(`pages.${key}`, params);
@@ -154,7 +175,8 @@ export function useTypedTranslation() {
   );
 
   return {
-    t: translate,
+    translate,
+    getArrayTranslation,
     tAuth,
     tAuthArray,
     tCommon,
@@ -162,9 +184,9 @@ export function useTypedTranslation() {
     tNavigation,
     tHome,
     tPokemon,
-    tPages,
-    getArrayTranslation,
-    language,
-    isLoading,
+    tUI,
+    tAdmin,
+    tForms,
+    tPages
   };
 }

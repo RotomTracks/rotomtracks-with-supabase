@@ -227,14 +227,7 @@ export function buildOptimizedSearchQuery(
 ) {
   let searchQuery = supabase
     .from('tournaments')
-    .select(`
-      *,
-      organizer:user_profiles!tournaments_organizer_id_fkey(
-        first_name,
-        last_name,
-        organization_name
-      )
-    `, { count: 'exact' });
+    .select('*', { count: 'exact' });
 
   // Use full-text search if query is provided
   if (params.query && params.query.length >= 2) {

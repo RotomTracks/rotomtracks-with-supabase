@@ -12,8 +12,13 @@ import {
   Users, 
   Clock,
   UserPlus,
-  Eye
+  Eye,
+  Settings,
+  Trophy
 } from 'lucide-react';
+
+// Hooks
+import { useTypedTranslation } from '@/lib/i18n';
 
 // Next.js
 import Link from 'next/link';
@@ -56,6 +61,7 @@ export function TournamentCard({
 }: TournamentCardProps) {
   // Use centralized formatting utilities
   const { formatDate, formatTime } = useTournamentFormatting();
+  const { tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
   // Get tournament type icon using centralized utility
   const tournamentIcon = getTournamentTypeIcon(tournament.tournament_type as TournamentType);
@@ -80,6 +86,25 @@ export function TournamentCard({
     );
   };
 
+  const getUserRoleBadge = () => {
+    if (tournament.user_role === 'organizer') {
+      return (
+        <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <Settings className="w-3 h-3 mr-1" />
+          {tTournaments('dashboard.role.organizing')}
+        </Badge>
+      );
+    } else if (tournament.user_role === 'participant') {
+      return (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          <Trophy className="w-3 h-3 mr-1" />
+          {tTournaments('dashboard.role.participating')}
+        </Badge>
+      );
+    }
+    return null;
+  };
+
   // Tournament state checks
   const isUpcoming = tournament.status === TournamentStatus.UPCOMING;
   const canRegister = tournament.registration_open && isUpcoming;
@@ -100,6 +125,7 @@ export function TournamentCard({
                     <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
                       {getStatusText(tournament.status as TournamentStatus)}
                     </Badge>
+                    {getUserRoleBadge()}
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{tournament.tournament_type}</p>
                 </div>
@@ -174,6 +200,7 @@ export function TournamentCard({
             <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
               {getStatusText(tournament.status as TournamentStatus)}
             </Badge>
+            {getUserRoleBadge()}
             {tournament.registration_status && getRegistrationStatusBadge(tournament.registration_status)}
           </div>
         </div>

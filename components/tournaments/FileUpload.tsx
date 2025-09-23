@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, File, X, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 // Hooks
-import { useFileUpload } from '@/hooks/use-file-upload';
+import { useFileUpload } from '@/lib/hooks/use-file-upload';
 
 // Constants
 import { FILE_UPLOAD_CONFIG } from '@/lib/constants/tournament';

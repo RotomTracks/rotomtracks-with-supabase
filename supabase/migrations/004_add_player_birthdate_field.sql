@@ -1,4 +1,6 @@
--- Add player_birthdate field to tournament_participants table
+-- Migration: Add player birthdate field
+-- Description: Add player_birthdate field to tournament_participants table
+-- Date: 2024-12-23
 -- This field is required as TDF always provides birthdate information
 
 ALTER TABLE tournament_participants 

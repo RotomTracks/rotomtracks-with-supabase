@@ -6,13 +6,13 @@ import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
 
 export function LoginButton() {
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
   return (
     <Link href="/auth/login" className="w-full">
       <Button className="w-full">
         <Mail className="w-4 h-4 mr-2" />
-        {tCommon('navigation.login')}
+        {tUI('navigation.login')}
       </Button>
     </Link>
   );

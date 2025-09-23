@@ -14,7 +14,7 @@ import { useTypedTranslation } from "@/lib/i18n";
 import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
 
 export default function AuthCodeErrorPage() {
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md">
@@ -25,16 +25,16 @@ export default function AuthCodeErrorPage() {
                 <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
               </div>
               <CardTitle className="text-2xl">
-                {tCommon('pages.authError.title')}
+                {tPages('authError.title')}
               </CardTitle>
               <CardDescription>
-                {tCommon('pages.authError.description')}
+                {tPages('authError.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
                 <p>
-                  {tCommon('pages.authError.expired')}
+                  {tPages('authError.expired')}
                 </p>
               </div>
 
@@ -42,14 +42,14 @@ export default function AuthCodeErrorPage() {
                 <Link href="/auth/login" className="w-full">
                   <Button className="w-full">
                     <Mail className="w-4 h-4 mr-2" />
-                    {tCommon('navigation.login')}
+                    {tUI('navigation.login')}
                   </Button>
                 </Link>
                 
                 <Link href="/auth/login" className="w-full">
                   <Button variant="outline" className="w-full">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    {tCommon('pages.authError.requestNewConfirmation')}
+                    {tPages('authError.requestNewConfirmation')}
                   </Button>
                 </Link>
                 

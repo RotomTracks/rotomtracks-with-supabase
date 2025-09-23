@@ -22,7 +22,7 @@ export function LoginForm({
   className,
   ...props
 }: LoginFormProps & React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth, tCommon } = useTypedTranslation();
+  const { tAuth, tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -80,7 +80,7 @@ export function LoginForm({
         window.location.href = "/dashboard";
       }
     } catch (error) {
-      setErrors({ submit: tCommon('messages.unexpectedError') });
+      setErrors({ submit: tUI('messages.error.generic') });
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export function LoginForm({
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? tCommon('ui.hidePassword') : tCommon('ui.showPassword')}
+                  aria-label={showPassword ? tUI('accessibility.hidePassword') : tUI('accessibility.showPassword')}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />

@@ -25,9 +25,6 @@ import Link from 'next/link';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
 import { CreateTournamentButton } from '@/components/tournaments/CreateTournamentButton';
 
-// Hooks
-import { useTranslation } from '@/lib/i18n/hooks/useTranslation';
-
 // Types
 import { 
   Tournament, 
@@ -38,6 +35,7 @@ import {
 import { 
   STATUS_TRANSLATIONS
 } from '@/lib/utils/tournament-status';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface UserTournament extends Tournament {
   user_role: 'participant' | 'organizer';
@@ -45,30 +43,56 @@ interface UserTournament extends Tournament {
   registration_date?: string;
 }
 
+
+interface User {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    full_name?: string;
+  };
+  user_profiles?: {
+    user_role?: string;
+    first_name?: string;
+    last_name?: string;
+  } | null;
+}
+
 interface TournamentDashboardProps {
-  user: any;
+  user: User;
   loading?: boolean;
   error?: string | null;
+  showHeader?: boolean;
 }
 
 export function TournamentDashboard({ 
   user, 
   loading: externalLoading = false, 
-  error: externalError = null 
+  error: externalError = null,
+  showHeader = true,
 }: TournamentDashboardProps) {
   // Hooks
-  useTranslation();
+  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   
   // State
   const [tournaments, setTournaments] = useState<UserTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('all');
+  const userRole = user?.user_profiles?.user_role || 'player';
+  const isOrganizer = userRole === 'organizer' || userRole === 'admin';
+  
+  console.log('Dashboard user data:', {
+    user: user,
+    userRole: userRole,
+    isOrganizer: isOrganizer,
+    userProfiles: user?.user_profiles
+  });
+  
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null as any;
+  const initialTab = (searchParams?.get('tab') as string) || (isOrganizer ? 'organizing' : 'participating');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  const userRole = user?.user_profiles?.user_role || 'player';
-  const isOrganizer = userRole === 'organizer';
 
   useEffect(() => {
     fetchUserTournaments();
@@ -79,91 +103,70 @@ export function TournamentDashboard({
       setLoading(true);
       setError(null);
 
-      // For now, we'll use mock data
-      // In production, this would fetch from /api/tournaments/user
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if user is available
+      if (!user?.id) {
+        console.log('No user available, skipping tournament fetch');
+        setLoading(false);
+        return;
+      }
 
-      const mockTournaments: UserTournament[] = [
-        {
-          id: '1',
-          official_tournament_id: '24-04-000247',
-          name: 'Regional Championship Madrid 2024',
-          tournament_type: TournamentType.VGC_PREMIER_EVENT,
-          city: 'Madrid',
-          country: 'España',
-          start_date: '2024-04-15T10:00:00Z',
-          end_date: '2024-04-15T18:00:00Z',
-          status: TournamentStatus.UPCOMING,
-          current_players: 89,
-          max_players: 120,
-          registration_open: true,
-          organizer_id: isOrganizer ? user.id : 'other-organizer',
-          user_role: isOrganizer ? 'organizer' : 'participant',
-          registration_status: isOrganizer ? undefined : 'registered' as const,
-          registration_date: isOrganizer ? undefined : '2024-03-01T10:00:00Z',
-          description: 'El campeonato regional más importante de Madrid',
-          created_at: '2024-02-01T10:00:00Z',
-          updated_at: '2024-03-25T10:00:00Z'
+      console.log('Fetching user tournaments for user:', user.id);
+      const response = await fetch('/api/tournaments/user', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          id: '2',
-          official_tournament_id: '24-03-000156',
-          name: 'TCG League Cup Barcelona',
-          tournament_type: TournamentType.TCG_LEAGUE_CUP,
-          city: 'Barcelona',
-          country: 'España',
-          start_date: '2024-03-20T09:00:00Z',
-          end_date: '2024-03-20T17:00:00Z',
-          status: TournamentStatus.COMPLETED,
-          current_players: 64,
-          max_players: 80,
-          registration_open: false,
-          organizer_id: isOrganizer ? user.id : 'other-organizer',
-          user_role: isOrganizer ? 'organizer' : 'participant',
-          registration_status: isOrganizer ? undefined : 'checked_in' as const,
-          registration_date: isOrganizer ? undefined : '2024-02-15T10:00:00Z',
-          description: 'Liga Cup oficial de TCG en Barcelona',
-          created_at: '2024-02-10T10:00:00Z',
-          updated_at: '2024-03-20T17:00:00Z'
-        },
-        {
-          id: '3',
-          official_tournament_id: '24-05-000089',
-          name: 'Pokémon GO Community Day Valencia',
-          tournament_type: TournamentType.GO_PREMIER_EVENT,
-          city: 'Valencia',
-          country: 'España',
-          start_date: '2024-05-05T11:00:00Z',
-          end_date: '2024-05-05T16:00:00Z',
-          status: TournamentStatus.UPCOMING,
-          current_players: 32,
-          max_players: 50,
-          registration_open: true,
-          organizer_id: isOrganizer ? 'other-organizer' : user.id,
-          user_role: 'participant',
-          registration_status: 'registered' as const,
-          registration_date: '2024-04-01T10:00:00Z',
-          description: 'Community Day especial en Valencia',
-          created_at: '2024-03-15T10:00:00Z',
-          updated_at: '2024-04-01T10:00:00Z'
-        }
-      ];
-
-      // Filter based on user role
-      const userTournaments = mockTournaments.filter(tournament => {
-        if (isOrganizer) {
-          // Show tournaments user organizes + tournaments user participates in
-          return tournament.organizer_id === user.id || tournament.user_role === 'participant';
-        } else {
-          // Show only tournaments user participates in
-          return tournament.user_role === 'participant';
-        }
       });
 
-      setTournaments(userTournaments);
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        let errorMessage = tTournaments('dashboard.error.loading');
+        let errorDetails = null;
+        
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+          errorDetails = errorData;
+          console.error('API Error Response:', errorData);
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorMessage = `Error ${response.status}: ${response.statusText}`;
+        }
+        
+        console.error('HTTP Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          message: errorMessage,
+          details: errorDetails
+        });
+        
+        // If it's a 404 or empty response, show empty state
+        if (response.status === 404 || (errorDetails && Object.keys(errorDetails).length === 0)) {
+          console.log('API returned empty data, showing empty state');
+          setTournaments([]);
+          setLoading(false);
+          return;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (data.success && data.data) {
+        console.log(`Found ${data.data.tournaments?.length || 0} tournaments`);
+        setTournaments(data.data.tournaments || []);
+      } else {
+        console.log('API returned unsuccessful response or no data');
+        setTournaments([]);
+      }
     } catch (err) {
       console.error('Error fetching user tournaments:', err);
-      setError('Error al cargar los torneos');
+      const errorMessage = err instanceof Error ? err.message : tTournaments('dashboard.error.loading');
+      setError(errorMessage);
+      setTournaments([]);
     } finally {
       setLoading(false);
     }
@@ -210,7 +213,7 @@ export function TournamentDashboard({
 
   // Render loading state with better accessibility
   const renderLoadingState = () => (
-    <div className="max-w-7xl mx-auto px-4 py-8" role="status" aria-label="Cargando dashboard">
+    <div className="max-w-7xl mx-auto px-4 py-8" role="status" aria-label={tUI('status.loading')}>
       <div className="animate-pulse">
         <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -232,7 +235,7 @@ export function TournamentDashboard({
           ))}
         </div>
       </div>
-      <span className="sr-only">Cargando dashboard de torneos...</span>
+      <span className="sr-only">{tUI('status.loading')}</span>
     </div>
   );
 
@@ -242,11 +245,11 @@ export function TournamentDashboard({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-8 text-center" role="alert">
         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-          Error al cargar el dashboard
+          {tUI('status.error')}
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{currentError}</p>
         <Button onClick={fetchUserTournaments} className="text-red-600 border-red-200 hover:bg-red-50">
-          Reintentar
+          {tUI('buttons.retry')}
         </Button>
       </div>
     </div>
@@ -254,53 +257,61 @@ export function TournamentDashboard({
 
   // Early returns for loading and error states
   if (isLoading) return renderLoadingState();
-  if (currentError) return renderErrorState();
+  
+  // Only show error state if we have no tournaments AND an error
+  if (currentError && tournaments.length === 0) return renderErrorState();
 
 
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Dashboard de Torneos
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            {isOrganizer 
-              ? 'Gestiona tus torneos y participaciones'
-              : 'Sigue tus participaciones en torneos'
-            }
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-3 mt-4 sm:mt-0">
-          <Link href="/tournaments">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              Buscar Torneos
-            </Button>
-          </Link>
+      {showHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              {tTournaments('dashboard.title')}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              {isOrganizer 
+                ? tTournaments('dashboard.subtitle.organizer')
+                : tTournaments('dashboard.subtitle.player')
+              }
+            </p>
+          </div>
           
-          {isOrganizer && (
-            <CreateTournamentButton />
-          )}
+          <div className="flex items-center gap-3 mt-4 sm:mt-0">
+            <Link href="/tournaments">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Search className="h-4 w-4" />
+                {tTournaments('filters.search')}
+              </Button>
+            </Link>
+            
+            {isOrganizer && (
+              <CreateTournamentButton />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Torneos</p>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{tTournaments('dashboard.stats.total')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{tournaments.length}</p>
             </div>
             <Trophy className="h-8 w-8 text-blue-500" />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {isOrganizer ? `${organizingTournaments.length} organizando` : 'Participaciones activas'}
-          </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              {isOrganizer 
+                ? `${organizingTournaments.length} ${tTournaments('dashboard.stats.organizing')}` 
+                : tTournaments('dashboard.stats.participating')
+              }
+            </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
@@ -349,11 +360,11 @@ export function TournamentDashboard({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Buscar torneos..."
+                placeholder={tTournaments('dashboard.search.placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                aria-label="Buscar torneos"
+                aria-label={tTournaments('dashboard.search.aria')}
               />
             </div>
           </div>
@@ -363,9 +374,9 @@ export function TournamentDashboard({
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              aria-label="Filtrar por estado"
+              aria-label={tTournaments('dashboard.filter.status.aria')}
             >
-              <option value="all">Todos los estados</option>
+              <option value="all">{tTournaments('dashboard.filter.status.all')}</option>
               <option value={TournamentStatus.UPCOMING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.UPCOMING]}</option>
               <option value={TournamentStatus.ONGOING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.ONGOING]}</option>
               <option value={TournamentStatus.COMPLETED}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.COMPLETED]}</option>
@@ -376,69 +387,19 @@ export function TournamentDashboard({
 
       {/* Tournament Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">
-            Todos ({tournaments.length})
-          </TabsTrigger>
+        <TabsList className={`grid w-full ${isOrganizer ? 'grid-cols-3' : 'grid-cols-2'}`}>
           {isOrganizer && (
             <TabsTrigger value="organizing">
-              Organizando ({organizingTournaments.length})
+              {tTournaments('dashboard.tabs.organizing')} ({organizingTournaments.length})
             </TabsTrigger>
           )}
           <TabsTrigger value="participating">
-            Participando ({participatingTournaments.length})
+            {tTournaments('dashboard.tabs.participating')} ({participatingTournaments.length})
+          </TabsTrigger>
+          <TabsTrigger value="all">
+            {tTournaments('dashboard.tabs.all')} ({tournaments.length})
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          {filteredTournaments.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
-              <Trophy className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                {searchQuery || statusFilter !== 'all' 
-                  ? 'No se encontraron torneos' 
-                  : 'No tienes torneos aún'
-                }
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {searchQuery || statusFilter !== 'all'
-                  ? 'Intenta ajustar los filtros de búsqueda'
-                  : isOrganizer 
-                    ? 'Crea tu primer torneo o regístrate en uno existente'
-                    : 'Busca torneos interesantes y regístrate para participar'
-                }
-              </p>
-              
-              {!searchQuery && statusFilter === 'all' && (
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link href="/tournaments">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Search className="h-4 w-4" />
-                      Buscar Torneos
-                    </Button>
-                  </Link>
-                  
-                  {isOrganizer && (
-                    <CreateTournamentButton />
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label="Lista de torneos">
-              {filteredTournaments.map((tournament) => (
-                <div key={tournament.id} role="listitem">
-                  <TournamentCard
-                    tournament={tournament as any}
-                    userRole="authenticated"
-                    showActions={true}
-                    className="h-full"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
 
         {isOrganizer && (
           <TabsContent value="organizing" className="space-y-4">
@@ -455,15 +416,15 @@ export function TournamentDashboard({
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
                 <Settings className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                  No estás organizando torneos
+                  {tTournaments('dashboard.empty.organizing.title')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  Crea tu primer torneo y comienza a gestionar participantes
+                  {tTournaments('dashboard.empty.organizing.description')}
                 </p>
                 <CreateTournamentButton />
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label="Torneos que organizas">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label={tTournaments('dashboard.tabs.organizingAria')}>
                 {organizingTournaments
                   .filter(t => {
                     if (searchQuery) {
@@ -504,20 +465,20 @@ export function TournamentDashboard({
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
               <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                No estás participando en torneos
+                {tTournaments('dashboard.empty.participating.title')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Busca torneos interesantes y regístrate para participar
+                {tTournaments('dashboard.empty.participating.description')}
               </p>
               <Link href="/tournaments">
                 <Button className="flex items-center gap-2">
                   <Search className="h-4 w-4" />
-                  Buscar Torneos
+                  {tTournaments('dashboard.empty.participating.searchButton')}
                 </Button>
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label="Torneos en los que participas">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label={tTournaments('dashboard.tabs.participatingAria')}>
               {participatingTournaments
                 .filter(t => {
                   if (searchQuery) {
@@ -539,6 +500,56 @@ export function TournamentDashboard({
                     />
                   </div>
                 ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="all" className="space-y-4">
+          {filteredTournaments.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
+              <Trophy className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                {searchQuery || statusFilter !== 'all' 
+                  ? 'No se encontraron torneos' 
+                  : 'No tienes torneos aún'
+                }
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {searchQuery || statusFilter !== 'all'
+                  ? 'Intenta ajustar los filtros de búsqueda'
+                  : isOrganizer 
+                    ? 'Crea tu primer torneo o regístrate en uno existente'
+                    : 'Busca torneos interesantes y regístrate para participar'
+                }
+              </p>
+              
+              {!searchQuery && statusFilter === 'all' && (
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/tournaments">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Search className="h-4 w-4" />
+                      Buscar Torneos
+                    </Button>
+                  </Link>
+                  
+                  {isOrganizer && (
+                    <CreateTournamentButton />
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label={tTournaments('dashboard.tabs.allAria')}>
+              {filteredTournaments.map((tournament) => (
+                <div key={tournament.id} role="listitem">
+                  <TournamentCard
+                    tournament={tournament as any}
+                    userRole="authenticated"
+                    showActions={true}
+                    className="h-full"
+                  />
+                </div>
+              ))}
             </div>
           )}
         </TabsContent>

@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { TournamentSearch } from "@/components/tournaments/TournamentSearch";
-import { UpcomingTournaments } from "@/components/home/UpcomingTournaments";
-import { PopularTournaments } from "@/components/home/PopularTournaments";
-import { MyTournaments } from "@/components/home/MyTournaments";
+// Lazy load heavy sections after first paint
+const UpcomingTournaments = dynamic(() => import('@/components/home/UpcomingTournaments').then(m => m.UpcomingTournaments), { ssr: false });
+const PopularTournaments = dynamic(() => import('@/components/home/PopularTournaments').then(m => m.PopularTournaments), { ssr: false });
+const MyTournaments = dynamic(() => import('@/components/home/MyTournaments').then(m => m.MyTournaments), { ssr: false });
 import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,7 @@ interface GeolocationPosition {
 }
 
 export function HomeContent({ user }: HomeContentProps) {
-  const { tPages } = useTypedTranslation();
+  const { tPages, tUI, tAdmin, tForms } = useTypedTranslation();
   const [userLocation, setUserLocation] = useState<string | undefined>(undefined);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showLocationNotification, setShowLocationNotification] = useState(false);
@@ -31,12 +33,19 @@ export function HomeContent({ user }: HomeContentProps) {
     // Check if user has a saved location
     const savedLocation = localStorage.getItem('userLocation');
     const locationDetectionDismissed = localStorage.getItem('locationDetectionDismissed');
-    
+
     if (savedLocation) {
       setUserLocation(savedLocation);
     } else if (!locationDetectionDismissed && user) {
-      // Auto-detect location for authenticated users
-      detectLocationAutomatically();
+      // Schedule detection during idle time to not block first paint
+      const idleCallback = (cb: any) => (
+        (window as any).requestIdleCallback ? (window as any).requestIdleCallback(cb, { timeout: 2000 }) : setTimeout(cb, 200)
+      );
+      const id = idleCallback(() => detectLocationAutomatically());
+      return () => {
+        if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
+        clearTimeout(id as any);
+      };
     }
   }, [user]);
 
@@ -64,9 +73,13 @@ export function HomeContent({ user }: HomeContentProps) {
       const { latitude, longitude } = position.coords;
       
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 2500);
         const response = await fetch(
-          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=es`
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=es`,
+          { signal: controller.signal }
         );
+        clearTimeout(timeout);
         
         if (response.ok) {
           const data = await response.json();

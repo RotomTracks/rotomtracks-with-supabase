@@ -1,6 +1,6 @@
 -- Migration: Add Pokemon League URL field
 -- Description: Adds pokemon_league_url field to user_profiles and organizer_requests tables
--- Date: 2025-01-27
+-- Date: 2024-12-23
 
 -- Add pokemon_league_url to user_profiles table if it doesn't exist
 DO $$ 

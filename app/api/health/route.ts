@@ -1,6 +1,4 @@
-/**
- * Health check endpoint for monitoring system status
- */
+// Health check endpoint
 
 import { NextResponse } from 'next/server';
 import { performHealthCheck, ResponseTimeTracker } from '@/lib/utils/monitoring';

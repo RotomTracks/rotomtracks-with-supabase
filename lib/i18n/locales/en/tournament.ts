@@ -1,3 +1,7 @@
+/**
+ * English translations for tournament-related components
+ */
+
 export const tournament = {
   title: 'Tournament',
   name: 'Tournament Name',
@@ -131,5 +135,95 @@ export const tournament = {
     startProcessingError: 'Error starting processing',
     connectionError: 'Connection error',
     cancelProcessingError: 'Error canceling processing'
-  }
-};
+  },
+  // Trending tournaments
+  trending: {
+    regional: 'Regional Championship',
+    spring: 'Spring Tournament'
+  },
+  // Create tournament form
+  createForm: {
+    descriptionPlaceholder: 'Optional tournament description...',
+    cityPlaceholder: 'Madrid',
+    statePlaceholder: 'Community of Madrid'
+  },
+  // Dashboard specific translations
+  dashboard: {
+    title: 'Tournament Dashboard',
+    subtitle: {
+      organizer: 'Manage your organized tournaments and participations',
+      player: 'Track your tournament participations'
+    },
+    stats: {
+      total: 'Total Tournaments',
+      organizing: 'organizing',
+      participating: 'Active participations',
+      upcoming: 'Upcoming',
+      scheduled: 'Scheduled tournaments',
+      participants: 'Participants',
+      cities: 'Cities',
+      inYourTournaments: 'In your tournaments',
+      visited: 'Visited'
+    },
+    tabs: {
+      organizing: 'Organizing',
+      participating: 'Participating',
+      all: 'All',
+      organizingAria: 'Tournaments you organize',
+      participatingAria: 'Tournaments you participate in',
+      allAria: 'Tournament list'
+    },
+    search: {
+      placeholder: 'Search tournaments...',
+      aria: 'Search tournaments'
+    },
+    filter: {
+      status: {
+        aria: 'Filter by status',
+        all: 'All statuses'
+      }
+    },
+    empty: {
+      organizing: {
+        title: 'You are not organizing tournaments',
+        description: 'Create your first tournament and start managing participants'
+      },
+      participating: {
+        title: 'You are not participating in tournaments',
+        description: 'Search for interesting tournaments and register to participate',
+        searchButton: 'Search Tournaments'
+      },
+      all: {
+        title: 'You have no tournaments yet',
+        titleFiltered: 'No tournaments found',
+        description: 'Create your first tournament or register for an existing one',
+        descriptionFiltered: 'Try adjusting your search filters'
+      }
+    },
+    role: {
+      organizing: 'Organizing',
+      participating: 'Participating'
+    }
+  },
+      error: {
+        loading: 'Error loading tournaments'
+      },
+      upcoming: {
+        title: 'Upcoming Tournaments',
+        subtitle: 'Find tournaments near you and register',
+        inLocation: 'in {location}',
+        empty: {
+          title: 'No upcoming tournaments',
+          description: 'No tournaments scheduled at the moment. Come back soon!',
+          descriptionWithLocation: 'No upcoming tournaments found in {location}. Try expanding your search.'
+        },
+        actions: {
+          viewAll: 'View all tournaments',
+          create: 'Create tournament'
+        },
+        error: {
+          title: 'Error loading tournaments',
+          loading: 'Error loading upcoming tournaments'
+        }
+      }
+    };

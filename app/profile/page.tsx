@@ -15,7 +15,7 @@ import { useTypedTranslation } from "@/lib/i18n";
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -110,7 +110,7 @@ export default function ProfilePage() {
       <HomePageNavigation
         title={navConfig.title}
         description={welcomeMessage || navConfig.description}
-        currentPageLabel={tCommon('pages.profile.title')}
+        currentPageLabel={tPages('profile.title')}
         currentPageHref="/profile"
         actions={profileActions}
       />
@@ -120,7 +120,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3 mb-6">
             <User className="w-6 h-6 text-blue-600" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {profile ? tCommon('pages.profile.updateProfile') : tCommon('pages.profile.completeProfile')}
+              {profile ? tPages('profile.updateProfile') : tPages('profile.completeProfile')}
             </h2>
           </div>
           

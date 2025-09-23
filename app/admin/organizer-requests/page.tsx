@@ -26,6 +26,7 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface RequestsListResponse {
   data: AdminOrganizerRequest[];
@@ -38,6 +39,7 @@ interface RequestsListResponse {
 }
 
 function AdminOrganizerRequestsContent() {
+  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const searchParams = useSearchParams();
   const [requests, setRequests] = useState<AdminOrganizerRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,8 +74,30 @@ function AdminOrganizerRequestsContent() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al cargar solicitudes');
+        let errorMessage = tAdmin('organizerRequests.error.loading');
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorMessage = `Error ${response.status}: ${response.statusText}`;
+        }
+        
+        // If it's a 404, it might mean the tables don't exist yet
+        if (response.status === 404) {
+          console.log('Organizer requests endpoint returned 404, showing empty state');
+          setRequests([]);
+          setPagination({
+            page: 1,
+            limit: 10,
+            total: 0,
+            totalPages: 0
+          });
+          setLoading(false);
+          return;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const result: RequestsListResponse = await response.json();
@@ -154,13 +178,34 @@ function AdminOrganizerRequestsContent() {
     setCurrentPage(page);
   };
 
+  const updateRequestStatus = async (id: string, status: OrganizerRequestStatus) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/admin/organizer-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || 'No se pudo actualizar la solicitud');
+      }
+      await fetchRequests();
+    } catch (e) {
+      console.error('Error updating request:', e);
+      setError(e instanceof Error ? e.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading && requests.length === 0) {
     return (
       <AdminRoute>
-        <AdminLayout title="Solicitudes de Organizador" description="Gestionar solicitudes de organizador">
+        <AdminLayout title={tAdmin('organizerRequests.title')} description={tAdmin('organizerRequests.description')}>
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Cargando solicitudes...</p>
+            <p className="text-gray-600 dark:text-gray-400">{tAdmin('organizerRequests.loading')}</p>
           </div>
         </AdminLayout>
       </AdminRoute>
@@ -169,17 +214,17 @@ function AdminOrganizerRequestsContent() {
 
   return (
     <AdminRoute>
-      <AdminLayout title="Solicitudes de Organizador" description="Gestionar solicitudes de organizador">
+      <AdminLayout title={tAdmin('organizerRequests.title')} description={tAdmin('organizerRequests.description')}>
         <div className="p-6 space-y-6">
           {/* Filters and Search */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Filter className="w-5 h-5" />
-                Filtros y Búsqueda
+                {tAdmin('organizerRequests.filters.title')}
               </CardTitle>
               <CardDescription>
-                Buscar y filtrar solicitudes de organizador
+                {tAdmin('organizerRequests.filters.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -188,7 +233,7 @@ function AdminOrganizerRequestsContent() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
-                      placeholder="Buscar por nombre de organización o solicitante..."
+                      placeholder={tAdmin('organizerRequests.searchPlaceholder')}
                       value={searchTerm}
                       onChange={(e) => handleSearch(e.target.value)}
                       className="pl-10"
@@ -198,7 +243,7 @@ function AdminOrganizerRequestsContent() {
                 <div className="w-full md:w-48">
                   <Select value={statusFilter} onValueChange={handleStatusFilter}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Filtrar por estado" />
+                      <SelectValue placeholder={tAdmin('organizerRequests.filterPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos los estados</SelectItem>
@@ -332,13 +377,30 @@ function AdminOrganizerRequestsContent() {
                         )}
                       </div>
 
-                      <div className="ml-4 flex flex-col gap-2">
+                      <div className="ml-4 flex flex-col gap-2 w-44">
                         <Link href={`/admin/organizer-requests/${request.id}`}>
-                          <Button size="sm" className="w-full">
+                          <Button size="sm" variant="outline" className="w-full">
                             <Eye className="w-4 h-4 mr-2" />
                             Ver Detalles
                           </Button>
                         </Link>
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          onClick={() => updateRequestStatus(request.id, OrganizerRequestStatus.APPROVED)}
+                          disabled={loading || request.status === OrganizerRequestStatus.APPROVED}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" /> Aprobar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="w-full"
+                          onClick={() => updateRequestStatus(request.id, OrganizerRequestStatus.REJECTED)}
+                          disabled={loading || request.status === OrganizerRequestStatus.REJECTED}
+                        >
+                          <XCircle className="w-4 h-4 mr-2" /> Rechazar
+                        </Button>
                       </div>
                     </div>
                   </CardContent>

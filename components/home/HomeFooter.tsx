@@ -10,7 +10,7 @@ interface HomeFooterProps {
 }
 
 export function HomeFooter({ user }: HomeFooterProps) {
-  const { tPages } = useTypedTranslation();
+  const { tPages, tUI, tAdmin, tForms } = useTypedTranslation();
 
   return (
     <footer className="bg-gray-900 text-white py-12">

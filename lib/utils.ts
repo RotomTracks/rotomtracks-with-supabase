@@ -5,10 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// This check can be removed, it is just for tutorial purposes
 export const hasEnvVars = (() => {
   try {
-    // Check if required environment variables are set
     return !!(
       process.env.NEXT_PUBLIC_DATABASE_URL &&
       (process.env.NEXT_PUBLIC_CLIENT_AUTH || 

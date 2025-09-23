@@ -28,7 +28,7 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/lib/hooks/use-toast';
 
 export default function AdminOrganizerRequestDetailPage() {
   const params = useParams();

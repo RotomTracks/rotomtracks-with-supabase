@@ -17,6 +17,7 @@ import {
   FileText
 } from 'lucide-react';
 import { AdminDashboardMetrics, AdminActivity, AdminActionType, OrganizerRequestStatus } from '@/lib/types/tournament';
+import { useTypedTranslation } from '@/lib/i18n';
 import Link from 'next/link';
 
 interface AdminDashboardResponse {
@@ -27,6 +28,7 @@ interface AdminDashboardResponse {
 }
 
 export function AdminDashboard() {
+  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,19 +37,55 @@ export function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setError(null);
-      const response = await fetch('/api/admin/dashboard');
+      setLoading(true);
       
+      const response = await fetch('/api/admin/dashboard', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al cargar datos del dashboard');
+            let errorMessage = tAdmin('dashboard.error.loading');
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+          errorMessage = `Error ${response.status}: ${response.statusText}`;
+        }
+        
+        // If it's a 404, it might mean the tables don't exist yet
+        if (response.status === 404) {
+          console.log('Dashboard endpoint returned 404, showing empty state');
+          setMetrics({
+            totalRequests: 0,
+            pendingRequests: 0,
+            approvedRequests: 0,
+            rejectedRequests: 0,
+            underReviewRequests: 0,
+            recentActivity: []
+          });
+          setLastUpdated(new Date());
+          return;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const result: AdminDashboardResponse = await response.json();
-      setMetrics(result.data);
-      setLastUpdated(new Date());
+      
+      if (result.data) {
+        setMetrics(result.data);
+        setLastUpdated(new Date());
+      } else {
+        throw new Error(tAdmin('dashboard.error.invalidData'));
+      }
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error fetching admin dashboard data:', err);
+      const errorMessage = err instanceof Error ? err.message : tUI('status.unknown');
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -141,13 +179,13 @@ export function AdminDashboard() {
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <h3 className="font-semibold text-red-800 dark:text-red-200">
-                Error al cargar el dashboard
+                {tAdmin('dashboard.error.title')}
               </h3>
             </div>
             <p className="text-red-700 dark:text-red-300 mb-4">{error}</p>
             <Button onClick={fetchDashboardData} variant="outline" size="sm">
               <RefreshCw className="w-4 h-4 mr-2" />
-              Reintentar
+              {tUI('buttons.retry')}
             </Button>
           </CardContent>
         </Card>
@@ -161,7 +199,7 @@ export function AdminDashboard() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-gray-500 dark:text-gray-400">
-              No hay datos disponibles
+              {tAdmin('dashboard.noData')}
             </p>
           </CardContent>
         </Card>
@@ -175,11 +213,11 @@ export function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Métricas del Sistema
+            {tAdmin('dashboard.title')}
           </h3>
           {lastUpdated && (
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Última actualización: {lastUpdated.toLocaleTimeString('es-ES', {
+              {tAdmin('dashboard.lastUpdated')}: {lastUpdated.toLocaleTimeString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
               })}
@@ -188,7 +226,7 @@ export function AdminDashboard() {
         </div>
         <Button onClick={fetchDashboardData} variant="outline" size="sm">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Actualizar
+          {tUI('buttons.refresh')}
         </Button>
       </div>
 
@@ -196,52 +234,52 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Solicitudes</CardTitle>
+            <CardTitle className="text-sm font-medium">{tAdmin('dashboard.metrics.totalRequests')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.totalRequests}</div>
             <p className="text-xs text-muted-foreground">
-              Todas las solicitudes registradas
+              {tAdmin('dashboard.metrics.totalRequestsDescription')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium">{tAdmin('dashboard.metrics.pending')}</CardTitle>
             <Clock className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-600">{metrics.pendingRequests}</div>
             <p className="text-xs text-muted-foreground">
-              Esperando revisión
+              {tAdmin('dashboard.metrics.pendingDescription')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aprobadas</CardTitle>
+            <CardTitle className="text-sm font-medium">{tAdmin('dashboard.metrics.approved')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{metrics.approvedRequests}</div>
             <p className="text-xs text-muted-foreground">
-              Solicitudes aprobadas
+              {tAdmin('dashboard.metrics.approvedDescription')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">En Revisión</CardTitle>
+            <CardTitle className="text-sm font-medium">{tAdmin('dashboard.metrics.underReview')}</CardTitle>
             <Eye className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{metrics.underReviewRequests}</div>
             <p className="text-xs text-muted-foreground">
-              Siendo revisadas
+              {tAdmin('dashboard.metrics.underReviewDescription')}
             </p>
           </CardContent>
         </Card>
@@ -254,15 +292,15 @@ export function AdminDashboard() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="w-5 h-5" />
-                Actividad Reciente
+                {tAdmin('dashboard.recentActivity.title')}
               </CardTitle>
               <CardDescription>
-                Últimas acciones realizadas por administradores
+                {tAdmin('dashboard.recentActivity.description')}
               </CardDescription>
             </div>
             <Button asChild variant="outline" size="sm">
               <Link href="/admin/organizer-requests">
-                Ver todas las solicitudes
+                {tAdmin('dashboard.recentActivity.viewAll')}
               </Link>
             </Button>
           </div>
@@ -272,7 +310,7 @@ export function AdminDashboard() {
             <div className="text-center py-8">
               <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400">
-                No hay actividad reciente
+                {tAdmin('dashboard.recentActivity.empty')}
               </p>
             </div>
           ) : (

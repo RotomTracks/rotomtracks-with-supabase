@@ -14,6 +14,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { OrganizerRequest, OrganizerRequestStatus as RequestStatus } from "@/lib/types/tournament";
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface OrganizerRequestStatusProps {
   userId: string;
@@ -22,6 +23,7 @@ interface OrganizerRequestStatusProps {
 }
 
 export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }: OrganizerRequestStatusProps) {
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [request, setRequest] = useState<OrganizerRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,15 +75,15 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
   const getStatusText = (status: RequestStatus) => {
     switch (status) {
       case RequestStatus.PENDING:
-        return "Solicitud Pendiente";
+        return tUI('status.pending');
       case RequestStatus.UNDER_REVIEW:
-        return "En Revisión";
+        return tUI('status.processing');
       case RequestStatus.APPROVED:
-        return "Solicitud Aprobada";
+        return tUI('status.completed');
       case RequestStatus.REJECTED:
-        return "Solicitud Rechazada";
+        return tUI('status.cancelled');
       default:
-        return "Estado Desconocido";
+        return tUI('status.unknown');
     }
   };
 
@@ -174,7 +176,7 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
       {showTitle && (
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <Building2 className="w-5 h-5 text-blue-600" />
-          Estado de Solicitud de Organizador
+          {tCommon('organizerRequest.title')}
         </h3>
       )}
       
@@ -188,20 +190,20 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
               </h4>
               <p className={`text-sm ${getStatusTextColor(request.status as RequestStatus)} opacity-80 mt-1`}>
                 {request.status === RequestStatus.PENDING && 
-                  "Tu solicitud está en cola para revisión"
+                  tCommon('organizerRequest.status.pending')
                 }
                 {request.status === RequestStatus.UNDER_REVIEW && 
-                  "Nuestro equipo está revisando tu solicitud"
+                  tCommon('organizerRequest.status.underReview')
                 }
                 {request.status === RequestStatus.APPROVED && 
-                  "¡Ya puedes crear y gestionar torneos!"
+                  tCommon('organizerRequest.status.approved')
                 }
                 {request.status === RequestStatus.REJECTED && 
-                  "Puedes enviar una nueva solicitud"
+                  tCommon('organizerRequest.status.rejected')
                 }
               </p>
               <p className={`text-xs ${getStatusTextColor(request.status as RequestStatus)} opacity-60 mt-1`}>
-                Solicitado el {new Date(request.requested_at).toLocaleDateString('es-ES')}
+                {tCommon('organizerRequest.requestedOn')} {new Date(request.requested_at).toLocaleDateString('es-ES')}
               </p>
             </div>
           </div>
@@ -212,7 +214,7 @@ export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }:
             onClick={() => setIsModalOpen(true)}
           >
             <ExternalLink className="w-3 h-3 mr-1" />
-            Ver Detalles
+            {tCommon('organizerRequest.viewDetails')}
           </Button>
         </div>
 

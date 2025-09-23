@@ -104,17 +104,10 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   }
 
   try {
-    // Build the query with joins to get user profile information
+    // Build the query to get organizer requests
     let query = supabase
       .from('organizer_requests')
-      .select(`
-        *,
-        user_profile:user_profiles!organizer_requests_user_id_fkey(
-          first_name,
-          last_name,
-          email:user_id
-        )
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     // Apply status filter
@@ -136,26 +129,63 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     const { data: requests, error, count } = await query;
 
     if (error) {
+      console.warn('Error fetching organizer requests:', error);
+      // If table doesn't exist, return empty data instead of error
+      if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        console.log('Organizer requests table not found, returning empty data');
+        const response: AdminOrganizerRequestsResponse = {
+          data: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0
+          },
+          filters: {
+            ...(status && { status }),
+            ...(search && { search })
+          },
+          message: 'No hay solicitudes de organizador disponibles',
+          timestamp: new Date().toISOString(),
+          request_id: requestId
+        };
+
+        return NextResponse.json(response, { status: 200 });
+      }
       return handleSupabaseError(error, 'búsqueda de solicitudes de organizador', requestId);
     }
 
-    // Get user emails for the requests (since we can't directly join with auth.users)
+    // Get user profiles for the requests
+    const userIds = requests?.map(r => r.user_id) || [];
+    const { data: userProfiles } = await supabase
+      .from('user_profiles')
+      .select('user_id, first_name, last_name')
+      .in('user_id', userIds);
+
+    const userProfileMap = new Map(
+      userProfiles?.map(profile => [profile.user_id, profile]) || []
+    );
+
+    // Get user emails from auth
     const { data: authUsers } = await supabase.auth.admin.listUsers();
     const userEmailMap = new Map(
       authUsers.users.map(user => [user.id, user.email])
     );
 
     // Format the response data
-    const formattedRequests: AdminOrganizerRequest[] = (requests || []).map(request => ({
-      ...request,
-      user_profile: {
-        first_name: request.user_profile?.first_name || '',
-        last_name: request.user_profile?.last_name || '',
-        email: userEmailMap.get(request.user_id) || '',
-        created_at: request.created_at
-      },
-      review_history: [] // Will be populated in individual request view
-    }));
+    const formattedRequests: AdminOrganizerRequest[] = (requests || []).map(request => {
+      const userProfile = userProfileMap.get(request.user_id);
+      return {
+        ...request,
+        user_profile: {
+          first_name: userProfile?.first_name || '',
+          last_name: userProfile?.last_name || '',
+          email: userEmailMap.get(request.user_id) || '',
+          created_at: request.created_at
+        },
+        review_history: [] // Will be populated in individual request view
+      };
+    });
 
     const totalPages = Math.ceil((count || 0) / limit);
 

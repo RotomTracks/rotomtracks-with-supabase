@@ -225,7 +225,7 @@ export function PopularSuggestions({
     const baseTrending = [
       { 
         id: 'trending-regional', 
-        name: t('tournament.trending.regional') || 'Regional Championship', 
+        name: t('tournament.trending.regional'), 
         category: 'trending' as const, 
         count: 156, 
         trend: 'up' as const,
@@ -234,7 +234,7 @@ export function PopularSuggestions({
       },
       { 
         id: 'trending-spring', 
-        name: t('tournament.trending.spring') || 'Spring Tournament', 
+        name: t('tournament.trending.spring'), 
         category: 'trending' as const, 
         count: 89, 
         trend: 'up' as const,

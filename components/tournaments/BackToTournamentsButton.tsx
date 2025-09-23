@@ -6,13 +6,13 @@ import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
 
 export function BackToTournamentsButton() {
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
 
   return (
     <Link href="/tournaments">
       <Button variant="outline" size="sm">
         <ArrowLeft className="h-4 w-4 mr-2" />
-        {tCommon('buttons.backToTournaments')}
+        {tUI('buttons.backToTournaments')}
       </Button>
     </Link>
   );

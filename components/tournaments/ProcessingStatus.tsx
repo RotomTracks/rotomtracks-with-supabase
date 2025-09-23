@@ -55,7 +55,7 @@ export function ProcessingStatus({
   error: externalError = null
 }: ProcessingStatusProps) {
   // Hooks
-  const { tCommon, tTournaments } = useTypedTranslation();
+  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const { formatDateTime } = useTournamentFormatting();
   
   // State

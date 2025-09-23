@@ -9,11 +9,9 @@ import { useTypedTranslation } from './useTypedTranslation';
  * Simple translation hook for backward compatibility
  */
 export function useTranslation() {
-  const { t, language, isLoading } = useTypedTranslation();
+  const { translate } = useTypedTranslation();
   
   return {
-    t,
-    language,
-    isLoading
+    t: translate
   };
 }

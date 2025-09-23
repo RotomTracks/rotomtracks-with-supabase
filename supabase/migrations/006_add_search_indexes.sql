@@ -1,8 +1,4 @@
--- Migration: Add search performance indexes
--- Created: 2024-12-21
--- Purpose: Optimize tournament search queries
-
--- Full-text search index for tournament names and locations
+-- Add search performance indexes
 CREATE INDEX IF NOT EXISTS idx_tournaments_search_text 
 ON tournaments USING gin(to_tsvector('english', 
   COALESCE(name, '') || ' ' || 
@@ -11,12 +7,12 @@ ON tournaments USING gin(to_tsvector('english',
   COALESCE(official_tournament_id, '')
 ));
 
--- Composite index for status and date filtering (most common query pattern)
+-- Status and date filtering index
 CREATE INDEX IF NOT EXISTS idx_tournaments_status_date 
 ON tournaments(status, start_date) 
 WHERE status IN ('upcoming', 'ongoing');
 
--- Index for tournament type and location filtering
+-- Type and location filtering index
 CREATE INDEX IF NOT EXISTS idx_tournaments_type_location 
 ON tournaments(tournament_type, city, country);
 

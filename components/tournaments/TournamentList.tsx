@@ -65,7 +65,7 @@ export function TournamentList({
   error = null
 }: TournamentListProps) {
   // Hooks
-  const { tTournaments } = useTypedTranslation();
+  const { tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   useTournamentFormatting();
   const router = useRouter();
   const currentSearchParams = useSearchParams();

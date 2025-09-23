@@ -35,7 +35,7 @@ export function LanguageSelector({
   className = ''
 }: LanguageSelectorProps) {
   const { language, setLanguage, languageInfo, isLoading } = useLanguage();
-  const { tCommon } = useTypedTranslation();
+  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLanguageChange = (newLanguage: SupportedLanguage) => {
@@ -99,7 +99,7 @@ export function LanguageSelector({
           variant="ghost"
           size="sm"
           className={`${className} hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-          aria-label={`${tCommon('buttons.select') as string} ${tCommon('navigation.language', { current: languageInfo.nativeName }) as string}`}
+          aria-label={`${tUI('buttons.select') as string} ${tUI('navigation.language', { current: languageInfo.nativeName }) as string}`}
           aria-expanded={isOpen}
           aria-haspopup="menu"
         >
@@ -111,7 +111,7 @@ export function LanguageSelector({
         align="end" 
         className="w-48"
         role="menu"
-        aria-label={tCommon('navigation.languageOptions') as string}
+        aria-label={tUI('navigation.languageOptions') as string}
       >
         {SUPPORTED_LANGUAGES.map((lang) => {
           const langInfo = LANGUAGE_METADATA[lang];

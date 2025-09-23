@@ -1,5 +1,4 @@
 // API Error Handling Utilities
-// Provides consistent error response formatting and handling across all API routes
 
 import { NextResponse } from 'next/server';
 import { ErrorCodes } from '@/lib/types/tournament';

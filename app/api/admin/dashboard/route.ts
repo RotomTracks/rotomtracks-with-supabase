@@ -75,6 +75,28 @@ export const GET = withErrorHandling(async () => {
       .order('created_at', { ascending: false });
 
     if (countsError) {
+      console.warn('Error fetching request counts:', countsError);
+      // If table doesn't exist, return empty data instead of error
+      if (countsError.code === 'PGRST116' || countsError.message?.includes('relation') || countsError.message?.includes('does not exist')) {
+        console.log('Organizer requests table not found, returning empty data');
+        const dashboardMetrics: AdminDashboardMetrics = {
+          totalRequests: 0,
+          pendingRequests: 0,
+          approvedRequests: 0,
+          rejectedRequests: 0,
+          underReviewRequests: 0,
+          recentActivity: []
+        };
+
+        const response: AdminDashboardResponse = {
+          data: dashboardMetrics,
+          message: 'No hay datos de solicitudes disponibles',
+          timestamp: new Date().toISOString(),
+          request_id: requestId
+        };
+
+        return NextResponse.json(response, { status: 200 });
+      }
       return handleSupabaseError(countsError, 'obtención de estadísticas de solicitudes', requestId);
     }
 
@@ -94,6 +116,10 @@ export const GET = withErrorHandling(async () => {
 
     if (activityError) {
       console.warn('Error fetching recent activity:', activityError);
+      // If table doesn't exist, continue with empty activity
+      if (activityError.code === 'PGRST116' || activityError.message?.includes('relation') || activityError.message?.includes('does not exist')) {
+        console.log('Admin activity log table not found, using empty activity');
+      }
     }
 
     // Format recent activity

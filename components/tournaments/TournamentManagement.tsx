@@ -72,7 +72,7 @@ export function TournamentManagement({
   userRole = UserRole.ORGANIZER 
 }: TournamentManagementProps) {
   // Hooks
-  const { tTournaments } = useTypedTranslation();
+  const { tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
   const { formatDate, formatDateTime } = useTournamentFormatting();
   
   // State

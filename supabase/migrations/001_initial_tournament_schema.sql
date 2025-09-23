@@ -1,11 +1,7 @@
--- Migration: Initial Tournament Management System Schema
--- Description: Creates all tables needed for tournament management system
--- Date: 2025-01-27
-
--- Enable UUID extension if not already enabled
+-- Initial Tournament Management System Schema
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Extend existing user_profiles table with role management
+-- Add role management to user_profiles
 ALTER TABLE user_profiles 
 ADD COLUMN IF NOT EXISTS user_role VARCHAR(20) DEFAULT 'player' CHECK (user_role IN ('player', 'organizer')),
 ADD COLUMN IF NOT EXISTS organization_name VARCHAR(255),

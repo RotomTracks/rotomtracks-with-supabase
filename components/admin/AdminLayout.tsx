@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useTypedTranslation } from '@/lib/i18n';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -22,31 +23,34 @@ interface NavItem {
   description: string;
 }
 
-const navigation: NavItem[] = [
-  {
-    name: 'Dashboard',
-    href: '/admin/dashboard',
-    icon: BarChart3,
-    description: 'Vista general y métricas'
-  },
-  {
-    name: 'Solicitudes de Organizador',
-    href: '/admin/organizer-requests',
-    icon: Users,
-    description: 'Gestionar solicitudes de organizador'
-  },
-  {
-    name: 'Configuración',
-    href: '/admin/settings',
-    icon: Settings,
-    description: 'Configuración del sistema'
-  }
-];
+// Navigation will be defined inside the component to use translations
 
 export function AdminLayout({ children, title, description }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { isAdmin, loading } = useAuth();
+  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+
+  const navigation: NavItem[] = [
+    {
+      name: tAdmin('navigation.dashboard'),
+      href: '/admin/dashboard',
+      icon: BarChart3,
+      description: tAdmin('navigation.dashboardDescription')
+    },
+    {
+      name: tAdmin('navigation.organizerRequests'),
+      href: '/admin/organizer-requests',
+      icon: Users,
+      description: tAdmin('navigation.organizerRequestsDescription')
+    },
+    {
+      name: tAdmin('navigation.settings'),
+      href: '/admin/settings',
+      icon: Settings,
+      description: tAdmin('navigation.settingsDescription')
+    }
+  ];
 
   // Show loading state while checking auth
   if (loading) {
@@ -69,30 +73,18 @@ export function AdminLayout({ children, title, description }: AdminLayoutProps) 
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push('/')}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Volver al sitio
-              </Button>
-              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-              <div className="flex items-center gap-2">
-                <Shield className="w-6 h-6 text-red-600" />
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Panel de Administración
-                </h1>
-              </div>
+            <div className="flex items-center gap-3">
+              <Shield className="w-6 h-6 text-red-600" />
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {tAdmin('panel')}
+              </h1>
             </div>
             <Link
               href="/"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <Home className="w-4 h-4" />
-              <span className="text-sm">Inicio</span>
+              <span className="text-sm font-medium">{tUI('navigation.home')}</span>
             </Link>
           </div>
         </div>
