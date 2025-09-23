@@ -1,0 +1,32 @@
+{
+  "jsc": {
+    "target": "es2020",
+    "parser": {
+      "syntax": "typescript",
+      "tsx": true,
+      "decorators": true
+    },
+    "transform": {
+      "react": {
+        "runtime": "automatic"
+      }
+    },
+    "experimental": {
+      "plugins": []
+    }
+  },
+  "module": {
+    "type": "es6"
+  },
+  "minify": true,
+  "env": {
+    "targets": {
+      "chrome": "90",
+      "firefox": "88",
+      "safari": "14",
+      "edge": "90"
+    },
+    "mode": "usage",
+    "coreJs": false
+  }
+}

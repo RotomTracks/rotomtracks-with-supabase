@@ -1,0 +1,22 @@
+# Browserslist configuration for modern browsers
+# This reduces JavaScript bundle size by eliminating unnecessary polyfills
+
+# Target only modern browsers that support ES2020+ features natively
+Chrome >= 90
+Firefox >= 88
+Safari >= 14
+Edge >= 90
+iOS >= 14
+Android >= 8
+
+# Exclude all old browsers that require polyfills
+not IE 11
+not IE_Mob 11
+not Chrome < 90
+not Firefox < 88
+not Safari < 14
+not Edge < 90
+not iOS < 14
+not Android < 8
+not dead
+not op_mini all
