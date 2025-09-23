@@ -75,6 +75,12 @@ body {
 .flex { display: flex; }
 .hidden { display: none; }
 .block { display: block; }
+
+/* Clases responsive críticas para header */
+@media (min-width: 1024px) {
+  .lg\:block { display: block; }
+  .lg\:hidden { display: none; }
+}
 .w-full { width: 100%; }
 .h-full { height: 100%; }
 .p-4 { padding: 1rem; }

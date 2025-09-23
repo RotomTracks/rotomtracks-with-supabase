@@ -1,6 +1,4 @@
-/* CSS base de Tailwind - necesario para responsive */
-@tailwind base;
-@tailwind components;
+/* Solo utilidades no críticas - CSS crítico está en critical.css */
 @tailwind utilities;
 
 /* Estilos específicos de la aplicación */
