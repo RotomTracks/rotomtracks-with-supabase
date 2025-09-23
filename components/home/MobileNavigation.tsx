@@ -19,7 +19,7 @@ export function MobileNavigation({ user }: MobileNavigationProps) {
   return (
     <>
       {/* Mobile Header */}
-      <nav className="w-full border-b border-gray-200 dark:border-gray-700 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 sticky top-0 z-50 lg:hidden">
+      <nav className="w-full border-b border-gray-200 dark:border-gray-700 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 sticky top-0 z-50">
         <div className="w-full flex justify-between items-center p-3 px-4 text-sm">
           <div className="flex items-center font-semibold">
             <Link 
@@ -45,7 +45,7 @@ export function MobileNavigation({ user }: MobileNavigationProps) {
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50">
           <div 
             className="fixed inset-0 bg-black/50" 
             onClick={() => setIsOpen(false)}
