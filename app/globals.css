@@ -1,4 +1,6 @@
-/* Solo utilidades no críticas - CSS crítico está en critical.css */
+/* Tailwind CSS completo */
+@tailwind base;
+@tailwind components;
 @tailwind utilities;
 
 /* Estilos específicos de la aplicación */

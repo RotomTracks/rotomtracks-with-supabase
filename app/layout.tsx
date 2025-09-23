@@ -3,7 +3,6 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
 import "./globals.css";
-import "./critical.css";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
