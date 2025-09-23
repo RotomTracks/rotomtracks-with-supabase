@@ -27,25 +27,62 @@ const nextConfig: NextConfig = {
         process: false,
       };
       
-      // Optimizar chunks
+      // Optimizar chunks para reducir JavaScript no utilizado
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 100000, // Limitar tamaño de chunks para evitar tareas largas
         cacheGroups: {
           ...config.optimization.splitChunks?.cacheGroups,
-          // Agrupar vendor libraries
+          // Chunk para React y librerías core
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+            name: 'react',
+            chunks: 'all',
+            priority: 20,
+            enforce: true,
+          },
+          // Chunk para Supabase
+          supabase: {
+            test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
+            name: 'supabase',
+            chunks: 'all',
+            priority: 15,
+            enforce: true,
+          },
+          // Chunk para UI libraries
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
+            name: 'ui',
+            chunks: 'all',
+            priority: 12,
+            enforce: true,
+          },
+          // Chunk para otras vendor libraries
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             chunks: 'all',
             priority: 10,
+            maxSize: 50000, // Chunks más pequeños
           },
-          // Agrupar componentes comunes
+          // Chunk para componentes comunes
           common: {
             name: 'common',
             minChunks: 2,
             chunks: 'all',
             priority: 5,
             reuseExistingChunk: true,
+            maxSize: 30000,
+          },
+          // Chunk para páginas específicas
+          pages: {
+            test: /[\\/]app[\\/]/,
+            name: 'pages',
+            chunks: 'all',
+            priority: 8,
+            maxSize: 40000,
           },
         },
       };
@@ -60,8 +97,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   
-  // Configuración de SWC para navegadores modernos
-  swcMinify: true,
+  // Configuración de SWC para navegadores modernos (ya habilitado por defecto)
   
   // Configuración de Turbopack
   turbopack: {

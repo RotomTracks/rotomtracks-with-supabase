@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { TournamentSearch } from "@/components/tournaments/TournamentSearch";
 // Lazy load heavy sections after first paint

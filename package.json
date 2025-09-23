@@ -11,7 +11,8 @@
     "validate-translations": "node scripts/validate-translations.js",
     "optimize-fonts": "node scripts/optimize-fonts.js",
     "analyze-css": "node scripts/analyze-css.js",
-    "analyze-js": "node scripts/analyze-js.js"
+    "analyze-js": "node scripts/analyze-js.js",
+    "analyze-unused-js": "node scripts/analyze-unused-js.js"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -34,6 +35,7 @@
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-intersection-observer": "^9.16.0",
     "tailwind-merge": "^3.3.0",
     "zod": "^4.1.3"
   },
