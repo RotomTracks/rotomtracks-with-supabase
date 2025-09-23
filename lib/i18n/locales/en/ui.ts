@@ -104,10 +104,11 @@ export const ui = {
     login: "Login",
     logout: "Logout",
     signUp: "Sign Up",
-    language: "Current language: {{current}}",
+    language: "Language",
     languageOptions: "Language options",
     admin: "Admin",
-    settings: "Settings"
+    settings: "Settings",
+    account: "Account"
   },
 
   // Messages and notifications

@@ -104,10 +104,11 @@ export const ui = {
     login: "Iniciar Sesión",
     logout: "Cerrar Sesión",
     signUp: "Registrarse",
-    language: "Idioma actual: {{current}}",
+    language: "Idioma",
     languageOptions: "Opciones de idioma",
     admin: "Admin",
-    settings: "Configuración"
+    settings: "Configuración",
+    account: "Cuenta"
   },
 
   // Messages and notifications
