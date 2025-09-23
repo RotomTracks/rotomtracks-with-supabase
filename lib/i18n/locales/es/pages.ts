@@ -53,29 +53,29 @@ export const pages = {
       search: {
         title: "Búsqueda Inteligente",
         description: "Encuentra torneos por nombre, ubicación, fecha y tipo con sugerencias en tiempo real.",
-        items: [
-          "Filtros avanzados",
-          "Autocompletado",
-          "Resultados relevantes"
-        ]
+        items: {
+          location: "Filtros avanzados",
+          date: "Autocompletado",
+          type: "Resultados relevantes"
+        }
       },
       management: {
         title: "Gestión Profesional",
         description: "Herramientas completas para organizadores con procesamiento automático de archivos TDF.",
-        items: [
-          "Procesamiento TDF",
-          "Reportes HTML",
-          "Gestión de participantes"
-        ]
+        items: {
+          upload: "Procesamiento TDF",
+          track: "Reportes HTML",
+          results: "Gestión de participantes"
+        }
       },
       community: {
         title: "Para Toda la Comunidad",
         description: "Soporte completo para TCG, VGC y Pokémon GO con perfiles personalizados.",
-        items: [
-          "Múltiples formatos",
-          "Perfiles de jugador",
-          "Historial de torneos"
-        ]
+        items: {
+          connect: "Múltiples formatos",
+          share: "Perfiles de jugador",
+          learn: "Historial de torneos"
+        }
       },
       readyToJoin: "¿Listo para unirte a la comunidad?",
       createFreeAccount: "Crear Cuenta Gratis",

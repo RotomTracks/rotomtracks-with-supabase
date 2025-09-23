@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
-import { LazyCSS } from "@/components/LazyCSS";
 import "./globals.css";
 import "./critical.css";
 

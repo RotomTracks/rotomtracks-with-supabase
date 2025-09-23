@@ -162,6 +162,7 @@ export const ui = {
     closeModal: "Cerrar modal",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
+    toggleMenu: "Alternar menú",
     toggleTheme: "Cambiar tema",
     skipToContent: "Saltar al contenido principal",
     loading: "Cargando contenido",

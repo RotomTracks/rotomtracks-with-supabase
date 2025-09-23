@@ -53,29 +53,29 @@ export const pages = {
       search: {
         title: "Smart Search",
         description: "Find tournaments by name, location, date and type with real-time suggestions.",
-        items: [
-          "Advanced filters",
-          "Autocomplete",
-          "Relevant results"
-        ]
+        items: {
+          location: "Advanced filters",
+          date: "Autocomplete",
+          type: "Relevant results"
+        }
       },
       management: {
         title: "Professional Management",
         description: "Complete tools for organizers with automatic TDF file processing.",
-        items: [
-          "TDF processing",
-          "HTML reports",
-          "Participant management"
-        ]
+        items: {
+          upload: "TDF processing",
+          track: "HTML reports",
+          results: "Participant management"
+        }
       },
       community: {
         title: "For the Entire Community",
         description: "Complete support for TCG, VGC and Pokémon GO with personalized profiles.",
-        items: [
-          "Multiple formats",
-          "Player profiles",
-          "Tournament history"
-        ]
+        items: {
+          connect: "Multiple formats",
+          share: "Player profiles",
+          learn: "Tournament history"
+        }
       },
       readyToJoin: "Ready to join the community?",
       createFreeAccount: "Create Free Account",
