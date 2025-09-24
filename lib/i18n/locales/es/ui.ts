@@ -120,7 +120,8 @@ export const ui = {
       updated: "Actualizado exitosamente",
       deleted: "Eliminado exitosamente",
       uploaded: "Archivo subido exitosamente",
-      sent: "Mensaje enviado exitosamente"
+      sent: "Mensaje enviado exitosamente",
+      accountCreated: "¡Cuenta creada exitosamente! Revisa tu email para confirmar tu cuenta."
     },
     error: {
       generic: "Ocurrió un error",
@@ -131,7 +132,8 @@ export const ui = {
       serverError: "Error del servidor. Por favor intenta más tarde.",
       validation: "Por favor revisa el formulario en busca de errores",
       timeout: "La solicitud expiró. Por favor intenta de nuevo.",
-      unknown: "Ocurrió un error desconocido"
+      unknown: "Ocurrió un error desconocido",
+      unexpectedError: "Ocurrió un error inesperado. Por favor intenta de nuevo."
     },
     warning: {
       unsavedChanges: "Tienes cambios sin guardar",

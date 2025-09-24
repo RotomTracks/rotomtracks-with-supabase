@@ -182,3 +182,14 @@
     line-height: 1.4;
   }
 }
+
+/* Responsive placeholder for search input */
+.responsive-placeholder::placeholder {
+  content: var(--mobile-placeholder);
+}
+
+@media (min-width: 640px) {
+  .responsive-placeholder::placeholder {
+    content: var(--desktop-placeholder);
+  }
+}

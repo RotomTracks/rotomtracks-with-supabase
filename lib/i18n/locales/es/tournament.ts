@@ -219,26 +219,32 @@ export const tournament = {
       loading: 'Error al cargar los torneos'
     }
   },
-      error: {
-        loading: 'Error al cargar los torneos'
-      },
-      upcoming: {
-        title: 'Próximos Torneos',
-        subtitle: 'Encuentra torneos cerca de ti y regístrate',
-        inLocation: 'en {location}',
-        empty: {
-          title: 'No hay torneos próximos',
-          description: 'No hay torneos programados en este momento. ¡Vuelve pronto!',
-          descriptionWithLocation: 'No encontramos torneos próximos en {location}. Prueba expandir tu búsqueda.'
-        },
-        actions: {
-          viewAll: 'Ver todos los torneos',
-          create: 'Crear torneo'
-        },
-        error: {
-          title: 'Error al cargar torneos',
-          loading: 'Error al cargar torneos próximos',
-          http: 'Error {{status}}: {{statusText}}'
-        }
-      }
-    };
+  upcoming: {
+    title: 'Próximos Torneos',
+    subtitle: 'Encuentra torneos cerca de ti y regístrate',
+    inLocation: 'en {location}',
+    empty: {
+      title: 'No hay torneos próximos',
+      description: 'No hay torneos programados en este momento. ¡Vuelve pronto!',
+      descriptionWithLocation: 'No encontramos torneos próximos en {location}. Prueba expandir tu búsqueda.'
+    },
+    actions: {
+      viewAll: 'Ver todos los torneos',
+      create: 'Crear torneo'
+    },
+    error: {
+      title: 'Error al cargar torneos',
+      loading: 'Error al cargar torneos próximos',
+      http: 'Error {{status}}: {{statusText}}'
+    }
+  },
+  search: {
+    placeholder: {
+      mobile: 'Buscar torneos...',
+      desktop: 'Buscar torneos por nombre, ciudad o tipo...'
+    },
+    recentSearch: 'Búsqueda reciente',
+    noSuggestions: 'No se encontraron sugerencias',
+    tryGeneralTerms: 'Intenta con términos más generales'
+  }
+};

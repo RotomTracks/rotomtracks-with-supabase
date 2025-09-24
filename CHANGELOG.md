@@ -1,5 +1,20 @@
 # Changelog
 
+## [2024-12-19] - Corrección de Verificación de Email v0.1.2
+
+### Corregido 🔧
+- **Flujo de Verificación de Email**: Configuración de Supabase corregida para habilitar confirmaciones
+- **Traducciones de Registro**: Añadidas traducciones faltantes para mensajes de éxito
+- **Formulario de Registro**: Redirección a página de éxito en lugar de alert
+- **Configuración de Supabase**: URLs de producción añadidas a `additional_redirect_urls`
+- **Referencias de Traducción**: Corregidas referencias de `tCommon` a `tUI` en formulario de registro
+
+### Técnico 🔧
+- **Supabase Config**: `enable_confirmations = true` en `[auth]` y `[auth.email]`
+- **URLs de Producción**: Añadidas URLs de Vercel a `additional_redirect_urls`
+- **Traducciones**: Añadidas claves `accountCreated` y `unexpectedError` en `ui.ts`
+- **Navegación**: Implementado `useRouter` para redirección a `/auth/sign-up-success`
+
 ## [2025-01-27] - Mejoras del Dashboard v0.1.1
 
 ### Mejorado ✨

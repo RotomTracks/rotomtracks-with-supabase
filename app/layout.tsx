@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
+import { AuthModalProvider } from "@/components/auth/AuthModalContext";
+import { AuthModals } from "@/components/auth/AuthModals";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -68,8 +70,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <DevToolsWrapper />
+          <AuthModalProvider>
+            {children}
+            <AuthModals />
+            <DevToolsWrapper />
+          </AuthModalProvider>
         </ThemeProvider>
       </body>
     </html>

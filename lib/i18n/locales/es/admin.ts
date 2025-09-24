@@ -6,6 +6,7 @@ export const admin = {
   // General admin
   panel: "Panel de Administración",
   verifyingPermissions: "Verificando permisos de administrador...",
+  redirectingToLogin: "Redirigiendo al login...",
   accessRestricted: "Acceso Restringido",
   accessRestrictedDescription: "Esta área está reservada para administradores del sistema. No tienes los permisos necesarios para acceder a esta sección.",
 

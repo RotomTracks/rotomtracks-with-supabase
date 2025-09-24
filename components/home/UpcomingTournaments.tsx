@@ -6,14 +6,16 @@ import { Button } from '@/components/ui/button';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
 import { Tournament, TournamentStatus } from '@/lib/types/tournament';
 import { useTypedTranslation } from '@/lib/i18n';
+import { User } from '@supabase/supabase-js';
 
 interface UpcomingTournamentsProps {
+  user?: User;
   userLocation?: string;
   limit?: number;
   onTournamentsChange?: (hasTournaments: boolean) => void;
 }
 
-export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChange }: UpcomingTournamentsProps) {
+export function UpcomingTournaments({ user, userLocation, limit = 6, onTournamentsChange }: UpcomingTournamentsProps) {
   const { tCommon, tTournaments, tUI } = useTypedTranslation();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,13 +114,12 @@ export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChan
           <p className="text-lg font-medium">{tTournaments('upcoming.error.title')}</p>
           <p className="text-sm text-gray-600">{error}</p>
         </div>
-        <Button 
+        <button 
           onClick={() => window.location.reload()} 
-          variant="outline"
-          className="mt-4"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground mt-4"
         >
           {tUI('buttons.retry')}
-        </Button>
+        </button>
       </div>
     );
   }
@@ -139,19 +140,20 @@ export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChan
           }
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
+          <button 
             onClick={() => window.location.href = '/tournaments'}
-            variant="outline"
-            className="rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 border-blue-600 text-black hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-white dark:hover:bg-blue-400 dark:hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 p-2"
           >
             {tTournaments('upcoming.actions.viewAll')}
-          </Button>
-          <Button 
-            onClick={() => window.location.href = '/dashboard'}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            {tTournaments('upcoming.actions.create')}
-          </Button>
+          </button>
+          {user && (
+            <Button 
+              onClick={() => window.location.href = '/dashboard'}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              {tTournaments('upcoming.actions.create')}
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -174,14 +176,13 @@ export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChan
           </p>
         </div>
         
-        <Button 
+        <button 
           onClick={() => window.location.href = '/tournaments'}
-          variant="outline"
-          className="hidden sm:flex items-center gap-2 rounded-lg border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200"
+          className="hidden sm:inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 bg-transparent"
         >
           {tTournaments('upcoming.actions.viewAll')}
           <ArrowRight className="w-4 h-4" />
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -197,13 +198,13 @@ export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChan
 
       {tournaments.length >= limit && (
         <div className="text-center pt-6">
-          <Button 
+          <button 
             onClick={() => window.location.href = '/tournaments'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
           >
             {tTournaments('upcoming.actions.viewAll')}
             <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          </button>
         </div>
       )}
     </div>

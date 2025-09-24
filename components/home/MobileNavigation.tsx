@@ -128,16 +128,16 @@ export function MobileNavigation({ user }: MobileNavigationProps) {
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.language')}</span>
-                      <LanguageSelector variant="compact" />
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.account')}</span>
+                      <AuthButtonClient />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.theme')}</span>
                       <ThemeSwitcher />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.account')}</span>
-                      <AuthButtonClient />
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.language')}</span>
+                      <LanguageSelector variant="compact" />
                     </div>
                   </div>
                 </div>

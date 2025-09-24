@@ -219,26 +219,32 @@ export const tournament = {
       loading: 'Error loading tournaments'
     }
   },
-      error: {
-        loading: 'Error loading tournaments'
-      },
-      upcoming: {
-        title: 'Upcoming Tournaments',
-        subtitle: 'Find tournaments near you and register',
-        inLocation: 'in {location}',
-        empty: {
-          title: 'No upcoming tournaments',
-          description: 'No tournaments scheduled at the moment. Come back soon!',
-          descriptionWithLocation: 'No upcoming tournaments found in {location}. Try expanding your search.'
-        },
-        actions: {
-          viewAll: 'View all tournaments',
-          create: 'Create tournament'
-        },
-        error: {
-          title: 'Error loading tournaments',
-          loading: 'Error loading upcoming tournaments',
-          http: 'Error {{status}}: {{statusText}}'
-        }
-      }
-    };
+  upcoming: {
+    title: 'Upcoming Tournaments',
+    subtitle: 'Find tournaments near you and register',
+    inLocation: 'in {location}',
+    empty: {
+      title: 'No upcoming tournaments',
+      description: 'No tournaments scheduled at the moment. Come back soon!',
+      descriptionWithLocation: 'No upcoming tournaments found in {location}. Try expanding your search.'
+    },
+    actions: {
+      viewAll: 'View all tournaments',
+      create: 'Create tournament'
+    },
+    error: {
+      title: 'Error loading tournaments',
+      loading: 'Error loading upcoming tournaments',
+      http: 'Error {{status}}: {{statusText}}'
+    }
+  },
+  search: {
+    placeholder: {
+      mobile: 'Search tournaments...',
+      desktop: 'Search tournaments by name, city or type...'
+    },
+    recentSearch: 'Recent search',
+    noSuggestions: 'No suggestions found',
+    tryGeneralTerms: 'Try with more general terms'
+  }
+};

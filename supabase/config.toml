@@ -11,15 +11,19 @@ max_rows = 1000
 enabled = true
 port = 54324
 site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
+additional_redirect_urls = [
+  "https://localhost:3000",
+  "https://rotomtracks.vercel.app",
+  "https://rotomtracks-with-supabase.vercel.app"
+]
 jwt_expiry = 3600
 enable_signup = true
-enable_confirmations = false
+enable_confirmations = true
 
 [auth.email]
 enable_signup = true
 double_confirm_changes = true
-enable_confirmations = false
+enable_confirmations = true
 
 [db]
 port = 54322

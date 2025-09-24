@@ -11,16 +11,24 @@ import { useTypedTranslation } from "@/lib/i18n";
 import { validateSignUpForm, type SignUpFormData } from "@/lib/utils/validation";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SignUpFormProps {
   className?: string;
+  onSuccess?: () => void;
+  onSwitchToLogin?: () => void;
+  isModal?: boolean;
 }
 
 export function SignUpForm({
   className,
+  onSuccess,
+  onSwitchToLogin,
+  isModal = false,
   ...props
 }: SignUpFormProps & React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth, tCommon } = useTypedTranslation();
+  const { tAuth, tUI } = useTypedTranslation();
+  const router = useRouter();
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     password: "",
@@ -85,11 +93,16 @@ export function SignUpForm({
       if (error) {
         setErrors({ submit: error.message });
       } else {
-        // Show success message or redirect
-        alert(tCommon('messages.accountCreated'));
+        // Call onSuccess if provided (for modal mode), otherwise redirect to success page
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Redirect to signup success page
+          router.push('/auth/sign-up-success');
+        }
       }
     } catch (error) {
-      setErrors({ submit: tCommon('messages.unexpectedError') });
+      setErrors({ submit: tUI('messages.error.unexpectedError') });
     } finally {
       setLoading(false);
     }
@@ -97,16 +110,18 @@ export function SignUpForm({
 
   return (
     <div className={cn("w-full max-w-2xl mx-auto", className)} {...props}>
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">
-            {tAuth('signUp.title')}
-          </CardTitle>
+      <Card className={isModal ? "border-0 shadow-none" : ""}>
+        <CardHeader className={isModal ? "space-y-1 p-4 pb-2" : "space-y-1"}>
+          {!isModal && (
+            <CardTitle className="text-2xl text-center">
+              {tAuth('signUp.title')}
+            </CardTitle>
+          )}
           <CardDescription className="text-center">
             {tAuth('signUp.description')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className={isModal ? "p-4 pt-2" : ""}>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div className="space-y-2">
@@ -152,7 +167,7 @@ export function SignUpForm({
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? tCommon('ui.hidePassword') : tCommon('ui.showPassword')}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -189,7 +204,7 @@ export function SignUpForm({
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? tCommon('ui.hideConfirmPassword') : tCommon('ui.showConfirmPassword')}
+                  aria-label={showConfirmPassword ? "Ocultar confirmación de contraseña" : "Mostrar confirmación de contraseña"}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -316,12 +331,21 @@ export function SignUpForm({
             <span className="text-muted-foreground">
               {tAuth('signUp.loginLink')}{" "}
             </span>
-            <a
-              href="/auth/login"
-              className="text-primary underline-offset-4 hover:underline font-medium"
-            >
-              {tAuth('signUp.loginLinkText')}
-            </a>
+            {isModal && onSwitchToLogin ? (
+              <button
+                onClick={onSwitchToLogin}
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('signUp.loginLinkText')}
+              </button>
+            ) : (
+              <a
+                href="/auth/login"
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('signUp.loginLinkText')}
+              </a>
+            )}
           </div>
         </CardContent>
       </Card>

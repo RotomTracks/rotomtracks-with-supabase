@@ -18,6 +18,7 @@ const MyTournaments = dynamic(() => import('@/components/home/MyTournaments').th
 });
 import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
+import { useAuthModalContext } from "@/components/auth/AuthModalContext";
 import { Button } from "@/components/ui/button";
 import { Trophy, Search, Users, MapPin, X } from "lucide-react";
 
@@ -34,6 +35,7 @@ interface GeolocationPosition {
 
 export function HomeContent({ user }: HomeContentProps) {
   const { tPages } = useTypedTranslation();
+  const { openSignUpModal, openLoginModal } = useAuthModalContext();
   const [userLocation, setUserLocation] = useState<string | undefined>(undefined);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [showLocationNotification, setShowLocationNotification] = useState(false);
@@ -87,6 +89,19 @@ export function HomeContent({ user }: HomeContentProps) {
 
     fetchStats();
   }, []);
+
+  // Listen for custom events from child components
+  useEffect(() => {
+    const handleOpenLoginModal = () => {
+      openLoginModal();
+    };
+
+    window.addEventListener('openLoginModal', handleOpenLoginModal);
+
+    return () => {
+      window.removeEventListener('openLoginModal', handleOpenLoginModal);
+    };
+  }, [openLoginModal]);
 
   const detectLocationAutomatically = async () => {
     if (!navigator.geolocation) {
@@ -179,36 +194,31 @@ export function HomeContent({ user }: HomeContentProps) {
                   </Button>
                 </Link>
                 <Link href="/tournaments">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="px-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  <button 
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
                   >
                     <Search className="h-5 w-5 mr-2" />
                     {tPages('home.hero.exploreTournaments')}
-                  </Button>
+                  </button>
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/auth/sign-up">
-                  <Button 
-                    size="lg" 
-                    className="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-                  >
-                    <Users className="h-5 w-5 mr-2" />
-                    {tPages('home.hero.joinFree')}
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  onClick={openSignUpModal}
+                >
+                  <Users className="h-5 w-5 mr-2" />
+                  {tPages('home.hero.joinFree')}
+                </Button>
                 <Link href="/tournaments">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="px-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  <button 
+                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-8 border-2 border-blue-600 text-black hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-white dark:hover:bg-blue-400 dark:hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <Search className="h-5 w-5 mr-2" />
                     {tPages('home.hero.viewTournaments')}
-                  </Button>
+                  </button>
                 </Link>
               </>
             )}
@@ -216,7 +226,7 @@ export function HomeContent({ user }: HomeContentProps) {
 
           {/* Central Search Component */}
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-700 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-600">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl px-8 pt-8 pb-4 border border-gray-200 dark:border-gray-600">
               <div className="mb-6">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
                   {tPages('home.search.title')}
@@ -232,8 +242,8 @@ export function HomeContent({ user }: HomeContentProps) {
                 showFilters={false}
               />
               
-              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4">
+                <div className="flex items-center gap-4 sm:gap-6 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span>{tPages('home.search.activeTournaments')}</span>
@@ -250,7 +260,7 @@ export function HomeContent({ user }: HomeContentProps) {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   {user && !userLocation && (
                     <button
                       onClick={detectLocationAutomatically}
@@ -364,6 +374,7 @@ export function HomeContent({ user }: HomeContentProps) {
             userLocation={userLocation}
             limit={6}
             onTournamentsChange={setHasUpcomingTournaments}
+            user={user}
           />
           
           {/* Call to Action for Tournament Discovery - Only show when there are upcoming tournaments */}
@@ -378,25 +389,21 @@ export function HomeContent({ user }: HomeContentProps) {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link href="/tournaments">
-                    <Button 
-                      size="lg" 
-                      className="px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                    <button 
+                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
                     >
                       <Search className="h-5 w-5 mr-2" />
                       {tPages('home.sections.exploreAll')}
-                    </Button>
+                    </button>
                   </Link>
                   {!user && (
-                    <Link href="/auth/sign-up">
-                      <Button 
-                        size="lg" 
-                        variant="outline" 
-                        className="px-8 rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                      >
-                        <Users className="h-5 w-5 mr-2" />
-                        {tPages('home.sections.createAccount')}
-                      </Button>
-                    </Link>
+                    <button 
+                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
+                      onClick={openSignUpModal}
+                    >
+                      <Users className="h-5 w-5 mr-2" />
+                      {tPages('home.sections.createAccount')}
+                    </button>
                   )}
                 </div>
               </div>
@@ -425,31 +432,28 @@ export function HomeContent({ user }: HomeContentProps) {
             </h3>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/tournaments?type=TCG">
-                <Button 
-                  variant="outline" 
-                  className="px-6 py-3 rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                <button 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-6 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
                 >
                   <Trophy className="h-4 w-4 mr-2" />
                   TCG
-                </Button>
+                </button>
               </Link>
               <Link href="/tournaments?type=VGC">
-                <Button 
-                  variant="outline" 
-                  className="px-6 py-3 rounded-xl border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                <button 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-6 py-3 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
                 >
                   <Trophy className="h-4 w-4 mr-2" />
                   VGC
-                </Button>
+                </button>
               </Link>
               <Link href="/tournaments?type=GO">
-                <Button 
-                  variant="outline" 
-                  className="px-6 py-3 rounded-xl border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                <button 
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-6 py-3 border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent"
                 >
                   <Trophy className="h-4 w-4 mr-2" />
                   Pokémon GO
-                </Button>
+                </button>
               </Link>
             </div>
           </div>

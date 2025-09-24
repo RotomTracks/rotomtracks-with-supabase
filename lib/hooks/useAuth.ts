@@ -38,35 +38,37 @@ export function useAuth(): UseAuthReturn {
       setUser(null);
       setProfile(null);
 
-      // Immediately set loading to false to show buttons
+      // Get current user
+      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.warn('Auth error (non-critical):', userError);
+        setLoading(false);
+        return;
+      }
+
+      setUser(currentUser);
+
+      // If user exists, fetch their profile
+      if (currentUser) {
+        try {
+          const { data: userProfile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .single();
+          
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.warn('Profile error (non-critical):', profileError);
+          } else {
+            setProfile(userProfile || null);
+          }
+        } catch (profileErr) {
+          console.error('Error loading profile:', profileErr);
+        }
+      }
+      
       setLoading(false);
-
-      // Get current user in background without blocking
-      supabase.auth.getUser()
-        .then(({ data: { user: currentUser }, error: userError }) => {
-          if (userError) {
-            console.warn('Auth error (non-critical):', userError);
-            return;
-          }
-
-          setUser(currentUser);
-
-          // If user exists, fetch their profile in the background
-          if (currentUser) {
-            supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('user_id', currentUser.id)
-              .single()
-              .then(({ data: userProfile, error: profileError }) => {
-                if (profileError && profileError.code !== 'PGRST116') {
-                  console.warn('Profile error (non-critical):', profileError);
-                } else {
-                  setProfile(userProfile || null);
-                }
-              })
-          }
-        });
     } catch (err) {
       console.error('Error in fetchUserAndProfile:', err);
       setUser(null);

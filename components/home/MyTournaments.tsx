@@ -131,7 +131,10 @@ export function MyTournaments() {
           Accede a tu cuenta para ver los torneos en los que participas u organizas
         </p>
         <Button 
-          onClick={() => window.location.href = '/auth/login'}
+          onClick={() => {
+            // This will be handled by the parent component
+            window.dispatchEvent(new CustomEvent('openLoginModal'));
+          }}
           className="bg-blue-600 hover:bg-blue-700"
         >
           Iniciar Sesión
@@ -173,12 +176,12 @@ export function MyTournaments() {
           <p className="text-lg font-medium">Error al cargar tus torneos</p>
           <p className="text-sm text-gray-600">{error}</p>
         </div>
-        <Button 
+        <button 
           onClick={() => window.location.reload()} 
-          variant="outline"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground"
         >
           Reintentar
-        </Button>
+        </button>
       </div>
     );
   }
@@ -200,14 +203,13 @@ export function MyTournaments() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
+          <button 
             onClick={() => window.location.href = '/tournaments'}
-            variant="outline"
-            className="flex items-center gap-2 rounded-xl border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200 bg-transparent px-4 py-2"
           >
             <Trophy className="w-4 h-4" />
-{tPages('home.myTournaments.searchTournaments')}
-          </Button>
+            {tPages('home.myTournaments.searchTournaments')}
+          </button>
           
           {profile?.user_role === 'organizer' && (
             <Button 
@@ -231,15 +233,13 @@ export function MyTournaments() {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">{tPages('home.myTournaments.title')}</h3>
         </div>
         
-        <Button 
+        <button 
           onClick={() => window.location.href = '/dashboard'}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2 rounded-lg border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-8 px-3 text-xs border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200 bg-transparent"
         >
-{tPages('home.myTournaments.viewAll')}
+          {tPages('home.myTournaments.viewAll')}
           <ArrowRight className="w-4 h-4" />
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -291,13 +291,13 @@ export function MyTournaments() {
 
       {tournaments.length > 0 && (
         <div className="mt-6 text-center">
-          <Button 
+          <button 
             onClick={() => window.location.href = '/dashboard'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 bg-transparent"
           >
             Ver Dashboard Completo
             <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          </button>
         </div>
       )}
     </div>

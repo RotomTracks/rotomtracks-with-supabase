@@ -13,6 +13,7 @@ import { Search, Filter, Calendar, MapPin, Trophy, X } from 'lucide-react';
 
 // Hooks
 import { useTournamentSearch } from '@/lib/hooks/useTournamentSearch';
+import { useTypedTranslation } from '@/lib/i18n';
 
 // Types
 import { 
@@ -42,13 +43,14 @@ interface TournamentSearchProps {
 export function TournamentSearch({
   onTournamentSelect,
   showFilters = true,
-  placeholder = "Buscar torneos por nombre, ciudad o tipo...",
+  placeholder,
   autoFocus = false,
   loading: externalLoading = false,
   error: externalError = null
 }: TournamentSearchProps) {
   // Hooks
-  const { formatDate } = useTournamentFormatting();
+  const { tTournaments, tUI } = useTypedTranslation();
+  const { formatDate } = useTournamentFormatting();  
   const [query, setQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
@@ -69,6 +71,10 @@ export function TournamentSearch({
   
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Placeholder responsive usando CSS
+  const mobilePlaceholder = tTournaments('search.placeholder.mobile');
+  const desktopPlaceholder = placeholder || tTournaments('search.placeholder.desktop');
   
   const {
     tournaments,
@@ -277,7 +283,7 @@ export function TournamentSearch({
   if (externalLoading) return renderLoadingState();
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-2 sm:px-0">
       {/* Search Input */}
       <div ref={searchRef} className="relative">
         <div className="relative">
@@ -285,7 +291,7 @@ export function TournamentSearch({
           <Input
             ref={inputRef}
             type="text"
-            placeholder={placeholder}
+            placeholder={desktopPlaceholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -296,7 +302,11 @@ export function TournamentSearch({
                 setShowSuggestions(true);
               }
             }}
-            className="pl-10 pr-10 py-3 text-lg rounded-xl"
+            className="pl-10 pr-10 py-3 text-base sm:text-lg rounded-xl bg-white dark:bg-gray-900 placeholder:text-sm sm:placeholder:text-base responsive-placeholder"
+            style={{
+              '--mobile-placeholder': `"${mobilePlaceholder}"`,
+              '--desktop-placeholder': `"${desktopPlaceholder}"`
+            } as React.CSSProperties}
             aria-expanded={showSuggestions}
             aria-haspopup="listbox"
             aria-autocomplete="list"
@@ -431,7 +441,7 @@ export function TournamentSearch({
                                 <Search className="h-4 w-4 text-gray-400" />
                                 <div className="flex-1">
                                   <div className="font-medium dark:text-gray-100">{search}</div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">Búsqueda reciente</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">{tTournaments('search.recentSearch')}</div>
                                 </div>
                               </button>
                             ))}
@@ -505,9 +515,9 @@ export function TournamentSearch({
                           query.length >= 2 && !suggestionsLoading && (
                             <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                               <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                              <p className="font-medium">No se encontraron sugerencias</p>
+                              <p className="font-medium">{tTournaments('search.noSuggestions')}</p>
                               <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-                                Intenta con términos más generales
+{tTournaments('search.tryGeneralTerms')}
                               </p>
                             </div>
                           )
@@ -533,7 +543,7 @@ export function TournamentSearch({
             className="flex items-center gap-2"
           >
             <Search className="h-4 w-4" />
-            Buscar
+            {tUI('buttons.search')}
           </Button>
 
           {activeFiltersCount > 0 && (
@@ -543,7 +553,7 @@ export function TournamentSearch({
               onClick={clearFilters}
               className="text-gray-500 hover:text-gray-700"
             >
-              Limpiar filtros ({activeFiltersCount})
+              {tUI('buttons.clearFilters')} ({activeFiltersCount})
             </Button>
           )}
 

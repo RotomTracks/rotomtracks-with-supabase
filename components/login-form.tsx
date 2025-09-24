@@ -16,10 +16,16 @@ import { useSearchParams } from "next/navigation";
 
 interface LoginFormProps {
   className?: string;
+  onSuccess?: () => void;
+  onSwitchToSignUp?: () => void;
+  isModal?: boolean;
 }
 
 export function LoginForm({
   className,
+  onSuccess,
+  onSwitchToSignUp,
+  isModal = false,
   ...props
 }: LoginFormProps & React.ComponentPropsWithoutRef<"div">) {
   const { tAuth, tCommon, tUI } = useTypedTranslation();
@@ -76,8 +82,13 @@ export function LoginForm({
       if (error) {
         setErrors({ submit: error.message });
       } else {
-        // Redirect will be handled by the auth state change
-        window.location.href = "/dashboard";
+        // Call onSuccess if provided (for modal mode), otherwise redirect
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Redirect will be handled by the auth state change
+          window.location.href = "/dashboard";
+        }
       }
     } catch (error) {
       setErrors({ submit: tUI('messages.error.generic') });
@@ -88,16 +99,18 @@ export function LoginForm({
 
   return (
     <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
-      <Card>
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">
-            {tAuth('login.title')}
-          </CardTitle>
+      <Card className={isModal ? "border-0 shadow-none" : ""}>
+        <CardHeader className={isModal ? "space-y-1 p-4 pb-2" : "space-y-1"}>
+          {!isModal && (
+            <CardTitle className="text-2xl text-center">
+              {tAuth('login.title')}
+            </CardTitle>
+          )}
           <CardDescription className="text-center">
             {tAuth('login.description')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className={isModal ? "p-4 pt-2" : ""}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{tAuth('login.emailLabel')}</Label>
@@ -185,12 +198,21 @@ export function LoginForm({
             <span className="text-muted-foreground">
               {tAuth('login.signUpLink')}{" "}
             </span>
-            <Link
-              href="/auth/sign-up"
-              className="text-primary underline-offset-4 hover:underline font-medium"
-            >
-              {tAuth('login.signUpLinkText')}
-            </Link>
+            {isModal && onSwitchToSignUp ? (
+              <button
+                onClick={onSwitchToSignUp}
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('login.signUpLinkText')}
+              </button>
+            ) : (
+              <Link
+                href="/auth/sign-up"
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('login.signUpLinkText')}
+              </Link>
+            )}
           </div>
         </CardContent>
       </Card>
