@@ -1,0 +1,33 @@
+{
+  "jsc": {
+    "target": "es2022",
+    "parser": {
+      "syntax": "typescript",
+      "tsx": true,
+      "decorators": true
+    },
+    "transform": {
+      "react": {
+        "runtime": "automatic"
+      }
+    },
+    "experimental": {
+      "plugins": []
+    }
+  },
+  "module": {
+    "type": "es6"
+  },
+  "env": {
+    "targets": {
+      "browsers": [
+        "Chrome >= 90",
+        "Firefox >= 90",
+        "Safari >= 14",
+        "Edge >= 90"
+      ]
+    },
+    "mode": "usage",
+    "coreJs": false
+  }
+}

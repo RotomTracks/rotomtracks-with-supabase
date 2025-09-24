@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
   webpack: (config, { dev, isServer }) => {
     // Optimizaciones para producción
     if (!dev && !isServer) {
-      // Configurar browserslist para reducir polyfills
-      config.resolve.alias = {
-        ...config.resolve.alias,
-      };
-      
       // Deshabilitar polyfills específicos para navegadores modernos
       config.resolve.fallback = {
         ...config.resolve.fallback,
