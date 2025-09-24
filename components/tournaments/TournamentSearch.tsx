@@ -261,7 +261,7 @@ export function TournamentSearch({
     <div className="w-full max-w-4xl mx-auto" role="status" aria-label="Loading tournament search">
       <div className="relative">
         <div className="animate-pulse">
-          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4"></div>
           {showFilters && (
             <div className="flex gap-2">
               <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
@@ -296,7 +296,7 @@ export function TournamentSearch({
                 setShowSuggestions(true);
               }
             }}
-            className="pl-10 pr-10 py-3 text-lg"
+            className="pl-10 pr-10 py-3 text-lg rounded-xl"
             aria-expanded={showSuggestions}
             aria-haspopup="listbox"
             aria-autocomplete="list"
@@ -335,7 +335,7 @@ export function TournamentSearch({
         {(showSuggestions || tournaments.length > 0 || (!isLoading && !suggestionsLoading && query.length >= 2)) && (
           <div 
             id="search-suggestions"
-            className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg max-h-96 overflow-y-auto"
             role="listbox"
             aria-label="Search suggestions and results"
           >

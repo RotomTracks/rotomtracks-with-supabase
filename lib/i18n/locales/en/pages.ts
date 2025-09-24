@@ -82,7 +82,7 @@ export const pages = {
       exploreTournaments: "Explore Tournaments"
     },
     footer: {
-      description: "The leading platform for Pokémon tournaments in Spain and Latin America.",
+      description: "Connect, compete, and celebrate your passion for Pokémon.<br/>The ultimate platform to organize and participate in TCG, VGC, and GO tournaments.",
       tournaments: "Tournaments",
       searchTournaments: "Search Tournaments",
       account: "Account",
@@ -95,6 +95,49 @@ export const pages = {
       terms: "Terms",
       privacy: "Privacy",
       copyright: "© 2024 RotomTracks. All rights reserved."
+    },
+    // Popular tournaments section
+    popular: {
+      types: {
+        title: "Most Popular Tournament Types",
+        subtitle: "Based on recent activity",
+        tournament: "tournament",
+        tournaments: "tournaments",
+        active: "active",
+        trend: {
+          up: "trending up",
+          down: "trending down",
+          stable: "stable"
+        },
+        empty: {
+          title: "No popularity data yet",
+          description: "Data will appear when there's more activity",
+          hint: "Create tournaments to see popularity statistics"
+        }
+      },
+      activity: {
+        title: "Recent Activity",
+        subtitle: "Latest community interactions",
+        empty: {
+          title: "No recent activity",
+          description: "Activity will appear when users interact with tournaments",
+          hint: "Participate in tournaments to see activity here"
+        }
+      }
+    },
+    // My tournaments section
+    myTournaments: {
+      title: "My Tournaments",
+      viewAll: "View all",
+      searchTournaments: "Search Tournaments",
+      createTournament: "Create Tournament",
+      empty: {
+        title: "You don't have tournaments yet",
+        description: {
+          organizer: "Create your first tournament or register for an existing one",
+          participant: "Search for interesting tournaments and register to participate"
+        }
+      }
     }
   },
 

@@ -82,7 +82,7 @@ export const pages = {
       exploreTournaments: "Explorar Torneos"
     },
     footer: {
-      description: "La plataforma líder para torneos de Pokémon en España y Latinoamérica.",
+      description: "Conecta, compite y celebra la pasión por Pokémon.<br/>La plataforma definitiva para organizar y participar en torneos TCG, VGC y GO.",
       tournaments: "Torneos",
       searchTournaments: "Buscar Torneos",
       account: "Cuenta",
@@ -95,6 +95,49 @@ export const pages = {
       terms: "Términos",
       privacy: "Privacidad",
       copyright: "© 2024 RotomTracks. Todos los derechos reservados."
+    },
+    // Popular tournaments section
+    popular: {
+      types: {
+        title: "Tipos de Torneos Más Populares",
+        subtitle: "Basado en la actividad reciente",
+        tournament: "torneo",
+        tournaments: "torneos",
+        active: "activos",
+        trend: {
+          up: "en aumento",
+          down: "en descenso",
+          stable: "estable"
+        },
+        empty: {
+          title: "No hay datos de popularidad aún",
+          description: "Los datos aparecerán cuando haya más actividad",
+          hint: "Crea torneos para ver estadísticas de popularidad"
+        }
+      },
+      activity: {
+        title: "Actividad Reciente",
+        subtitle: "Últimas interacciones de la comunidad",
+        empty: {
+          title: "No hay actividad reciente",
+          description: "La actividad aparecerá cuando los usuarios interactúen con torneos",
+          hint: "Participa en torneos para ver la actividad aquí"
+        }
+      }
+    },
+    // My tournaments section
+    myTournaments: {
+      title: "Mis Torneos",
+      viewAll: "Ver todos",
+      searchTournaments: "Buscar Torneos",
+      createTournament: "Crear Torneo",
+      empty: {
+        title: "No tienes torneos aún",
+        description: {
+          organizer: "Crea tu primer torneo o regístrate en uno existente",
+          participant: "Busca torneos interesantes y regístrate para participar"
+        }
+      }
     }
   },
 

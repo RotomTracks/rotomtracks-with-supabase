@@ -34,17 +34,10 @@ export const GET = withErrorHandling(async (
     );
   }
 
-  // Get tournament details with organizer information and participant count
+  // Get tournament details
   const { data: tournament, error } = await supabase
     .from('tournaments')
-    .select(`
-      *,
-      organizer:user_profiles!tournaments_organizer_id_fkey(
-        first_name,
-        last_name,
-        organization_name
-      )
-    `)
+    .select('*')
     .eq('id', id)
     .single();
 

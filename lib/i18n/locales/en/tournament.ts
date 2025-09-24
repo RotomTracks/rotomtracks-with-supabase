@@ -223,7 +223,8 @@ export const tournament = {
         },
         error: {
           title: 'Error loading tournaments',
-          loading: 'Error loading upcoming tournaments'
+          loading: 'Error loading upcoming tournaments',
+          http: 'Error {{status}}: {{statusText}}'
         }
       }
     };

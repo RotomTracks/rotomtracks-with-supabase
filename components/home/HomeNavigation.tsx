@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LanguageSelector } from "@/components/language-selector";
 import { AuthButtonClient } from "@/components/auth-button-client";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { MobileNavigation } from "./MobileNavigation";
 import { useTypedTranslation } from "@/lib/i18n";
 
@@ -44,6 +45,7 @@ export function HomeNavigation({ user }: HomeNavigationProps) {
           <div className="flex items-center gap-3">
             <AuthButtonClient />
             <div className="border-l border-gray-200 dark:border-gray-700 h-6"></div>
+            <ThemeSwitcher />
             <LanguageSelector variant="compact" />
           </div>
         </div>

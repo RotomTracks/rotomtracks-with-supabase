@@ -106,6 +106,7 @@ export const ui = {
     signUp: "Sign Up",
     language: "Language",
     languageOptions: "Language options",
+    theme: "Theme",
     admin: "Admin",
     settings: "Settings",
     account: "Account"

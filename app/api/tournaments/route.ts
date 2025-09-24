@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { TournamentType, CreateTournamentRequest, ErrorCodes } from '@/lib/types/tournament';
+import { TournamentType, ErrorCodes, TournamentStatus } from '@/lib/types/tournament';
 import { z } from 'zod';
 import {
   withErrorHandling,
   generateRequestId,
   handleValidationError,
   handleSupabaseError,
-  handleAuthError,
-  handleForbiddenError,
   createErrorResponse,
   validateAuthentication,
   validateUserRole
@@ -45,19 +43,15 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   
   // Validate and format search parameters
   const searchFilters = validateSearchParams(searchParams);
+  
+  // Get sort parameter
+  const sortOrder = searchParams.get('sort') === 'asc' ? 'asc' : 'desc';
 
   // Build query with consistent field selection
   let query = supabase
     .from('tournaments')
-    .select(`
-      *,
-      organizer:user_profiles!tournaments_organizer_id_fkey(
-        first_name,
-        last_name,
-        organization_name
-      )
-    `, { count: 'exact' })
-    .order('start_date', { ascending: false });
+    .select('*', { count: 'exact' })
+    .order('start_date', { ascending: sortOrder === 'asc' });
 
   // Apply filters with proper validation
   if (searchFilters.query) {
@@ -170,7 +164,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const tournamentData = {
     ...validatedData,
     organizer_id: user.id,
-    status: 'upcoming',
+    status: TournamentStatus.UPCOMING,
     current_players: 0,
     registration_open: true,
     created_at: new Date().toISOString(),

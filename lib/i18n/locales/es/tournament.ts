@@ -223,7 +223,8 @@ export const tournament = {
         },
         error: {
           title: 'Error al cargar torneos',
-          loading: 'Error al cargar torneos próximos'
+          loading: 'Error al cargar torneos próximos',
+          http: 'Error {{status}}: {{statusText}}'
         }
       }
     };

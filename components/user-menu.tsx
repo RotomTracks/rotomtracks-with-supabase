@@ -139,6 +139,22 @@ export function UserMenu({ user }: UserMenuProps) {
             )}
           </div>
 
+          {/* Admin Panel Link - Only show for admin users - FIRST */}
+          {isAdmin && (
+            <>
+              <Link 
+                href="/admin/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 font-medium"
+                role="menuitem"
+              >
+                <Shield className="w-4 h-4" />
+                Panel de Administración
+              </Link>
+              <div className="border-t border-gray-200 dark:border-gray-700 my-1" />
+            </>
+          )}
+
           <Link 
             href="/profile"
             onClick={() => setIsOpen(false)}
@@ -148,19 +164,6 @@ export function UserMenu({ user }: UserMenuProps) {
             <User className="w-4 h-4" />
             {tUI("buttons.view")} {tUI("navigation.profile")}
           </Link>
-
-          {/* Admin Panel Link - Only show for admin users */}
-          {isAdmin && (
-            <Link 
-              href="/admin/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 font-medium"
-              role="menuitem"
-            >
-              <Shield className="w-4 h-4" />
-              Panel de Administración
-            </Link>
-          )}
 
           {/* Single dashboard entry for all roles */}
           <Link 

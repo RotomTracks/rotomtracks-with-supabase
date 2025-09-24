@@ -109,7 +109,7 @@ export function LanguageSelector({
       
       <DropdownMenuContent 
         align="end" 
-        className="w-48"
+        className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
         role="menu"
         aria-label={tUI('navigation.languageOptions')}
       >

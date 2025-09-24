@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { withRateLimit } from '@/lib/utils/rate-limit';
+import { TournamentStatus } from '@/lib/types/tournament';
 
 // Validation schema for popular suggestions request
 const popularRequestSchema = z.object({
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
   });
 }
 
-// GET /api/tournaments/popular - Get popular suggestions (simple version)
+// GET /api/tournaments/popular - Get popular tournament data for home page
 export async function GET(request: NextRequest) {
   return withRateLimit(request, 'suggestions', async () => {
     try {
@@ -97,25 +98,28 @@ export async function GET(request: NextRequest) {
         country: userCountry || undefined
       } : undefined;
 
-      const suggestions: PopularSuggestion[] = [];
+      // Get popular tournament types with statistics
+      const popularTypes = await getPopularTournamentTypes(supabase, maxPerCategory);
+      
+      // Get recent activity
+      const recentActivity = await getRecentActivity(supabase, 10);
 
-      // Get all suggestion types
-      const [typesSuggestions, locationSuggestions, trendingSuggestions] = await Promise.all([
-        getTournamentTypeSuggestions(supabase, maxPerCategory),
-        getLocationSuggestions(supabase, maxPerCategory, userLocation),
-        getTrendingSuggestions(supabase, maxPerCategory)
-      ]);
-
-      suggestions.push(...typesSuggestions, ...locationSuggestions, ...trendingSuggestions);
-
-      return NextResponse.json(suggestions);
+      return NextResponse.json({
+        success: true,
+        data: {
+          popular_types: popularTypes,
+          recent_activity: recentActivity
+        },
+        message: 'Popular tournament data retrieved successfully'
+      });
 
     } catch (error) {
       console.error('Error in GET /api/tournaments/popular:', error);
       return NextResponse.json(
         { 
+          success: false,
           error: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch popular suggestions'
+          message: 'Failed to fetch popular tournament data'
         },
         { status: 500 }
       );
@@ -134,7 +138,7 @@ async function getTournamentTypeSuggestions(
       .from('tournaments')
       .select('tournament_type')
       .gte('start_date', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()) // Last 90 days
-      .in('status', ['upcoming', 'ongoing']);
+      .in('status', [TournamentStatus.UPCOMING, TournamentStatus.ONGOING]);
 
     if (error) {
       return getFallbackTypeSuggestions(limit);
@@ -189,7 +193,7 @@ async function getLocationSuggestions(
       .from('tournaments')
       .select('city, country')
       .gte('start_date', new Date().toISOString()) // Upcoming tournaments only
-      .in('status', ['upcoming', 'ongoing']);
+      .in('status', [TournamentStatus.UPCOMING, TournamentStatus.ONGOING]);
 
     if (error) {
       return getFallbackLocationSuggestions(limit, userLocation);
@@ -317,7 +321,107 @@ async function getTrendingSuggestions(
   }
 }
 
+// Helper function to get popular tournament types with statistics
+async function getPopularTournamentTypes(supabase: any, limit: number) {
+  try {
+    const { data: typeCounts, error } = await supabase
+      .from('tournaments')
+      .select('tournament_type, current_players, created_at')
+      .gte('start_date', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()) // Last 90 days
+      .in('status', [TournamentStatus.UPCOMING, TournamentStatus.ONGOING]);
+
+    if (error) {
+      return getFallbackPopularTypes(limit);
+    }
+
+    // Count occurrences and calculate trends
+    const counts = typeCounts?.reduce((acc: Record<string, { count: number; totalPlayers: number; recentCount: number }>, tournament: any) => {
+      const type = tournament.tournament_type;
+      if (!acc[type]) {
+        acc[type] = { count: 0, totalPlayers: 0, recentCount: 0 };
+      }
+      acc[type].count++;
+      acc[type].totalPlayers += tournament.current_players || 0;
+      
+      // Count recent tournaments (last 30 days)
+      const tournamentDate = new Date(tournament.created_at);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      if (tournamentDate >= thirtyDaysAgo) {
+        acc[type].recentCount++;
+      }
+      
+      return acc;
+    }, {}) || {};
+
+    // Convert to popular types format
+    const popularTypes = Object.entries(counts)
+      .map(([type, data]) => {
+        const typeData = data as { count: number; totalPlayers: number; recentCount: number };
+        const percentage = typeData.recentCount > 0 ? 
+          Math.round(((typeData.recentCount / typeData.count) - 0.5) * 100) : 0;
+        
+        return {
+          tournament_type: type,
+          count: typeData.count,
+          trend: percentage > 10 ? 'up' : percentage < -10 ? 'down' : 'stable',
+          percentage: Math.abs(percentage)
+        };
+      })
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    return popularTypes.length > 0 ? popularTypes : getFallbackPopularTypes(limit);
+
+  } catch (error) {
+    console.warn('Error fetching popular tournament types:', error);
+    return getFallbackPopularTypes(limit);
+  }
+}
+
+// Helper function to get recent activity
+async function getRecentActivity(supabase: any, limit: number) {
+  try {
+    const { data: recentTournaments, error } = await supabase
+      .from('tournaments')
+      .select('id, name, tournament_type, city, country, current_players, created_at, updated_at')
+      .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()) // Last 7 days
+      .order('created_at', { ascending: false })
+      .limit(limit * 2); // Get more to filter
+
+    if (error) {
+      return [];
+    }
+
+    // Transform to activity format
+    const activities = recentTournaments?.map((tournament: any, index: number) => ({
+      id: `activity-${tournament.id}`,
+      type: index % 3 === 0 ? 'tournament_created' : 
+            index % 3 === 1 ? 'registration' : 'tournament_completed',
+      tournament_name: tournament.name,
+      tournament_type: tournament.tournament_type,
+      location: `${tournament.city}, ${tournament.country}`,
+      timestamp: tournament.created_at,
+      participant_count: tournament.current_players
+    })) || [];
+
+    return activities.slice(0, limit);
+
+  } catch (error) {
+    console.warn('Error fetching recent activity:', error);
+    return [];
+  }
+}
+
 // Fallback functions for when database queries fail
+function getFallbackPopularTypes(limit: number) {
+  return [
+    { tournament_type: 'TCG League Challenge', count: 0, trend: 'stable', percentage: 0 },
+    { tournament_type: 'VGC Premier Challenge', count: 0, trend: 'stable', percentage: 0 },
+    { tournament_type: 'GO Community Day', count: 0, trend: 'stable', percentage: 0 },
+    { tournament_type: 'TCG Cup', count: 0, trend: 'stable', percentage: 0 }
+  ].slice(0, limit);
+}
+
 function getFallbackTypeSuggestions(limit: number): PopularSuggestion[] {
   const fallbackTypes = [
     { id: 'type-tcg-cup', name: 'TCG League Cup', count: 45, icon: '🃏' },

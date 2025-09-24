@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { LanguageSelector } from "@/components/language-selector";
 import { AuthButtonClient } from "@/components/auth-button-client";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { useTypedTranslation } from "@/lib/i18n";
 
@@ -129,6 +130,10 @@ export function MobileNavigation({ user }: MobileNavigationProps) {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.language')}</span>
                       <LanguageSelector variant="compact" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.theme')}</span>
+                      <ThemeSwitcher />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{tUI('navigation.account')}</span>

@@ -4,59 +4,27 @@ import { useEffect, useState } from 'react';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
-import { Tournament } from '@/lib/types/tournament';
+import { Tournament, TournamentStatus } from '@/lib/types/tournament';
 import { useTypedTranslation } from '@/lib/i18n';
 
 interface UpcomingTournamentsProps {
   userLocation?: string;
   limit?: number;
+  onTournamentsChange?: (hasTournaments: boolean) => void;
 }
 
-export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournamentsProps) {
+export function UpcomingTournaments({ userLocation, limit = 6, onTournamentsChange }: UpcomingTournamentsProps) {
   const { tCommon, tTournaments, tUI } = useTypedTranslation();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Demo data for fallback
-  const getDemoTournaments = (): Tournament[] => [
-    {
-      id: 'demo-upcoming-1',
-      official_tournament_id: '24-12-000001',
-      name: 'Demo VGC Championship Madrid',
-      tournament_type: 'VGC_PREMIER_EVENT' as any,
-      city: 'Madrid',
-      country: 'España',
-      start_date: '2024-12-15T10:00:00Z',
-      end_date: '2024-12-15T18:00:00Z',
-      status: 'UPCOMING' as any,
-      current_players: 8,
-      max_players: 32,
-      registration_open: true,
-      organizer_id: 'demo-organizer',
-      description: 'Torneo de demostración VGC en Madrid',
-      created_at: '2024-12-01T10:00:00Z',
-      updated_at: '2024-12-01T10:00:00Z'
-    },
-    {
-      id: 'demo-upcoming-2',
-      official_tournament_id: '24-12-000002',
-      name: 'Demo TCG League Cup Barcelona',
-      tournament_type: 'TCG_LEAGUE_CUP' as any,
-      city: 'Barcelona',
-      country: 'España',
-      start_date: '2024-12-20T09:00:00Z',
-      end_date: '2024-12-20T17:00:00Z',
-      status: 'UPCOMING' as any,
-      current_players: 12,
-      max_players: 16,
-      registration_open: true,
-      organizer_id: 'demo-organizer-2',
-      description: 'Torneo de demostración TCG en Barcelona',
-      created_at: '2024-12-01T10:00:00Z',
-      updated_at: '2024-12-01T10:00:00Z'
+  // Notify parent component about tournament changes
+  useEffect(() => {
+    if (onTournamentsChange) {
+      onTournamentsChange(tournaments.length > 0);
     }
-  ];
+  }, [tournaments.length, onTournamentsChange]);
 
   useEffect(() => {
     const fetchUpcomingTournaments = async () => {
@@ -67,15 +35,17 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
         // Build query parameters
         const params = new URLSearchParams({
           limit: limit.toString(),
-          status: 'upcoming',
-          sort: 'date_asc'
+          status: TournamentStatus.UPCOMING,
+          sort: 'asc'
         });
         
         if (userLocation) {
-          params.append('location', userLocation);
+          // Extract city from location string (e.g., "Madrid" from "Madrid, España")
+          const city = userLocation.split(',')[0].trim();
+          params.append('city', city);
         }
 
-        const response = await fetch(`/api/tournaments/search?${params}`);
+        const response = await fetch(`/api/tournaments?${params}`);
         
         if (!response.ok) {
           let errorMessage = tTournaments('upcoming.error.loading');
@@ -84,33 +54,23 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
             errorMessage = errorData.message || errorData.error || errorMessage;
           } catch (parseError) {
             console.error('Error parsing error response:', parseError);
-            errorMessage = `Error ${response.status}: ${response.statusText}`;
+            errorMessage = tTournaments('upcoming.error.http', { status: response.status, statusText: response.statusText });
           }
           throw new Error(errorMessage);
         }
 
         const data = await response.json();
         
-        if (data.success && data.tournaments && data.tournaments.length > 0) {
-          setTournaments(data.tournaments);
+        if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+          setTournaments(data.data);
         } else {
-          // Show demo data if no real tournaments found
-          console.log('No upcoming tournaments found, showing demo data');
-          setTournaments(getDemoTournaments());
+          setTournaments([]);
         }
       } catch (err) {
         console.error('Error fetching upcoming tournaments:', err);
         const errorMessage = err instanceof Error ? err.message : tUI('status.unknown');
         setError(errorMessage);
-        
-        // Show demo data as fallback even on error
-        try {
-          console.log('Showing demo data as fallback due to error');
-          setTournaments(getDemoTournaments());
-          setError(null); // Clear error since we have demo data
-        } catch (demoError) {
-          console.error('Error creating demo data:', demoError);
-        }
+        setTournaments([]);
       } finally {
         setLoading(false);
       }
@@ -165,27 +125,30 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
 
   if (tournaments.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+      <div className="bg-blue-50 dark:bg-gray-700 rounded-2xl shadow-lg p-6 border border-blue-100 dark:border-gray-600 text-center">
+        <div className="bg-blue-100 dark:bg-blue-800/40 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-blue-200 dark:border-blue-700">
+          <Trophy className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+        </div>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
           {tTournaments('upcoming.empty.title')}
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-md mx-auto">
           {userLocation 
             ? tTournaments('upcoming.empty.descriptionWithLocation', { location: userLocation })
             : tTournaments('upcoming.empty.description')
           }
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
             onClick={() => window.location.href = '/tournaments'}
             variant="outline"
+            className="rounded-xl border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {tTournaments('upcoming.actions.viewAll')}
           </Button>
           <Button 
             onClick={() => window.location.href = '/dashboard'}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {tTournaments('upcoming.actions.create')}
           </Button>
@@ -214,7 +177,7 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
         <Button 
           onClick={() => window.location.href = '/tournaments'}
           variant="outline"
-          className="hidden sm:flex items-center gap-2"
+          className="hidden sm:flex items-center gap-2 rounded-lg border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200"
         >
           {tTournaments('upcoming.actions.viewAll')}
           <ArrowRight className="w-4 h-4" />
@@ -236,7 +199,7 @@ export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournam
         <div className="text-center pt-6">
           <Button 
             onClick={() => window.location.href = '/tournaments'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {tTournaments('upcoming.actions.viewAll')}
             <ArrowRight className="w-4 h-4 ml-2" />

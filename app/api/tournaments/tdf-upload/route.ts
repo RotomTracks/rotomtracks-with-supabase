@@ -208,14 +208,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     const { data: tournament, error: createError } = await supabase
       .from('tournaments')
       .insert([tournamentData])
-      .select(`
-        *,
-        organizer:user_profiles!tournaments_organizer_id_fkey(
-          first_name,
-          last_name,
-          organization_name
-        )
-      `)
+      .select('*')
       .single();
 
     if (createError) {
