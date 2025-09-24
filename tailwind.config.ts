@@ -8,11 +8,12 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  // Optimizaciones para producción
+  // Optimización para reducir el tamaño del CSS
+  mode: 'jit',
+  // Optimizaciones conservadoras para producción
   corePlugins: {
-    // Deshabilitar plugins no utilizados
     preflight: true,
-    container: false,
+    container: false, // Deshabilitar container ya que usamos max-width manual
     accessibility: true,
     pointerEvents: true,
     visibility: true,
@@ -34,28 +35,20 @@ export default {
     overflow: true,
     overscrollBehavior: true,
   },
-  // Configuración de purging más agresiva
+  // Safelist mínimo - solo clases críticas realmente necesarias
   safelist: [
-    // Mantener clases críticas que podrían no ser detectadas
-    'bg-background',
-    'text-foreground',
-    'border-border',
-    'bg-card',
-    'text-card-foreground',
-    'bg-primary',
-    'text-primary-foreground',
-    'bg-secondary',
-    'text-secondary-foreground',
-    'bg-muted',
-    'text-muted-foreground',
-    'bg-accent',
-    'text-accent-foreground',
-    'bg-destructive',
-    'text-destructive-foreground',
-    'bg-popover',
-    'text-popover-foreground',
-    'bg-input',
-    'ring-ring',
+    // Solo clases de tema que se usan dinámicamente
+    'dark',
+    'light',
+    // Clases de animación personalizadas
+    'animate-fade-in',
+    'animate-slide-in',
+    // Clases de utilidad personalizadas
+    'text-balance',
+    'scrollbar-hide',
+    'will-change-transform',
+    'will-change-opacity',
+    'gpu-accelerated',
   ],
   theme: {
     extend: {
