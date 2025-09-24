@@ -15,7 +15,7 @@ import { useTypedTranslation } from "@/lib/i18n";
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI, tPages } = useTypedTranslation();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,7 +34,7 @@ export default function ProfilePage() {
         const supabase = createClient();
         
         // Obtener perfil del usuario
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from("user_profiles")
           .select("*")
           .eq("user_id", user.id)
@@ -80,7 +80,7 @@ export default function ProfilePage() {
   
   // Welcome message for new users (no profile yet)
   const welcomeMessage = !profile 
-    ? "¡Bienvenido! Completa tu perfil para acceder a todas las funciones de RotomTracks."
+    ? tPages('profile.welcomeMessage')
     : undefined;
 
   const profileActions = profile ? (
@@ -91,7 +91,7 @@ export default function ProfilePage() {
         disabled={isEditing}
       >
         <Edit className="w-4 h-4 mr-2" />
-        Editar
+        {tUI('buttons.edit')}
       </Button>
       {isEditing && (
         <Button
@@ -99,7 +99,7 @@ export default function ProfilePage() {
           onClick={() => setIsEditing(false)}
         >
           <Eye className="w-4 h-4 mr-2" />
-          Ver
+          {tUI('buttons.view')}
         </Button>
       )}
     </div>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
           />
         ) : (
           <div className="text-center py-8">
-            <p>No se encontró perfil. Creando uno nuevo...</p>
+            <p>{tPages('profile.noProfileFound')}</p>
           </div>
         )
       )}

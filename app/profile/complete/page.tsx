@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
-import { getCurrentUser, getCurrentUserProfile } from "@/lib/auth/roles";
+"use client";
 
-// Forzar renderizado dinámico
-export const dynamic = 'force-dynamic';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { ProfileForm } from "@/components/profile-form";
 import {
   Card,
@@ -12,19 +12,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { User, AlertCircle } from "lucide-react";
+import { useTypedTranslation } from "@/lib/i18n";
 
-export default async function CompleteProfilePage() {
-  const user = await getCurrentUser();
-  
-  if (!user) {
-    redirect("/auth/login");
+export default function CompleteProfilePage() {
+  const { user, loading } = useAuth();
+  const { tPages } = useTypedTranslation();
+  const router = useRouter();
+  const [profile, setProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (loading) return;
+    
+    if (!user) {
+      router.push("/auth/login");
+      return;
+    }
+
+    // If user already has a complete profile, redirect to home
+    if ((user as any).user_profiles && (user as any).user_profiles.first_name && (user as any).user_profiles.last_name && (user as any).user_profiles.player_id) {
+      router.push("/");
+      return;
+    }
+
+    setProfile((user as any).user_profiles);
+    setIsLoading(false);
+  }, [user, loading, router]);
+
+  if (loading || isLoading) {
+    return (
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
-  const profile = await getCurrentUserProfile();
-  
-  // If user already has a complete profile, redirect to home
-  if (profile && profile.first_name && profile.last_name && profile.player_id) {
-    redirect("/");
+  if (!user) {
+    return null;
   }
 
   return (
@@ -37,10 +61,10 @@ export default async function CompleteProfilePage() {
                 <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
               <CardTitle className="text-2xl">
-                Complete Your Profile
+                {tPages('auth.completeProfile.title')}
               </CardTitle>
               <CardDescription>
-                Please complete your profile to access all tournament features
+                {tPages('auth.completeProfile.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -48,10 +72,10 @@ export default async function CompleteProfilePage() {
                 <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-amber-800 dark:text-amber-200">
-                    Profile Required
+                    {tPages('auth.completeProfile.profileRequired')}
                   </p>
                   <p className="text-amber-700 dark:text-amber-300">
-                    To participate in tournaments and access all features, please complete your profile with your tournament information.
+                    {tPages('auth.completeProfile.profileRequiredDescription')}
                   </p>
                 </div>
               </div>

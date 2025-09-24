@@ -20,7 +20,7 @@ export function SignUpForm({
   className,
   ...props
 }: SignUpFormProps & React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth, tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tAuth, tCommon } = useTypedTranslation();
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     password: "",

@@ -21,7 +21,7 @@ import { useTypedTranslation } from '@/lib/i18n';
 import { useState, useEffect } from 'react';
 
 function AdminSettingsContent() {
-  const { tAdmin, tUI, tForms, tPages } = useTypedTranslation();
+  const { tAdmin, tUI } = useTypedTranslation();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [settings, setSettings] = useState({

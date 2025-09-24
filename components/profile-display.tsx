@@ -45,7 +45,7 @@ export function ProfileDisplay({
 }: ProfileDisplayProps) {
   const [copySuccess, setCopySuccess] = useState(false);
   const { formatLongDate } = useFormatting();
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tCommon } = useTypedTranslation();
   const isOrganizer = profile.user_role === UserRole.ORGANIZER;
 
   // Función para copiar datos básicos al portapapeles

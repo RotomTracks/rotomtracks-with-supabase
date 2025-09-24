@@ -15,7 +15,7 @@ interface AdminRouteProps {
 export function AdminRoute({ children, fallback }: AdminRouteProps) {
   const { isAdmin, loading, user } = useAuth();
   const router = useRouter();
-  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI, tAdmin } = useTypedTranslation();
 
   // Show loading state while checking auth
   if (loading) {

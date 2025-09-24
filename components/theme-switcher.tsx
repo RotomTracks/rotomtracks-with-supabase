@@ -11,10 +11,12 @@ import {
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTypedTranslation } from "@/lib/i18n";
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { tUI } = useTypedTranslation();
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
@@ -30,7 +32,11 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={"sm"}>
+        <Button 
+          variant="ghost" 
+          size={"sm"}
+          aria-label={tUI('accessibility.toggleTheme')}
+        >
           {theme === "light" ? (
             <Sun
               key="light"

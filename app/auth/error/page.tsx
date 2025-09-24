@@ -1,11 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ error: string }>;
-}) {
-  const params = await searchParams;
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTypedTranslation } from "@/lib/i18n";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function ErrorContent() {
+  const { tPages } = useTypedTranslation();
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -14,17 +17,17 @@ export default async function Page({
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">
-                Sorry, something went wrong.
+                {tPages('auth.error.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {params?.error ? (
+              {error ? (
                 <p className="text-sm text-muted-foreground">
-                  Code error: {params.error}
+                  {tPages('auth.error.codeError', { error })}
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  An unspecified error occurred.
+                  {tPages('auth.error.unspecifiedError')}
                 </p>
               )}
             </CardContent>
@@ -32,5 +35,23 @@ export default async function Page({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+        <div className="w-full max-w-sm">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Loading...</CardTitle>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    }>
+      <ErrorContent />
+    </Suspense>
   );
 }

@@ -4,7 +4,7 @@ import { SupabaseDiagnostic } from '@/components/debug/SupabaseDiagnostic';
 import { useTypedTranslation } from '@/lib/i18n';
 
 export default function SupabaseDiagnosticPage() {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tPages } = useTypedTranslation();
   return (
     <div className="container mx-auto py-8">
       <div className="flex flex-col items-center gap-8">

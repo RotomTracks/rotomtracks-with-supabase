@@ -26,7 +26,7 @@ const locales = {
  * Uses static locale data for better performance and type safety
  */
 export function useTypedTranslation() {
-  const { language, isLoading } = useLanguage();
+  const { language } = useLanguage();
   const currentLocale = locales[language];
 
   // Helper function to get nested value from object

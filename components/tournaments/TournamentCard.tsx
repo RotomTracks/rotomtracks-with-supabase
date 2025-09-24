@@ -61,7 +61,7 @@ export function TournamentCard({
 }: TournamentCardProps) {
   // Use centralized formatting utilities
   const { formatDate, formatTime } = useTournamentFormatting();
-  const { tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tTournaments } = useTypedTranslation();
 
   // Get tournament type icon using centralized utility
   const tournamentIcon = getTournamentTypeIcon(tournament.tournament_type as TournamentType);
@@ -182,13 +182,21 @@ export function TournamentCard({
 
   // Grid view
   return (
-    <Card className={`hover:shadow-lg transition-shadow h-full flex flex-col ${className}`}>
+    <Card 
+      className={`hover:shadow-lg transition-shadow h-full flex flex-col ${className}`}
+      role="article"
+      aria-labelledby={`tournament-title-${tournament.id}`}
+      aria-describedby={`tournament-description-${tournament.id}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2 min-w-0 flex-1">
             <span className="text-xl">{tournamentIcon}</span>
             <div className="min-w-0 flex-1">
-              <CardTitle className="text-lg line-clamp-2">
+              <CardTitle 
+                id={`tournament-title-${tournament.id}`}
+                className="text-lg line-clamp-2"
+              >
                 {tournament.name}
               </CardTitle>
               <CardDescription className="text-sm">
@@ -243,7 +251,10 @@ export function TournamentCard({
             </div>
           )}
           
-          <p className="text-sm text-gray-600 line-clamp-3 flex-1">
+          <p 
+            id={`tournament-description-${tournament.id}`}
+            className="text-sm text-gray-600 line-clamp-3 flex-1"
+          >
             {tournament.description}
           </p>
         </div>

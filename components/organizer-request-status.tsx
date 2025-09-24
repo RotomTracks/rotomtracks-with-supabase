@@ -28,7 +28,7 @@ interface OrganizerRequestStatusProps {
 }
 
 export function OrganizerRequestStatus({ userId, userEmail, showTitle = false }: OrganizerRequestStatusProps) {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tCommon, tUI } = useTypedTranslation();
   const [request, setRequest] = useState<OrganizerRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

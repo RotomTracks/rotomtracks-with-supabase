@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Home, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +52,7 @@ export function PageNavigation({
     <div className={cn("space-y-4 mb-8", className)}>
       {/* Breadcrumbs */}
       {breadcrumbs.length > 0 && (
-        <nav aria-label="Breadcrumb" className="flex items-center space-x-1 text-sm text-muted-foreground">
+        <nav aria-label="Breadcrumb navigation" className="flex items-center space-x-1 text-sm text-muted-foreground">
           {breadcrumbs.map((item, index) => (
             <div key={item.href} className="flex items-center">
               {index > 0 && (
@@ -88,7 +88,7 @@ export function PageNavigation({
               size="sm"
               onClick={handleBackNavigation}
               className="flex-shrink-0 mt-1"
-              aria-label={`${backButtonText}${backButtonHref ? ` a ${backButtonHref}` : ''}`}
+              aria-label={`${backButtonText}${backButtonHref ? ` to ${backButtonHref}` : ''}`}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {backButtonText}

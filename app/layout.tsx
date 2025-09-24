@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
+import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -59,6 +60,8 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={`${geistSans.className} antialiased`}>
+        <SkipLinks />
+        
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

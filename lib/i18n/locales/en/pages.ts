@@ -148,6 +148,8 @@ export const pages = {
     edit: "Edit",
     view: "View",
     loading: "Loading...",
+    welcomeMessage: "Welcome! Complete your profile to access all RotomTracks features.",
+    noProfileFound: "No profile found. Creating a new one...",
     descriptions: {
       complete: "Manage your personal information and account settings",
       incomplete: "Complete your profile to access all features"
@@ -198,6 +200,98 @@ export const pages = {
   // Tournaments page
   tournaments: {
     title: "Pokémon Tournaments",
-    subtitle: "Discover and participate in TCG, VGC and Pokémon GO tournaments"
+    subtitle: "Discover and participate in TCG, VGC and Pokémon GO tournaments",
+    metadata: {
+      title: "Tournaments - RotomTracks",
+      description: "Find and participate in Pokémon TCG, VGC and GO tournaments in Spain and Latin America"
+    },
+    create: {
+      title: "Create new tournament",
+      description: "Complete the basic information or upload a TDF from TOM.",
+      breadcrumbs: {
+        home: "Home",
+        dashboard: "Dashboard",
+        createTournament: "Create tournament"
+      },
+      backButton: "Back to dashboard",
+      metadata: {
+        title: "Create Tournament - RotomTracks",
+        description: "Create and manage a new Pokémon tournament"
+      }
+    },
+    details: {
+      manageTournament: "Manage Tournament",
+      notFound: "Tournament not found",
+      metadata: {
+        description: "Tournament details {{name}} in {{city}}, {{country}}. Type: {{type}}. Date: {{date}}.",
+        openGraph: {
+          description: "{{type}} tournament in {{city}}, {{country}}"
+        }
+      }
+    }
+  },
+
+  // Admin pages
+  admin: {
+    dashboard: {
+      title: "Dashboard",
+      description: "System overview and organizer request metrics"
+    }
+  },
+
+  // Auth pages
+  auth: {
+    error: {
+      title: "Sorry, something went wrong.",
+      codeError: "Code error: {{error}}",
+      unspecifiedError: "An unspecified error occurred."
+    },
+    signupSuccess: {
+      title: "Welcome to RotomTracks!",
+      description: "Your tournament account has been created successfully",
+      checkEmail: "Check your email",
+      emailSent: "We've sent you a confirmation link to verify your account.",
+      whatsNext: "What's next?",
+      steps: {
+        confirmEmail: "Confirm your email address",
+        completeProfile: "Complete your profile setup",
+        searchTournaments: "Start searching for tournaments",
+        registerTrack: "Register and track your results"
+      },
+      signInButton: "Sign In to Your Account",
+      backToHomeButton: "Back to Home"
+    },
+    completeProfile: {
+      title: "Complete Your Profile",
+      description: "Please complete your profile to access all tournament features",
+      profileRequired: "Profile Required",
+      profileRequiredDescription: "To participate in tournaments and access all features, please complete your profile with your tournament information."
+    },
+    unauthorized: {
+      organizerRequired: {
+        title: "Organizer Account Required",
+        description: "This feature requires an organizer account to access.",
+        suggestion: "To create tournaments and manage events, you need to upgrade your account to organizer status."
+      },
+      playerRequired: {
+        title: "Player Account Required",
+        description: "This feature requires a player account to access.",
+        suggestion: "To participate in tournaments, you need to complete your player profile."
+      },
+      accessDenied: {
+        title: "Access Denied",
+        description: "You don't have permission to access this resource.",
+        suggestion: "Please check your account permissions or contact support if you believe this is an error."
+      },
+      howToBecomeOrganizer: "How to become an organizer:",
+      organizerSteps: {
+        goToProfile: "Go to your profile settings",
+        changeAccountType: "Change your account type to \"Organizer\"",
+        addOrganization: "Add your organization information",
+        saveChanges: "Save your changes"
+      },
+      updateProfileButton: "Update Profile",
+      needHelp: "Need help? Contact support if you continue having access issues."
+    }
   }
 } as const;

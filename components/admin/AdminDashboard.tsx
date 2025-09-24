@@ -28,7 +28,7 @@ interface AdminDashboardResponse {
 }
 
 export function AdminDashboard() {
-  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI, tAdmin } = useTypedTranslation();
   const [metrics, setMetrics] = useState<AdminDashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -10,7 +10,7 @@ interface GoBackButtonProps {
 }
 
 export function GoBackButton({ href = "/" }: GoBackButtonProps) {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI } = useTypedTranslation();
 
   return (
     <Link href={href} className="w-full">

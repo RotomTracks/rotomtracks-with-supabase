@@ -22,7 +22,7 @@ export function LoginForm({
   className,
   ...props
 }: LoginFormProps & React.ComponentPropsWithoutRef<"div">) {
-  const { tAuth, tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tAuth, tCommon, tUI } = useTypedTranslation();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",

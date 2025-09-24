@@ -258,7 +258,7 @@ export function TournamentSearch({
 
   // Render loading state
   const renderLoadingState = () => (
-    <div className="w-full max-w-4xl mx-auto" role="status" aria-label="Cargando búsqueda de torneos">
+    <div className="w-full max-w-4xl mx-auto" role="status" aria-label="Loading tournament search">
       <div className="relative">
         <div className="animate-pulse">
           <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
@@ -270,7 +270,7 @@ export function TournamentSearch({
           )}
         </div>
       </div>
-      <span className="sr-only">Cargando búsqueda de torneos...</span>
+      <span className="sr-only">Loading tournament search...</span>
     </div>
   );
 
@@ -337,17 +337,17 @@ export function TournamentSearch({
             id="search-suggestions"
             className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto"
             role="listbox"
-            aria-label="Sugerencias de búsqueda y resultados"
+            aria-label="Search suggestions and results"
           >
             {/* Loading State */}
             {(suggestionsLoading || isLoading) && (
               <div className="p-4 text-center text-gray-500 dark:text-gray-400" role="status" aria-live="polite">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mx-auto mb-2"></div>
                 <span className="sr-only">
-                  {suggestionsLoading ? 'Cargando sugerencias' : 'Buscando torneos'}
+                  {suggestionsLoading ? 'Loading suggestions' : 'Searching tournaments'}
                 </span>
                 <span aria-hidden="true">
-                  {suggestionsLoading ? 'Buscando sugerencias...' : 'Buscando torneos...'}
+                  {suggestionsLoading ? 'Loading suggestions...' : 'Searching tournaments...'}
                 </span>
               </div>
             )}

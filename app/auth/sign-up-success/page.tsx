@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -8,8 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CheckCircle, Mail } from "lucide-react";
+import { useTypedTranslation } from "@/lib/i18n";
 
 export default function Page() {
+  const { tPages } = useTypedTranslation();
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md">
@@ -20,10 +25,10 @@ export default function Page() {
                 <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               <CardTitle className="text-2xl">
-                Welcome to RotomTracks!
+                {tPages('auth.signupSuccess.title')}
               </CardTitle>
               <CardDescription>
-                Your tournament account has been created successfully
+                {tPages('auth.signupSuccess.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -31,34 +36,34 @@ export default function Page() {
                 <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-blue-800 dark:text-blue-200">
-                    Check your email
+                    {tPages('auth.signupSuccess.checkEmail')}
                   </p>
                   <p className="text-blue-700 dark:text-blue-300">
-                    We&apos;ve sent you a confirmation link to verify your account.
+                    {tPages('auth.signupSuccess.emailSent')}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                  What&apos;s next?
+                  {tPages('auth.signupSuccess.whatsNext')}
                 </h3>
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Confirm your email address</span>
+                    <span>{tPages('auth.signupSuccess.steps.confirmEmail')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Complete your profile setup</span>
+                    <span>{tPages('auth.signupSuccess.steps.completeProfile')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Start searching for tournaments</span>
+                    <span>{tPages('auth.signupSuccess.steps.searchTournaments')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    <span>Register and track your results</span>
+                    <span>{tPages('auth.signupSuccess.steps.registerTrack')}</span>
                   </div>
                 </div>
               </div>
@@ -66,13 +71,13 @@ export default function Page() {
               <div className="space-y-3">
                 <Link href="/auth/login" className="w-full">
                   <Button className="w-full">
-                    Sign In to Your Account
+                    {tPages('auth.signupSuccess.signInButton')}
                   </Button>
                 </Link>
                 
                 <Link href="/" className="w-full">
                   <Button variant="outline" className="w-full">
-                    Back to Home
+                    {tPages('auth.signupSuccess.backToHomeButton')}
                   </Button>
                 </Link>
               </div>

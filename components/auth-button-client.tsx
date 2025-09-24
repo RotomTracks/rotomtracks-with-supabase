@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/hooks/useAuth";
 import { UserMenu } from "./user-menu";
 
 export function AuthButtonClient() {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI } = useTypedTranslation();
   const { user, loading } = useAuth();
 
   if (loading) {

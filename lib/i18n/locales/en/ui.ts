@@ -165,12 +165,18 @@ export const ui = {
     toggleMenu: "Toggle menu",
     toggleTheme: "Toggle theme",
     skipToContent: "Skip to main content",
+    skipToNavigation: "Skip to navigation",
     loading: "Loading content",
     error: "Error occurred",
     success: "Success",
     warning: "Warning",
     info: "Information",
     hidePassword: "Hide password",
-    showPassword: "Show password"
+    showPassword: "Show password",
+    mainNavigation: "Main navigation",
+    goToHomepage: "Go to homepage",
+    loadingAuth: "Loading authentication",
+    selectLanguage: "Select language",
+    currentLanguage: "Current language"
   }
 } as const;

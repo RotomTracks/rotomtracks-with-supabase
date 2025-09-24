@@ -33,7 +33,7 @@ export default function Home() {
     }
   }, [loading]);
   return (
-    <main className="min-h-screen flex flex-col">
+    <main id="main-content" className="min-h-screen flex flex-col" role="main">
       <HomeNavigation user={user} />
 
       <div className="flex-1 flex flex-col">
@@ -41,7 +41,12 @@ export default function Home() {
         <HomeFooter user={user} />
       </div>
       {loading && forceShow && (
-        <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm">
+        <div 
+          className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm"
+          role="status"
+          aria-live="polite"
+          aria-label={tPages('home.loadingAuth')}
+        >
           {tPages('home.loadingAuth')}
         </div>
       )}

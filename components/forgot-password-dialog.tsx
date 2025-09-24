@@ -32,7 +32,7 @@ interface ForgotPasswordDialogProps {
 }
 
 export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialogProps) {
-  const { tAuth, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tAuth } = useTypedTranslation();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

@@ -39,7 +39,7 @@ interface RequestsListResponse {
 }
 
 function AdminOrganizerRequestsContent() {
-  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tAdmin } = useTypedTranslation();
   const searchParams = useSearchParams();
   const [requests, setRequests] = useState<AdminOrganizerRequest[]>([]);
   const [loading, setLoading] = useState(true);

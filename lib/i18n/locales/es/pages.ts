@@ -148,6 +148,8 @@ export const pages = {
     edit: "Editar",
     view: "Ver",
     loading: "Cargando...",
+    welcomeMessage: "¡Bienvenido! Completa tu perfil para acceder a todas las funciones de RotomTracks.",
+    noProfileFound: "No se encontró perfil. Creando uno nuevo...",
     descriptions: {
       complete: "Gestiona tu información personal y configuración de cuenta",
       incomplete: "Completa tu perfil para acceder a todas las funciones"
@@ -198,6 +200,98 @@ export const pages = {
   // Tournaments page
   tournaments: {
     title: "Torneos de Pokémon",
-    subtitle: "Descubre y participa en torneos de TCG, VGC y Pokémon GO"
+    subtitle: "Descubre y participa en torneos de TCG, VGC y Pokémon GO",
+    metadata: {
+      title: "Torneos - RotomTracks",
+      description: "Encuentra y participa en torneos de Pokémon TCG, VGC y GO en España y Latinoamérica"
+    },
+    create: {
+      title: "Crear nuevo torneo",
+      description: "Completa la información básica o sube un TDF de TOM.",
+      breadcrumbs: {
+        home: "Inicio",
+        dashboard: "Dashboard",
+        createTournament: "Crear torneo"
+      },
+      backButton: "Volver al dashboard",
+      metadata: {
+        title: "Crear Torneo - RotomTracks",
+        description: "Crea y gestiona un nuevo torneo de Pokémon"
+      }
+    },
+    details: {
+      manageTournament: "Gestionar Torneo",
+      notFound: "Torneo no encontrado",
+      metadata: {
+        description: "Detalles del torneo {{name}} en {{city}}, {{country}}. Tipo: {{type}}. Fecha: {{date}}.",
+        openGraph: {
+          description: "Torneo de {{type}} en {{city}}, {{country}}"
+        }
+      }
+    }
+  },
+
+  // Admin pages
+  admin: {
+    dashboard: {
+      title: "Dashboard",
+      description: "Vista general del sistema y métricas de solicitudes de organizador"
+    }
+  },
+
+  // Auth pages
+  auth: {
+    error: {
+      title: "Lo siento, algo salió mal.",
+      codeError: "Error de código: {{error}}",
+      unspecifiedError: "Ocurrió un error no especificado."
+    },
+    signupSuccess: {
+      title: "¡Bienvenido a RotomTracks!",
+      description: "Tu cuenta de torneos ha sido creada exitosamente",
+      checkEmail: "Revisa tu email",
+      emailSent: "Te hemos enviado un enlace de confirmación para verificar tu cuenta.",
+      whatsNext: "¿Qué sigue?",
+      steps: {
+        confirmEmail: "Confirma tu dirección de email",
+        completeProfile: "Completa la configuración de tu perfil",
+        searchTournaments: "Comienza a buscar torneos",
+        registerTrack: "Regístrate y sigue tus resultados"
+      },
+      signInButton: "Iniciar Sesión en tu Cuenta",
+      backToHomeButton: "Volver al Inicio"
+    },
+    completeProfile: {
+      title: "Completa tu Perfil",
+      description: "Por favor completa tu perfil para acceder a todas las funciones de torneos",
+      profileRequired: "Perfil Requerido",
+      profileRequiredDescription: "Para participar en torneos y acceder a todas las funciones, por favor completa tu perfil con tu información de torneos."
+    },
+    unauthorized: {
+      organizerRequired: {
+        title: "Cuenta de Organizador Requerida",
+        description: "Esta función requiere una cuenta de organizador para acceder.",
+        suggestion: "Para crear torneos y gestionar eventos, necesitas actualizar tu cuenta a estado de organizador."
+      },
+      playerRequired: {
+        title: "Cuenta de Jugador Requerida",
+        description: "Esta función requiere una cuenta de jugador para acceder.",
+        suggestion: "Para participar en torneos, necesitas completar tu perfil de jugador."
+      },
+      accessDenied: {
+        title: "Acceso Denegado",
+        description: "No tienes permisos para acceder a este recurso.",
+        suggestion: "Por favor verifica los permisos de tu cuenta o contacta soporte si crees que esto es un error."
+      },
+      howToBecomeOrganizer: "Cómo convertirse en organizador:",
+      organizerSteps: {
+        goToProfile: "Ve a la configuración de tu perfil",
+        changeAccountType: "Cambia tu tipo de cuenta a \"Organizador\"",
+        addOrganization: "Agrega la información de tu organización",
+        saveChanges: "Guarda tus cambios"
+      },
+      updateProfileButton: "Actualizar Perfil",
+      needHelp: "¿Necesitas ayuda? Contacta soporte si continúas teniendo problemas de acceso."
+    }
   }
 } as const;

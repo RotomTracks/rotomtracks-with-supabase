@@ -42,7 +42,7 @@ interface FormErrors {
 }
 
 export function CreateTournamentForm({ user }: CreateTournamentFormProps) {
-  const { tTournaments, tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tTournaments } = useTypedTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});

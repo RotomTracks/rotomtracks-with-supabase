@@ -54,7 +54,7 @@ export function DashboardContent({
   participatingTournaments,
   recentTournaments
 }: DashboardContentProps) {
-  const { tPages, tUI, tAdmin, tForms } = useTypedTranslation();
+  const { tPages } = useTypedTranslation();
   const isOrganizer = profile?.user_role === 'organizer';
   
   const formatDate = (dateString: string) => {

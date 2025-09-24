@@ -1,41 +1,61 @@
-import { redirect } from 'next/navigation';
-import { getCurrentUser, getCurrentUserRole } from '@/lib/auth/roles';
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { UserRole } from '@/lib/types/tournament';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
-import { getNavigationConfig } from '@/lib/navigation/config';
 import CreateTournamentSwitcher from '../../../components/tournaments/CreateTournamentSwitcher';
+import { useTypedTranslation } from '@/lib/i18n';
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+export default function CreateTournamentPage() {
+  const { user, loading } = useAuth();
+  const { tPages } = useTypedTranslation();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function CreateTournamentPage() {
-  const user = await getCurrentUser();
-  
+  useEffect(() => {
+    if (loading) return;
+    
+    if (!user) {
+      router.push('/auth/login?redirect=/tournaments/create');
+      return;
+    }
+
+    // Check if user is an organizer
+    if ((user as any).user_profiles?.account_type !== UserRole.ORGANIZER) {
+      router.push('/organizer-request?redirect=/tournaments/create');
+      return;
+    }
+
+    setIsLoading(false);
+  }, [user, loading, router]);
+
+  if (loading || isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   if (!user) {
-    redirect('/auth/login?redirect=/tournaments/create');
+    return null;
   }
-
-  // Check if user is an organizer
-  const userRole = await getCurrentUserRole();
-  if (userRole !== UserRole.ORGANIZER) {
-    redirect('/organizer-request?redirect=/tournaments/create');
-  }
-
-  const navConfig = getNavigationConfig('tournaments');
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <PageNavigation
-          title="Crear nuevo torneo"
-          description="Completa la información básica o sube un TDF de TOM."
+          title={tPages('tournaments.create.title')}
+          description={tPages('tournaments.create.description')}
           breadcrumbs={[
-            { label: 'Inicio', href: '/' },
-            { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Crear torneo', href: '/tournaments/create', current: true },
+            { label: tPages('tournaments.create.breadcrumbs.home'), href: '/' },
+            { label: tPages('tournaments.create.breadcrumbs.dashboard'), href: '/dashboard' },
+            { label: tPages('tournaments.create.breadcrumbs.createTournament'), href: '/tournaments/create', current: true },
           ]}
           backButtonHref="/dashboard"
-          backButtonText="Volver al dashboard"
+          backButtonText={tPages('tournaments.create.backButton')}
         />
 
         <CreateTournamentSwitcher user={user} />
@@ -43,8 +63,3 @@ export default async function CreateTournamentPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: 'Crear Torneo - RotomTracks',
-  description: 'Crea y gestiona un nuevo torneo de Pokémon',
-};

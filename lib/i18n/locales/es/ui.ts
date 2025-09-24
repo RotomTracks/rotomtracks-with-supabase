@@ -165,12 +165,18 @@ export const ui = {
     toggleMenu: "Alternar menú",
     toggleTheme: "Cambiar tema",
     skipToContent: "Saltar al contenido principal",
+    skipToNavigation: "Saltar a la navegación",
     loading: "Cargando contenido",
     error: "Ocurrió un error",
     success: "Éxito",
     warning: "Advertencia",
     info: "Información",
     hidePassword: "Ocultar contraseña",
-    showPassword: "Mostrar contraseña"
+    showPassword: "Mostrar contraseña",
+    mainNavigation: "Navegación principal",
+    goToHomepage: "Ir a la página principal",
+    loadingAuth: "Cargando autenticación",
+    selectLanguage: "Seleccionar idioma",
+    currentLanguage: "Idioma actual"
   }
 } as const;

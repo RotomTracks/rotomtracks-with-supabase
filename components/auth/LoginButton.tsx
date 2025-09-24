@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
 
 export function LoginButton() {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI } = useTypedTranslation();
 
   return (
     <Link href="/auth/login" className="w-full">

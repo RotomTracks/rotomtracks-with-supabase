@@ -36,9 +36,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { signOut, isAdmin } = useAuth();
   const supabase = createClient();
-  const { tCommon, tAuth, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
-
-
+  const { tAuth, tUI } = useTypedTranslation();
 
   // Obtener el perfil del usuario y estadísticas de torneos
   useEffect(() => {
@@ -70,8 +68,6 @@ export function UserMenu({ user }: UserMenuProps) {
     fetchUserData();
   }, [user.id, supabase]);
 
-
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -92,6 +88,10 @@ export function UserMenu({ user }: UserMenuProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+        aria-label={`${tUI('navigation.account')} menu`}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-controls="user-menu"
       >
         <Avatar 
           firstName={userProfile?.first_name}
@@ -107,7 +107,12 @@ export function UserMenu({ user }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+        <div 
+          id="user-menu"
+          className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+          role="menu"
+          aria-label="User account menu"
+        >
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {userProfile?.first_name && userProfile?.last_name 
@@ -138,6 +143,7 @@ export function UserMenu({ user }: UserMenuProps) {
             href="/profile"
             onClick={() => setIsOpen(false)}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            role="menuitem"
           >
             <User className="w-4 h-4" />
             {tUI("buttons.view")} {tUI("navigation.profile")}
@@ -149,6 +155,7 @@ export function UserMenu({ user }: UserMenuProps) {
               href="/admin/dashboard"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 font-medium"
+              role="menuitem"
             >
               <Shield className="w-4 h-4" />
               Panel de Administración
@@ -160,6 +167,7 @@ export function UserMenu({ user }: UserMenuProps) {
             href="/dashboard"
             onClick={() => setIsOpen(false)}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            role="menuitem"
           >
             <Trophy className="w-4 h-4" />
             Ir al dashboard
@@ -170,6 +178,7 @@ export function UserMenu({ user }: UserMenuProps) {
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+            role="menuitem"
           >
             <LogOut className="w-4 h-4" />
             {tUI("navigation.logout")}

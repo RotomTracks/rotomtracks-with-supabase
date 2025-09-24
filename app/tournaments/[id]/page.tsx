@@ -123,7 +123,7 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
               <Link href={`/tournaments/${tournamentId}/manage`}>
                 <Button>
                   <Settings className="h-4 w-4 mr-2" />
-                  Gestionar Torneo
+                  Manage Tournament
                 </Button>
               </Link>
             </div>
@@ -160,16 +160,16 @@ export async function generateMetadata({ params }: TournamentPageProps) {
 
   if (!tournament) {
     return {
-      title: 'Torneo no encontrado',
+      title: 'Tournament not found',
     };
   }
 
   return {
     title: `${tournament.name} - RotomTracks`,
-    description: `Detalles del torneo ${tournament.name} en ${tournament.city}, ${tournament.country}. Tipo: ${tournament.tournament_type}. Fecha: ${new Date(tournament.start_date).toLocaleDateString('es-ES')}.`,
+    description: `Tournament details ${tournament.name} in ${tournament.city}, ${tournament.country}. Type: ${tournament.tournament_type}. Date: ${new Date(tournament.start_date).toLocaleDateString('en-US')}.`,
     openGraph: {
       title: tournament.name,
-      description: `Torneo de ${tournament.tournament_type} en ${tournament.city}, ${tournament.country}`,
+      description: `${tournament.tournament_type} tournament in ${tournament.city}, ${tournament.country}`,
       type: 'website',
     },
   };

@@ -13,7 +13,7 @@ interface UpcomingTournamentsProps {
 }
 
 export function UpcomingTournaments({ userLocation, limit = 6 }: UpcomingTournamentsProps) {
-  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tCommon, tTournaments, tUI } = useTypedTranslation();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

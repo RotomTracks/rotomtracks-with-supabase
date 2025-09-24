@@ -14,7 +14,7 @@ import { useTypedTranslation } from "@/lib/i18n";
 import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
 
 export default function AuthCodeErrorPage() {
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI, tPages } = useTypedTranslation();
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md">

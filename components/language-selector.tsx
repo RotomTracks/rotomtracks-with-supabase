@@ -35,7 +35,7 @@ export function LanguageSelector({
   className = ''
 }: LanguageSelectorProps) {
   const { language, setLanguage, languageInfo, isLoading } = useLanguage();
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI } = useTypedTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLanguageChange = (newLanguage: SupportedLanguage) => {
@@ -99,7 +99,7 @@ export function LanguageSelector({
           variant="ghost"
           size="sm"
           className={`${className} hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-          aria-label={`${tUI('buttons.select') as string} ${tUI('navigation.language', { current: languageInfo.nativeName }) as string}`}
+          aria-label={`${tUI('accessibility.selectLanguage')} - ${languageInfo.nativeName}`}
           aria-expanded={isOpen}
           aria-haspopup="menu"
         >
@@ -111,7 +111,7 @@ export function LanguageSelector({
         align="end" 
         className="w-48"
         role="menu"
-        aria-label={tUI('navigation.languageOptions') as string}
+        aria-label={tUI('navigation.languageOptions')}
       >
         {SUPPORTED_LANGUAGES.map((lang) => {
           const langInfo = LANGUAGE_METADATA[lang];
@@ -154,6 +154,7 @@ export function LanguageSelector({
  */
 export function LanguageToggle({ className = '' }: { className?: string }) {
   const { toggleLanguage, languageInfo, isLoading } = useLanguage();
+  const { tUI } = useTypedTranslation();
 
   const handleToggle = () => {
     toggleLanguage();
@@ -180,7 +181,7 @@ export function LanguageToggle({ className = '' }: { className?: string }) {
       size="sm"
       onClick={handleToggle}
       className={`${className} hover:bg-accent hover:text-accent-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2`}
-      aria-label={`Switch to ${languageInfo.code === 'es' ? 'English' : 'Español'}`}
+      aria-label={`${tUI('accessibility.selectLanguage')} - ${languageInfo.code === 'es' ? 'English' : 'Español'}`}
     >
       <div className="flex items-center gap-2">
         <span>{languageInfo.flag}</span>

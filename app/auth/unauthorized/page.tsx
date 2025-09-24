@@ -18,7 +18,7 @@ import { GoBackButton } from "@/components/auth/GoBackButton";
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();
-  const { tCommon, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tPages } = useTypedTranslation();
   const reason = searchParams.get("reason");
   const redirectTo = searchParams.get("redirectTo");
 
@@ -82,24 +82,24 @@ function UnauthorizedContent() {
               {reason === "organizer_required" && (
                 <div className="space-y-3">
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                    How to become an organizer:
+                    {tPages('auth.unauthorized.howToBecomeOrganizer')}
                   </h3>
                   <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
-                      <span>Go to your profile settings</span>
+                      <span>{tPages('auth.unauthorized.organizerSteps.goToProfile')}</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
-                      <span>Change your account type to &quot;Organizer&quot;</span>
+                      <span>{tPages('auth.unauthorized.organizerSteps.changeAccountType')}</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
-                      <span>Add your organization information</span>
+                      <span>{tPages('auth.unauthorized.organizerSteps.addOrganization')}</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
-                      <span>Save your changes</span>
+                      <span>{tPages('auth.unauthorized.organizerSteps.saveChanges')}</span>
                     </div>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ function UnauthorizedContent() {
                 <Link href="/profile" className="w-full">
                   <Button className="w-full">
                     <Trophy className="w-4 h-4 mr-2" />
-                    Update Profile
+                    {tPages('auth.unauthorized.updateProfileButton')}
                   </Button>
                 </Link>
                 
@@ -121,7 +121,7 @@ function UnauthorizedContent() {
               </div>
 
               <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                Need help? Contact support if you continue having access issues.
+                {tPages('auth.unauthorized.needHelp')}
               </div>
             </CardContent>
           </Card>
@@ -132,6 +132,8 @@ function UnauthorizedContent() {
 }
 
 export default function UnauthorizedPage() {
+  const { tUI } = useTypedTranslation();
+
   return (
     <Suspense fallback={
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -141,7 +143,7 @@ export default function UnauthorizedPage() {
               <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                 <Shield className="w-8 h-8 text-gray-600 dark:text-gray-400" />
               </div>
-              <CardTitle className="text-2xl">Loading...</CardTitle>
+              <CardTitle className="text-2xl">{tUI('status.loading')}</CardTitle>
             </CardHeader>
           </Card>
         </div>

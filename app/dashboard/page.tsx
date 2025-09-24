@@ -43,5 +43,5 @@ export default async function DashboardPage() {
 
 export const metadata = {
   title: 'Dashboard - RotomTracks',
-  description: 'Gestiona tus torneos, participaciones y organizaciones',
+  description: 'Manage your tournaments, participations and organizations',
 };

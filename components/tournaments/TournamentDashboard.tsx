@@ -72,7 +72,7 @@ export function TournamentDashboard({
   showHeader = true,
 }: TournamentDashboardProps) {
   // Hooks
-  const { tCommon, tTournaments, tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tTournaments, tUI } = useTypedTranslation();
   
   // State
   const [tournaments, setTournaments] = useState<UserTournament[]>([]);

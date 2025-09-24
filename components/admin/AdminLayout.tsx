@@ -29,7 +29,7 @@ export function AdminLayout({ children, title, description }: AdminLayoutProps) 
   const pathname = usePathname();
   const router = useRouter();
   const { isAdmin, loading } = useAuth();
-  const { tUI, tAdmin, tForms, tPages } = useTypedTranslation();
+  const { tUI, tAdmin } = useTypedTranslation();
 
   const navigation: NavItem[] = [
     {

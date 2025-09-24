@@ -5,21 +5,30 @@ import Image from "next/image";
 import { LanguageSelector } from "@/components/language-selector";
 import { AuthButtonClient } from "@/components/auth-button-client";
 import { MobileNavigation } from "./MobileNavigation";
+import { useTypedTranslation } from "@/lib/i18n";
 
 interface HomeNavigationProps {
   user: any;
 }
 
 export function HomeNavigation({ user }: HomeNavigationProps) {
+  const { tUI } = useTypedTranslation();
+  
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="hidden lg:block w-full border-b border-gray-200 dark:border-gray-700 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 sticky top-0 z-50">
+      <nav 
+        id="navigation"
+        className="hidden lg:block w-full border-b border-gray-200 dark:border-gray-700 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 sticky top-0 z-50"
+        role="navigation"
+        aria-label={tUI('accessibility.mainNavigation')}
+      >
         <div className="w-full max-w-7xl mx-auto flex justify-between items-center h-full px-5 text-sm">
           <div className="flex items-center font-semibold">
             <Link 
               href="/" 
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md px-2 py-1"
+              aria-label={`RotomTracks - ${tUI('accessibility.goToHomepage')}`}
             >
               <Image 
                 src="/images/rotom-image.png" 

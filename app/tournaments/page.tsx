@@ -200,7 +200,7 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
         <HomePageNavigation
           title={navConfig.title}
           description={navConfig.description}
-          currentPageLabel="Torneos"
+          currentPageLabel={navConfig.title}
           currentPageHref="/tournaments"
         />
 
@@ -219,5 +219,5 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
 
 export const metadata = {
   title: 'Tournaments - RotomTracks',
-  description: 'Encuentra y participa en torneos de Pokémon TCG, VGC y GO en España y Latinoamérica',
+  description: 'Find and participate in Pokémon TCG, VGC and GO tournaments in Spain and Latin America',
 };
