@@ -22,6 +22,27 @@ const nextConfig: NextConfig = {
         process: false,
       };
       
+      // Excluir módulos de polyfills específicos
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Excluir polyfills que ya están disponibles en navegadores modernos
+        'core-js/modules/es.array.at': false,
+        'core-js/modules/es.array.flat': false,
+        'core-js/modules/es.array.flat-map': false,
+        'core-js/modules/es.object.from-entries': false,
+        'core-js/modules/es.object.has-own': false,
+        'core-js/modules/es.string.trim-end': false,
+        'core-js/modules/es.string.trim-start': false,
+      };
+      
+      // Configurar webpack para ignorar polyfills específicos
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new (require('webpack')).IgnorePlugin({
+          resourceRegExp: /^(core-js\/modules\/es\.(array\.(at|flat|flat-map)|object\.(from-entries|has-own)|string\.(trim-end|trim-start)))$/,
+        })
+      );
+      
       // Optimizar chunks para reducir JavaScript no utilizado
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
