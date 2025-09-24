@@ -1,7 +1,7 @@
 
 import { TournamentList } from '@/components/tournaments/TournamentList';
 import { getCurrentUser } from '@/lib/auth/roles';
-import { HomePageNavigation } from '@/components/navigation/PageNavigation';
+import { PageNavigation } from '@/components/navigation/PageNavigation';
 import { getNavigationConfig } from '@/lib/navigation/config';
 import { TournamentType, TournamentStatus } from '@/lib/types/tournament';
 
@@ -195,13 +195,19 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
   const navConfig = getNavigationConfig('tournaments');
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto py-8">
       <div className="max-w-7xl mx-auto">
-        <HomePageNavigation
+        <PageNavigation
           title={navConfig.title}
           description={navConfig.description}
-          currentPageLabel={navConfig.title}
-          currentPageHref="/tournaments"
+          breadcrumbs={[
+            { label: "Inicio", href: "/" },
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Torneos de Pokémon", href: "/tournaments", current: true }
+          ]}
+          backButtonHref="/dashboard"
+          backButtonText="Volver al Dashboard"
         />
 
         <TournamentList
@@ -212,6 +218,7 @@ export default async function TournamentsPage({ searchParams }: TournamentsPageP
           searchParams={params}
           userRole={user ? 'authenticated' : 'guest'}
         />
+      </div>
       </div>
     </div>
   );

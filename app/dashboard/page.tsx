@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { TournamentDashboard } from '@/components/tournaments/TournamentDashboard';
-import { HomePageNavigation } from '@/components/navigation/PageNavigation';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { getNavigationConfig } from '@/lib/navigation/config';
 
 // Force dynamic rendering
@@ -28,11 +28,9 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <HomePageNavigation
+        <DashboardHeader
           title={navConfig.title}
           description={navConfig.description}
-          currentPageLabel={navConfig.title}
-          currentPageHref="/dashboard"
         />
 
         <TournamentDashboard user={userWithProfile} showHeader={false} />

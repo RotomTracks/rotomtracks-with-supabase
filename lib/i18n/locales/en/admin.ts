@@ -49,6 +49,14 @@ export const admin = {
     empty: {
       title: "No data available",
       description: "Admin tables have not been configured yet or contain no data."
+    },
+    actions: {
+      approved: "Approved request",
+      rejected: "Rejected request",
+      underReview: "Marked for review",
+      addedNotes: "Added notes",
+      changedStatus: "Changed status",
+      performedAction: "Performed action"
     }
   },
 

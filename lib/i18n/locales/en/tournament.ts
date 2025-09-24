@@ -147,6 +147,13 @@ export const tournament = {
     cityPlaceholder: 'Madrid',
     statePlaceholder: 'Community of Madrid'
   },
+  // Stats translations
+  stats: {
+    participants: 'Participants',
+    cities: 'Cities',
+    inYourTournaments: 'In your tournaments',
+    visited: 'Visited'
+  },
   // Dashboard specific translations
   dashboard: {
     title: 'Tournament Dashboard',
@@ -157,6 +164,7 @@ export const tournament = {
     stats: {
       total: 'Total Tournaments',
       organizing: 'organizing',
+      noOrganizing: 'Haven\'t organized tournaments yet',
       participating: 'Active participations',
       upcoming: 'Upcoming',
       scheduled: 'Scheduled tournaments',
@@ -203,6 +211,12 @@ export const tournament = {
     role: {
       organizing: 'Organizing',
       participating: 'Participating'
+    },
+    actions: {
+      createTournament: 'Create Tournament'
+    },
+    error: {
+      loading: 'Error loading tournaments'
     }
   },
       error: {

@@ -152,6 +152,7 @@ export const pages = {
       organizedTournaments: "Torneos Organizados",
       ongoing: "En Curso",
       completed: "Completados",
+      cancelled: "Cancelado",
       totalParticipants: "Total Participantes",
       participations: "Participaciones",
       activeTournaments: "Torneos Activos",
@@ -181,6 +182,18 @@ export const pages = {
     alerts: {
       completeProfile: "Completa tu perfil para obtener una mejor experiencia en la plataforma.",
       completeProfileAction: "Completar Perfil"
+    },
+    metadata: {
+      title: "Dashboard - RotomTracks",
+      description: "Gestiona tus torneos, participaciones y organizaciones"
+    },
+    api: {
+      noDataAvailable: "No hay datos de solicitudes disponibles",
+      metricsRetrieved: "Métricas del panel de administración obtenidas exitosamente"
+    },
+    navigation: {
+      home: "Inicio",
+      dashboard: "Dashboard"
     }
   },
 

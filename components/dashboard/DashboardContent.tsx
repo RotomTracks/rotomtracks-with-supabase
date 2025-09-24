@@ -80,7 +80,7 @@ export function DashboardContent({
       case 'completed': return tPages('dashboard.stats.completed');
       case 'ongoing': return tPages('dashboard.stats.ongoing');
       case 'upcoming': return tPages('dashboard.stats.upcoming');
-      case 'cancelled': return 'Cancelado';
+      case 'cancelled': return tPages('dashboard.stats.cancelled');
       default: return status;
     }
   };
@@ -98,10 +98,10 @@ export function DashboardContent({
       {/* Welcome Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             {tPages('dashboard.welcome', { name: profile?.full_name || user.email })}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-muted-foreground mt-2">
             {isOrganizer 
               ? tPages('dashboard.organizerSubtitle')
               : tPages('dashboard.playerSubtitle')
@@ -110,14 +110,14 @@ export function DashboardContent({
         </div>
         <div className="flex items-center space-x-3">
           <Link href="/tournaments">
-            <Button variant="outline">
+            <Button variant="outline" className="rounded-xl border-2 hover:shadow-lg transition-all duration-200">
               <Search className="h-4 w-4 mr-2" />
               {tPages('dashboard.searchTournaments')}
             </Button>
           </Link>
           {isOrganizer && (
             <Link href="/tournaments/create">
-              <Button>
+              <Button className="rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
                 <Plus className="h-4 w-4 mr-2" />
                 {tPages('dashboard.newTournament')}
               </Button>
@@ -130,71 +130,71 @@ export function DashboardContent({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {isOrganizer ? (
           <>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Trophy className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">{stats.totalTournaments}</div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.organizedTournaments')}</div>
+                <Trophy className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalTournaments}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.organizedTournaments')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Clock className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-600">{stats.activeTournaments}</div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.ongoing')}</div>
+                <Clock className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.activeTournaments}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.ongoing')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <TrendingUp className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-600">{stats.completedTournaments}</div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.completed')}</div>
+                <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.completedTournaments}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.completed')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Users className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-600">
+                <Users className="h-8 w-8 text-orange-600 dark:text-orange-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {userTournaments.reduce((sum, t) => sum + t.current_players, 0)}
                 </div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.totalParticipants')}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.totalParticipants')}</div>
               </CardContent>
             </Card>
           </>
         ) : (
           <>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Star className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">{stats.participations}</div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.participations')}</div>
+                <Star className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.participations}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.participations')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Clock className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-600">
+                <Clock className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {participatingTournaments.filter(p => p.tournaments.status === 'ongoing').length}
                 </div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.activeTournaments')}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.activeTournaments')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Trophy className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-600">
+                <Trophy className="h-8 w-8 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {participatingTournaments.filter(p => p.tournaments.status === 'completed').length}
                 </div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.completed')}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.completed')}</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
               <CardContent className="p-6 text-center">
-                <Calendar className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-600">
+                <Calendar className="h-8 w-8 text-orange-600 dark:text-orange-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {participatingTournaments.filter(p => p.tournaments.status === 'upcoming').length}
                 </div>
-                <div className="text-sm text-gray-600">{tPages('dashboard.stats.upcoming')}</div>
+                <div className="text-sm text-muted-foreground">{tPages('dashboard.stats.upcoming')}</div>
               </CardContent>
             </Card>
           </>
@@ -203,15 +203,15 @@ export function DashboardContent({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* User's Tournaments */}
-        <Card>
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Trophy className="h-5 w-5" />
+            <CardTitle className="flex items-center space-x-2 text-foreground">
+              <Trophy className="h-5 w-5 text-primary" />
               <span>
                 {isOrganizer ? tPages('dashboard.sections.myTournaments') : tPages('dashboard.sections.myParticipations')}
               </span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-muted-foreground">
               {isOrganizer 
                 ? tPages('dashboard.sections.organizerDescription')
                 : tPages('dashboard.sections.playerDescription')
@@ -226,16 +226,16 @@ export function DashboardContent({
                   .map((tournament) => (
                     <div
                       key={tournament.id}
-                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                      className="flex items-center justify-between p-3 border rounded-xl hover:bg-accent/50 transition-all duration-200"
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-medium text-gray-900">{tournament.name}</h4>
-                          <Badge className={getStatusColor(tournament.status)}>
+                          <h4 className="font-medium text-foreground">{tournament.name}</h4>
+                          <Badge className={`${getStatusColor(tournament.status)} rounded-full`}>
                             {getStatusText(tournament.status)}
                           </Badge>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
                           <div className="flex items-center space-x-1">
                             <MapPin className="h-3 w-3" />
                             <span>{tournament.city}, {tournament.country}</span>
@@ -252,13 +252,13 @@ export function DashboardContent({
                       </div>
                       <div className="flex items-center space-x-2">
                         <Link href={`/tournaments/${tournament.id}`}>
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" className="rounded-xl">
                             {tPages('dashboard.actions.view')}
                           </Button>
                         </Link>
                         {isOrganizer && tournament.organizer_id === user.id && (
                           <Link href={`/tournaments/${tournament.id}/manage`}>
-                            <Button size="sm">
+                            <Button size="sm" className="rounded-xl">
                               <Settings className="h-4 w-4 mr-1" />
                               {tPages('dashboard.actions.manage')}
                             </Button>
@@ -271,8 +271,8 @@ export function DashboardContent({
                 {(isOrganizer ? userTournaments : participatingTournaments).length > 5 && (
                   <div className="text-center pt-3">
                     <Link href="/tournaments">
-                      <Button variant="outline" size="sm">
-                        Ver todos
+                      <Button variant="outline" size="sm" className="rounded-xl">
+                        {tPages('dashboard.actions.viewAll')}
                         <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </Link>
@@ -280,18 +280,18 @@ export function DashboardContent({
                 )}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Trophy className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-muted-foreground">
+                <Trophy className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                 <p>
                   {isOrganizer 
-                    ? 'No has organizado ningún torneo aún'
-                    : 'No has participado en ningún torneo aún'
+                    ? tPages('dashboard.empty.noTournamentsOrganized')
+                    : tPages('dashboard.empty.noParticipations')
                   }
                 </p>
                 <Link href="/tournaments">
-                  <Button className="mt-4">
+                  <Button className="mt-4 rounded-xl">
                     <Search className="h-4 w-4 mr-2" />
-                    Explorar Torneos
+                    {tPages('dashboard.empty.exploreTournaments')}
                   </Button>
                 </Link>
               </div>
@@ -300,14 +300,14 @@ export function DashboardContent({
         </Card>
 
         {/* Recent Tournaments */}
-        <Card>
+        <Card className="rounded-2xl border-2 hover:shadow-lg transition-all duration-200 bg-gray-50 dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5" />
-              <span>Torneos Recientes</span>
+            <CardTitle className="flex items-center space-x-2 text-foreground">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <span>{tPages('dashboard.sections.recentTournaments')}</span>
             </CardTitle>
-            <CardDescription>
-              Descubre torneos completados recientemente
+            <CardDescription className="text-muted-foreground">
+              {tPages('dashboard.sections.recentDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -316,11 +316,11 @@ export function DashboardContent({
                 {recentTournaments.slice(0, 5).map((tournament) => (
                   <div
                     key={tournament.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 border rounded-xl hover:bg-accent/50 transition-all duration-200"
                   >
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{tournament.name}</h4>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                      <h4 className="font-medium text-foreground">{tournament.name}</h4>
+                      <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
                         <div className="flex items-center space-x-1">
                           <MapPin className="h-3 w-3" />
                           <span>{tournament.city}, {tournament.country}</span>
@@ -336,8 +336,8 @@ export function DashboardContent({
                       </div>
                     </div>
                     <Link href={`/tournaments/${tournament.id}`}>
-                      <Button size="sm" variant="outline">
-                        Ver Resultados
+                      <Button size="sm" variant="outline" className="rounded-xl">
+                        {tPages('dashboard.actions.viewResults')}
                       </Button>
                     </Link>
                   </div>
@@ -345,17 +345,17 @@ export function DashboardContent({
                 
                 <div className="text-center pt-3">
                   <Link href="/tournaments">
-                    <Button variant="outline" size="sm">
-                      Ver más torneos
+                    <Button variant="outline" size="sm" className="rounded-xl">
+                      {tPages('dashboard.actions.viewMore')}
                       <ArrowRight className="h-4 w-4 ml-1" />
                     </Button>
                   </Link>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>No hay torneos recientes disponibles</p>
+              <div className="text-center py-8 text-muted-foreground">
+                <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p>{tPages('dashboard.empty.noRecentTournaments')}</p>
               </div>
             )}
           </CardContent>
@@ -364,15 +364,15 @@ export function DashboardContent({
 
       {/* Profile completion alert */}
       {!profile?.full_name && (
-        <Alert>
-          <Settings className="h-4 w-4" />
+        <Alert className="rounded-2xl border-2 bg-gray-50 dark:bg-gray-800">
+          <Settings className="h-4 w-4 text-primary" />
           <AlertDescription className="flex items-center justify-between">
-            <span>
-              Completa tu perfil para obtener una mejor experiencia en la plataforma.
+            <span className="text-foreground">
+              {tPages('dashboard.alerts.completeProfile')}
             </span>
             <Link href="/profile">
-              <Button size="sm" variant="outline">
-                Completar Perfil
+              <Button size="sm" variant="outline" className="rounded-xl">
+                {tPages('dashboard.alerts.completeProfileAction')}
               </Button>
             </Link>
           </AlertDescription>

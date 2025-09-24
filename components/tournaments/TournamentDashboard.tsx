@@ -218,7 +218,7 @@ export function TournamentDashboard({
         <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border">
+            <div key={i} className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm border">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-4"></div>
               <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2"></div>
               <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
@@ -227,7 +227,7 @@ export function TournamentDashboard({
         </div>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border">
+            <div key={i} className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-sm border">
               <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4"></div>
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
@@ -242,13 +242,13 @@ export function TournamentDashboard({
   // Render error state with better styling
   const renderErrorState = () => (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-8 text-center" role="alert">
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-300 dark:border-gray-600 p-8 text-center" role="alert">
         <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
           {tUI('status.error')}
         </h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{currentError}</p>
-        <Button onClick={fetchUserTournaments} className="text-red-600 border-red-200 hover:bg-red-50">
+        <Button onClick={fetchUserTournaments} className="text-red-600 border-red-200 hover:bg-red-50 rounded-xl">
           {tUI('buttons.retry')}
         </Button>
       </div>
@@ -290,7 +290,7 @@ export function TournamentDashboard({
             </Link>
             
             {isOrganizer && (
-              <CreateTournamentButton />
+              <CreateTournamentButton centered />
             )}
           </div>
         </div>
@@ -298,40 +298,42 @@ export function TournamentDashboard({
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-300 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{tTournaments('dashboard.stats.total')}</p>
+              <p className="text-base font-medium text-gray-600 dark:text-gray-400">{tTournaments('dashboard.stats.total')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{tournaments.length}</p>
             </div>
             <Trophy className="h-8 w-8 text-blue-500" />
           </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               {isOrganizer 
-                ? `${organizingTournaments.length} ${tTournaments('dashboard.stats.organizing')}` 
+                ? organizingTournaments.length > 0 
+                  ? `${organizingTournaments.length} ${tTournaments('dashboard.stats.organizing')}` 
+                  : tTournaments('dashboard.stats.noOrganizing')
                 : tTournaments('dashboard.stats.participating')
               }
             </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-300 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Próximos</p>
+              <p className="text-base font-medium text-gray-600 dark:text-gray-400">{tTournaments('dashboard.stats.upcoming')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{upcomingTournaments.length}</p>
             </div>
             <Calendar className="h-8 w-8 text-green-500" />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            Torneos programados
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {tTournaments('dashboard.stats.scheduled')}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border dark:border-gray-700">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-300 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {isOrganizer ? 'Participantes' : 'Ciudades'}
+              <p className="text-base font-medium text-gray-600 dark:text-gray-400">
+                {isOrganizer ? tTournaments('stats.participants') : tTournaments('stats.cities')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {isOrganizer 
@@ -346,15 +348,16 @@ export function TournamentDashboard({
               <MapPin className="h-8 w-8 text-purple-500" />
             )}
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {isOrganizer ? 'En tus torneos' : 'Visitadas'}
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {isOrganizer ? tTournaments('stats.inYourTournaments') : tTournaments('stats.visited')}
           </p>
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 mb-6">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      {/* Combined Filters, Search and Tabs */}
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-300 dark:border-gray-600 p-6 pb-4 mb-6">
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between mb-4">
           <div className="flex-1 max-w-md">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -363,40 +366,46 @@ export function TournamentDashboard({
                 placeholder={tTournaments('dashboard.search.placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
                 aria-label={tTournaments('dashboard.search.aria')}
               />
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              aria-label={tTournaments('dashboard.filter.status.aria')}
-            >
-              <option value="all">{tTournaments('dashboard.filter.status.all')}</option>
-              <option value={TournamentStatus.UPCOMING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.UPCOMING]}</option>
-              <option value={TournamentStatus.ONGOING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.ONGOING]}</option>
-              <option value={TournamentStatus.COMPLETED}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.COMPLETED]}</option>
-            </select>
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-3 pr-8 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm hover:shadow-md transition-all duration-200 appearance-none cursor-pointer min-w-[140px]"
+                aria-label={tTournaments('dashboard.filter.status.aria')}
+              >
+                <option value="all">{tTournaments('dashboard.filter.status.all')}</option>
+                <option value={TournamentStatus.UPCOMING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.UPCOMING]}</option>
+                <option value={TournamentStatus.ONGOING}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.ONGOING]}</option>
+                <option value={TournamentStatus.COMPLETED}>{STATUS_TRANSLATIONS.tournament[TournamentStatus.COMPLETED]}</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Tournament Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className={`grid w-full ${isOrganizer ? 'grid-cols-3' : 'grid-cols-2'}`}>
+        {/* Tournament Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <TabsList className={`grid w-full ${isOrganizer ? 'grid-cols-3' : 'grid-cols-2'} bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-xl p-1.5 mb-0 !h-auto`}>
           {isOrganizer && (
-            <TabsTrigger value="organizing">
+            <TabsTrigger value="organizing" className="rounded-xl data-[state=active]:bg-gray-50 data-[state=active]:text-gray-900 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:p-2 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-gray-100 dark:data-[state=active]:border-gray-500 transition-all duration-200 font-medium px-3 m-0 flex items-center justify-center h-full leading-none">
               {tTournaments('dashboard.tabs.organizing')} ({organizingTournaments.length})
             </TabsTrigger>
           )}
-          <TabsTrigger value="participating">
+          <TabsTrigger value="participating" className="rounded-xl data-[state=active]:bg-gray-50 data-[state=active]:text-gray-900 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:p-2 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-gray-100 dark:data-[state=active]:border-gray-500 transition-all duration-200 font-medium px-3 m-0 flex items-center justify-center h-full leading-none">
             {tTournaments('dashboard.tabs.participating')} ({participatingTournaments.length})
           </TabsTrigger>
-          <TabsTrigger value="all">
+          <TabsTrigger value="all" className="rounded-xl data-[state=active]:bg-gray-50 data-[state=active]:text-gray-900 data-[state=active]:shadow-lg data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:p-2 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-gray-100 dark:data-[state=active]:border-gray-500 transition-all duration-200 font-medium px-3 m-0 flex items-center justify-center h-full leading-none">
             {tTournaments('dashboard.tabs.all')} ({tournaments.length})
           </TabsTrigger>
         </TabsList>
@@ -413,15 +422,15 @@ export function TournamentDashboard({
               if (statusFilter !== 'all') return t.status === statusFilter;
               return true;
             }).length === 0 ? (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
-                <Settings className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-300 dark:border-gray-600 p-8 text-center">
+                <Settings className="h-12 w-12 text-gray-300 dark:text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   {tTournaments('dashboard.empty.organizing.title')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   {tTournaments('dashboard.empty.organizing.description')}
                 </p>
-                <CreateTournamentButton />
+                <CreateTournamentButton centered />
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label={tTournaments('dashboard.tabs.organizingAria')}>
@@ -462,20 +471,22 @@ export function TournamentDashboard({
             if (statusFilter !== 'all') return t.status === statusFilter;
             return true;
           }).length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
-              <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-300 dark:border-gray-600 p-8 text-center">
+              <Users className="h-12 w-12 text-gray-300 dark:text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 {tTournaments('dashboard.empty.participating.title')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {tTournaments('dashboard.empty.participating.description')}
               </p>
-              <Link href="/tournaments">
-                <Button className="flex items-center gap-2">
-                  <Search className="h-4 w-4" />
-                  {tTournaments('dashboard.empty.participating.searchButton')}
-                </Button>
-              </Link>
+              <div className="flex justify-center">
+                <Link href="/tournaments">
+                  <Button className="flex items-center gap-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-600 hover:border-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:border-blue-500 dark:hover:border-blue-600">
+                    <Search className="h-4 w-4" />
+                    {tTournaments('dashboard.empty.participating.searchButton')}
+                  </Button>
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" role="list" aria-label={tTournaments('dashboard.tabs.participatingAria')}>
@@ -506,34 +517,34 @@ export function TournamentDashboard({
 
         <TabsContent value="all" className="space-y-4">
           {filteredTournaments.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-8 text-center">
-              <Trophy className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-300 dark:border-gray-600 p-8 text-center">
+              <Trophy className="h-12 w-12 text-gray-300 dark:text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 {searchQuery || statusFilter !== 'all' 
-                  ? 'No se encontraron torneos' 
-                  : 'No tienes torneos aún'
+                  ? tTournaments('dashboard.empty.all.titleFiltered') 
+                  : tTournaments('dashboard.empty.all.title')
                 }
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {searchQuery || statusFilter !== 'all'
-                  ? 'Intenta ajustar los filtros de búsqueda'
+                  ? tTournaments('dashboard.empty.all.descriptionFiltered')
                   : isOrganizer 
-                    ? 'Crea tu primer torneo o regístrate en uno existente'
-                    : 'Busca torneos interesantes y regístrate para participar'
+                    ? tTournaments('dashboard.empty.all.description')
+                    : tTournaments('dashboard.empty.participating.description')
                 }
               </p>
               
               {!searchQuery && statusFilter === 'all' && (
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link href="/tournaments">
-                    <Button variant="outline" className="flex items-center gap-2">
+                    <Button variant="outline" className="flex items-center gap-2 rounded-xl border-2 border-blue-600 text-white hover:bg-blue-600 hover:text-white transition-all duration-200 dark:border-blue-500 dark:text-white dark:hover:bg-blue-500 dark:hover:text-white">
                       <Search className="h-4 w-4" />
-                      Buscar Torneos
+                      {tTournaments('dashboard.empty.participating.searchButton')}
                     </Button>
                   </Link>
                   
                   {isOrganizer && (
-                    <CreateTournamentButton />
+                    <CreateTournamentButton centered />
                   )}
                 </div>
               )}
@@ -554,6 +565,7 @@ export function TournamentDashboard({
           )}
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

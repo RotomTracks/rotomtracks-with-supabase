@@ -89,7 +89,7 @@ export const GET = withErrorHandling(async () => {
 
         const response: AdminDashboardResponse = {
           data: dashboardMetrics,
-          message: 'No hay datos de solicitudes disponibles',
+          message: 'No hay datos de solicitudes disponibles', // TODO: Implement server-side translations
           timestamp: new Date().toISOString(),
           request_id: requestId
         };
@@ -146,7 +146,7 @@ export const GET = withErrorHandling(async () => {
 
     const response: AdminDashboardResponse = {
       data: dashboardMetrics,
-      message: 'Métricas del panel de administración obtenidas exitosamente',
+      message: 'Métricas del panel de administración obtenidas exitosamente', // TODO: Implement server-side translations
       timestamp: new Date().toISOString(),
       request_id: requestId
     };

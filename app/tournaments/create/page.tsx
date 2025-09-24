@@ -1,64 +1,44 @@
-"use client";
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/useAuth';
-import { UserRole } from '@/lib/types/tournament';
+import { redirect } from 'next/navigation';
+import { getCurrentUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 import CreateTournamentSwitcher from '../../../components/tournaments/CreateTournamentSwitcher';
-import { useTypedTranslation } from '@/lib/i18n';
+// Translations will be handled by the components
 
-export default function CreateTournamentPage() {
-  const { user, loading } = useAuth();
-  const { tPages } = useTypedTranslation();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 
-  useEffect(() => {
-    if (loading) return;
-    
-    if (!user) {
-      router.push('/auth/login?redirect=/tournaments/create');
-      return;
-    }
-
-    // Check if user is an organizer
-    if ((user as any).user_profiles?.account_type !== UserRole.ORGANIZER) {
-      router.push('/organizer-request?redirect=/tournaments/create');
-      return;
-    }
-
-    setIsLoading(false);
-  }, [user, loading, router]);
-
-  if (loading || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
+export default async function CreateTournamentPage() {
+  const user = await getCurrentUser();
+  
   if (!user) {
-    return null;
+    redirect('/auth/login?redirect=/tournaments/create');
   }
+
+  // Get user profile with role information
+  const userProfile = await getCurrentUserProfile();
+  
+  // Create user object with profile data
+  const userWithProfile = {
+    ...user,
+    user_profiles: userProfile
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <PageNavigation
-          title={tPages('tournaments.create.title')}
-          description={tPages('tournaments.create.description')}
+          title="Crear Torneo"
+          description="Completa los detalles para crear un nuevo torneo Pokémon"
           breadcrumbs={[
-            { label: tPages('tournaments.create.breadcrumbs.home'), href: '/' },
-            { label: tPages('tournaments.create.breadcrumbs.dashboard'), href: '/dashboard' },
-            { label: tPages('tournaments.create.breadcrumbs.createTournament'), href: '/tournaments/create', current: true },
+            { label: 'Inicio', href: '/' },
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Crear Torneo', href: '/tournaments/create', current: true },
           ]}
           backButtonHref="/dashboard"
-          backButtonText={tPages('tournaments.create.backButton')}
+          backButtonText="Volver al Dashboard"
         />
 
-        <CreateTournamentSwitcher user={user} />
+        <CreateTournamentSwitcher user={userWithProfile} />
       </div>
     </div>
   );

@@ -1,5 +1,32 @@
 # Changelog
 
+## [2025-01-27] - Mejoras del Dashboard v0.1.1
+
+### Mejorado ✨
+- **Contraste del Light Mode**: Implementado sistema de tonos de grises variados para mejor contraste visual
+- **Paneles del Dashboard**: Actualizados con `bg-gray-50` en lugar de `bg-white` para mejor definición
+- **Inputs y Selects**: Mejorados con `bg-gray-100` para mejor visibilidad
+- **Sistema de Tabs**: Contraste mejorado con `bg-gray-200` para container y `bg-gray-50` para tabs activos
+- **Bordes**: Actualizados de `border-gray-200` a `border-gray-300` para mejor definición
+- **Variables CSS**: Agregadas variables CSS globales para `bg-background` con mejor contraste
+- **Navegación**: Breadcrumbs corregidos para mostrar "Inicio > Dashboard > Torneos de Pokémon"
+- **Botón Crear Torneo**: Navegación corregida y estilizado con mejor contraste
+- **Traducciones**: Completadas todas las traducciones faltantes en el dashboard
+
+### Técnico 🔧
+- **Variables CSS**: Definidas en `globals.css` con `@layer base` para shadcn/ui
+- **Componentes**: `DashboardHeader`, `CreateTournamentButton` creados para mejor organización
+- **Autenticación**: Página de crear torneo convertida a server component para consistencia
+- **Jerarquía Visual**: Progresión lógica de tonos de gris (96% → 98% → 100%)
+
+### Impacto 🎯
+- **UX Mejorada**: Mejor contraste y legibilidad en modo claro
+- **Consistencia**: Todos los paneles siguen el mismo patrón de colores
+- **Mantenibilidad**: Variables CSS globales para fácil ajuste futuro
+- **Navegación**: Flujo más intuitivo desde dashboard a torneos
+
+---
+
 ## [2025-01-27] - Simplificación del Sistema de Perfiles
 
 ### Eliminado ❌

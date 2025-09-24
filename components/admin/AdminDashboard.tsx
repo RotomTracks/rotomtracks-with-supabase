@@ -130,17 +130,17 @@ export function AdminDashboard() {
   const getActionText = (action: AdminActionType) => {
     switch (action) {
       case AdminActionType.APPROVED:
-        return 'Aprobó solicitud';
+        return tAdmin('dashboard.actions.approved');
       case AdminActionType.REJECTED:
-        return 'Rechazó solicitud';
+        return tAdmin('dashboard.actions.rejected');
       case AdminActionType.UNDER_REVIEW:
-        return 'Marcó en revisión';
+        return tAdmin('dashboard.actions.underReview');
       case AdminActionType.NOTES_ADDED:
-        return 'Agregó notas';
+        return tAdmin('dashboard.actions.addedNotes');
       case AdminActionType.STATUS_CHANGED:
-        return 'Cambió estado';
+        return tAdmin('dashboard.actions.changedStatus');
       default:
-        return 'Realizó acción';
+        return tAdmin('dashboard.actions.performedAction');
     }
   };
 
