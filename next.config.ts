@@ -125,46 +125,28 @@ const nextConfig: NextConfig = {
     },
   },
   
-      // Headers de seguridad y rendimiento
-      async headers() {
-        return [
+  // Headers de seguridad y rendimiento
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
           {
-            source: '/(.*)',
-            headers: [
-              {
-                key: 'X-Content-Type-Options',
-                value: 'nosniff',
-              },
-              {
-                key: 'X-Frame-Options',
-                value: 'DENY',
-              },
-              {
-                key: 'X-XSS-Protection',
-                value: '1; mode=block',
-              },
-            ],
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
-            source: '/non-critical.css',
-            headers: [
-              {
-                key: 'Cache-Control',
-                value: 'public, max-age=31536000, immutable',
-              },
-            ],
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
-            source: '/_next/static/css/(.*)',
-            headers: [
-              {
-                key: 'Cache-Control',
-                value: 'public, max-age=31536000, immutable',
-              },
-            ],
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
-        ];
+        ],
       },
+    ];
+  },
 };
 
 export default nextConfig;
