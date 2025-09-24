@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { OrganizerRequestModal } from "./organizer-request-modal";
+import dynamic from "next/dynamic";
+
+const OrganizerRequestModal = dynamic(() => import("./organizer-request-modal").then(mod => ({ default: mod.OrganizerRequestModal })), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-32 rounded-lg"></div>
+});
 import { 
   Clock, 
   CheckCircle, 

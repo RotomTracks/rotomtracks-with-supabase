@@ -11,7 +11,12 @@ import { Save, ArrowLeft, Building2, Trophy, AlertCircle, CheckCircle } from "lu
 import { validatePlayerId, ValidationMessages } from "@/lib/utils/validation";
 import { UserRole } from "@/lib/types/tournament";
 
-import { OrganizerRequestModal } from "./organizer-request-modal";
+import dynamic from "next/dynamic";
+
+const OrganizerRequestModal = dynamic(() => import("./organizer-request-modal").then(mod => ({ default: mod.OrganizerRequestModal })), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-32 rounded-lg"></div>
+});
 import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
 
