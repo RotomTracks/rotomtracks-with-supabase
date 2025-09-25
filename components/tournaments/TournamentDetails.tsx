@@ -3,6 +3,9 @@
 // React
 import { useState } from 'react';
 
+// Translations
+import { useTypedTranslation } from '@/lib/i18n/';
+
 // UI Components
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -91,6 +94,9 @@ export function TournamentDetails({
 }: TournamentDetailsProps) {
   // State
   const [selectedTab, setSelectedTab] = useState('overview');
+  
+  // Translations
+  const { tTournaments, tCommon } = useTypedTranslation();
 
   // Use centralized formatting utilities
   const { formatDate, formatDateTime } = useTournamentFormatting();
@@ -143,7 +149,7 @@ export function TournamentDetails({
                 {organizer && (
                   <div className="flex items-center space-x-1">
                     <User className="h-4 w-4" />
-                    <span>{organizer.full_name || organizer.organization_name || t('tournament.organizer')}</span>
+                    <span>{organizer.full_name || organizer.organization_name || tTournaments('organizer')}</span>
                   </div>
                 )}
               </div>
@@ -303,7 +309,7 @@ export function TournamentDetails({
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Resultados Disponibles:</span>
                   <span className={`font-semibold ${stats.hasResults ? 'text-green-600' : 'text-gray-400'}`}>
-                    {stats.hasResults ? t('common.yes') : t('common.no')}
+                    {stats.hasResults ? tCommon('yes') : tCommon('no')}
                   </span>
                 </div>
               </CardContent>
