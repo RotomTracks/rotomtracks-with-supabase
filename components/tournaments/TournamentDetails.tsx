@@ -143,7 +143,7 @@ export function TournamentDetails({
                 {organizer && (
                   <div className="flex items-center space-x-1">
                     <User className="h-4 w-4" />
-                    <span>{organizer.full_name || organizer.organization_name || 'Organizador'}</span>
+                    <span>{organizer.full_name || organizer.organization_name || t('tournament.organizer')}</span>
                   </div>
                 )}
               </div>
@@ -303,7 +303,7 @@ export function TournamentDetails({
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Resultados Disponibles:</span>
                   <span className={`font-semibold ${stats.hasResults ? 'text-green-600' : 'text-gray-400'}`}>
-                    {stats.hasResults ? 'Sí' : 'No'}
+                    {stats.hasResults ? t('common.yes') : t('common.no')}
                   </span>
                 </div>
               </CardContent>

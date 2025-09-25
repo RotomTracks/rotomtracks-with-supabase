@@ -117,7 +117,7 @@ export function TournamentList({
   // Render loading state
   const renderLoadingState = () => (
     <div className="space-y-6" role="status" aria-label={tTournaments('list.loading')}>
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-0">
         <CardContent className="p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
@@ -143,7 +143,7 @@ export function TournamentList({
 
   // Render error state
   const renderErrorState = () => (
-    <Card>
+    <Card className="bg-gray-50 dark:bg-gray-800 border-0">
       <CardContent className="text-center py-12" role="alert">
         <div className="text-red-500 text-lg font-medium mb-2">
           {tTournaments('list.errorLoading')}
@@ -167,7 +167,7 @@ export function TournamentList({
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-0">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
@@ -179,26 +179,27 @@ export function TournamentList({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
+                className="bg-white dark:bg-gray-700"
               >
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
                 {tTournaments('list.filters')}
               </Button>
-              <div className="flex border rounded-lg" role="group" aria-label="Cambiar vista">
+              <div className="flex border rounded-lg" role="group" aria-label={tTournaments('list.changeView')}>
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('grid')}
-                  className="rounded-r-none"
+                  className={`rounded-r-none ${viewMode === 'grid' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                   aria-label={tTournaments('list.gridView')}
                   aria-pressed={viewMode === 'grid'}
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="rounded-l-none"
+                  className={`rounded-l-none ${viewMode === 'list' ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                   aria-label={tTournaments('list.listView')}
                   aria-pressed={viewMode === 'list'}
                 >
@@ -218,7 +219,7 @@ export function TournamentList({
                   placeholder={tTournaments('list.searchByName')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-gray-700"
                   aria-label={tTournaments('list.searchByNameAria')}
                 />
               </div>
@@ -228,12 +229,12 @@ export function TournamentList({
                   placeholder={tTournaments('list.cityOrCountry')}
                   value={locationQuery}
                   onChange={(e) => setLocationQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white dark:bg-gray-700"
                   aria-label={tTournaments('list.searchByLocationAria')}
                 />
               </div>
               <div className="flex space-x-2">
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 text-white">
                   <Search className="h-4 w-4 mr-2" />
                   {tTournaments('list.search')}
                 </Button>
@@ -260,7 +261,10 @@ export function TournamentList({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {tTournaments('list.tournamentsFound', { count: totalTournaments })}
+            {totalTournaments === 1 
+              ? tTournaments('list.tournamentsFound_one', { count: totalTournaments })
+              : tTournaments('list.tournamentsFound_other', { count: totalTournaments })
+            }
           </h2>
           {hasActiveFilters && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -274,7 +278,7 @@ export function TournamentList({
           <select
             value={searchParams.sort || 'date'}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="text-sm border rounded px-3 py-1 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
+            className="text-sm border rounded px-3 py-1 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
             aria-label={tTournaments('list.sortByAria')}
           >
             <option value="date">{tTournaments('list.date')}</option>
@@ -308,7 +312,7 @@ export function TournamentList({
           ))}
         </div>
       ) : (
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-0">
           <CardContent className="text-center py-12">
             <Trophy className="h-16 w-16 mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">

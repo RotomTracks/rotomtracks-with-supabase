@@ -354,10 +354,10 @@ export function TournamentSearch({
               <div className="p-4 text-center text-gray-500 dark:text-gray-400" role="status" aria-live="polite">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mx-auto mb-2"></div>
                 <span className="sr-only">
-                  {suggestionsLoading ? 'Loading suggestions' : 'Searching tournaments'}
+                  {suggestionsLoading ? tUI('common.loading') : tTournaments('search.searching')}
                 </span>
                 <span aria-hidden="true">
-                  {suggestionsLoading ? 'Loading suggestions...' : 'Searching tournaments...'}
+                  {suggestionsLoading ? tTournaments('search.loadingSuggestions') : tTournaments('search.searchingTournaments')}
                 </span>
               </div>
             )}
@@ -460,9 +460,9 @@ export function TournamentSearch({
                               const adjustedIndex = query.length < 2 ? recentSearches.length + index : index;
                               const getCategoryLabel = (category: string) => {
                                 switch (category) {
-                                  case 'tournament': return 'Torneo';
-                                  case 'location': return 'Ubicación';
-                                  case 'type': return 'Tipo';
+                                  case 'tournament': return tTournaments('search.categories.tournament');
+                                  case 'location': return tTournaments('search.categories.location');
+                                  case 'type': return tTournaments('search.categories.type');
                                   default: return category;
                                 }
                               };

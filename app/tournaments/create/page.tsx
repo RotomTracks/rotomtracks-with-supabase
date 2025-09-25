@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 import CreateTournamentSwitcher from '../../../components/tournaments/CreateTournamentSwitcher';
-// Translations will be handled by the components
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

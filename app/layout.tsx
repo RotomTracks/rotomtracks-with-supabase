@@ -5,6 +5,7 @@ import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { AuthModalProvider } from "@/components/auth/AuthModalContext";
 import { AuthModals } from "@/components/auth/AuthModals";
+import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -70,11 +71,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthModalProvider>
-            {children}
-            <AuthModals />
-            <DevToolsWrapper />
-          </AuthModalProvider>
+          <ToastProvider>
+            <AuthModalProvider>
+              {children}
+              <AuthModals />
+              <DevToolsWrapper />
+            </AuthModalProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

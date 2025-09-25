@@ -121,19 +121,27 @@ export const ui = {
       deleted: "Eliminado exitosamente",
       uploaded: "Archivo subido exitosamente",
       sent: "Mensaje enviado exitosamente",
-      accountCreated: "¡Cuenta creada exitosamente! Revisa tu email para confirmar tu cuenta."
+      accountCreated: "¡Cuenta creada exitosamente! Revisa tu email para confirmar tu cuenta.",
+      registrationSuccess: "¡Registro exitoso!",
+      registrationComplete: "Te has registrado correctamente en el torneo"
     },
     error: {
       generic: "Ocurrió un error",
       network: "Error de red. Por favor verifica tu conexión.",
-      unauthorized: "No estás autorizado para realizar esta acción",
+      unauthorized: "Debes iniciar sesión para registrarte en torneos",
       forbidden: "Acceso denegado",
       notFound: "Recurso no encontrado",
       serverError: "Error del servidor. Por favor intenta más tarde.",
       validation: "Por favor revisa el formulario en busca de errores",
       timeout: "La solicitud expiró. Por favor intenta de nuevo.",
       unknown: "Ocurrió un error desconocido",
-      unexpectedError: "Ocurrió un error inesperado. Por favor intenta de nuevo."
+      unexpectedError: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
+      profileRequired: "Completa tu perfil antes de registrarte en torneos",
+      tournamentNotFound: "Torneo no encontrado",
+      registrationClosed: "Las inscripciones están cerradas para este torneo",
+      onlyUpcomingTournaments: "Las inscripciones solo están disponibles para torneos próximos",
+      alreadyRegistered: "Ya estás registrado en este torneo",
+      registrationError: "Error en el registro"
     },
     warning: {
       unsavedChanges: "Tienes cambios sin guardar",

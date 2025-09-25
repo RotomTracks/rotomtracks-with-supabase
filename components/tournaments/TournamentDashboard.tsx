@@ -200,8 +200,6 @@ export function TournamentDashboard({
     return true;
   });
 
-
-
   // Computed values
   const organizingTournaments = tournaments.filter(t => t.user_role === 'organizer');
   const participatingTournaments = tournaments.filter(t => t.user_role === 'participant');
@@ -260,8 +258,6 @@ export function TournamentDashboard({
   
   // Only show error state if we have no tournaments AND an error
   if (currentError && tournaments.length === 0) return renderErrorState();
-
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

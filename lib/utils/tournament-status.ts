@@ -64,28 +64,28 @@ export const STATUS_TRANSLATIONS: StatusTranslations = {
 const TOURNAMENT_STATUS_CONFIGS: Record<TournamentStatus, StatusConfig> = {
   [TournamentStatus.UPCOMING]: {
     label: STATUS_TRANSLATIONS.tournament[TournamentStatus.UPCOMING],
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-    bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-    textColor: 'text-blue-800 dark:text-blue-300',
-    borderColor: 'border-blue-200 dark:border-blue-800',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100',
+    bgColor: 'bg-blue-100 dark:bg-blue-800',
+    textColor: 'text-blue-800 dark:text-blue-100',
+    borderColor: 'border-blue-200 dark:border-blue-600',
     icon: '📅',
     badgeVariant: 'default'
   },
   [TournamentStatus.ONGOING]: {
     label: STATUS_TRANSLATIONS.tournament[TournamentStatus.ONGOING],
-    color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
-    bgColor: 'bg-green-100 dark:bg-green-900/20',
-    textColor: 'text-green-800 dark:text-green-300',
-    borderColor: 'border-green-200 dark:border-green-800',
+    color: 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100',
+    bgColor: 'bg-green-100 dark:bg-green-800',
+    textColor: 'text-green-800 dark:text-green-100',
+    borderColor: 'border-green-200 dark:border-green-600',
     icon: '🎮',
     badgeVariant: 'default'
   },
   [TournamentStatus.COMPLETED]: {
     label: STATUS_TRANSLATIONS.tournament[TournamentStatus.COMPLETED],
-    color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
-    bgColor: 'bg-gray-100 dark:bg-gray-900/20',
-    textColor: 'text-gray-800 dark:text-gray-300',
-    borderColor: 'border-gray-200 dark:border-gray-800',
+    color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
+    bgColor: 'bg-gray-100 dark:bg-gray-700',
+    textColor: 'text-gray-800 dark:text-gray-100',
+    borderColor: 'border-gray-200 dark:border-gray-500',
     icon: '🏆',
     badgeVariant: 'secondary'
   },

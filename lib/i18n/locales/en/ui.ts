@@ -121,19 +121,27 @@ export const ui = {
       deleted: "Deleted successfully",
       uploaded: "File uploaded successfully",
       sent: "Message sent successfully",
-      accountCreated: "Account created successfully! Check your email to confirm your account."
+      accountCreated: "Account created successfully! Check your email to confirm your account.",
+      registrationSuccess: "Registration successful!",
+      registrationComplete: "You have been successfully registered for the tournament"
     },
     error: {
       generic: "An error occurred",
       network: "Network error. Please check your connection.",
-      unauthorized: "You are not authorized to perform this action",
+      unauthorized: "You must log in to register for tournaments",
       forbidden: "Access denied",
       notFound: "Resource not found",
       serverError: "Server error. Please try again later.",
       validation: "Please check the form for errors",
       timeout: "Request timed out. Please try again.",
       unknown: "An unknown error occurred",
-      unexpectedError: "An unexpected error occurred. Please try again."
+      unexpectedError: "An unexpected error occurred. Please try again.",
+      profileRequired: "Complete your profile before registering for tournaments",
+      tournamentNotFound: "Tournament not found",
+      registrationClosed: "Registration is closed for this tournament",
+      onlyUpcomingTournaments: "Registration is only available for upcoming tournaments",
+      alreadyRegistered: "You are already registered for this tournament",
+      registrationError: "Registration error"
     },
     warning: {
       unsavedChanges: "You have unsaved changes",

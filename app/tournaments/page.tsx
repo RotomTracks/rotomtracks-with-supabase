@@ -4,7 +4,6 @@ import { getCurrentUser } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 import { getNavigationConfig } from '@/lib/navigation/config';
 import { TournamentType, TournamentStatus } from '@/lib/types/tournament';
-
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
 

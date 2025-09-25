@@ -19,6 +19,7 @@ import {
 
 // Hooks
 import { useTypedTranslation } from '@/lib/i18n';
+import { useTournamentRegistration } from './useTournamentRegistration';
 
 // Next.js
 import Link from 'next/link';
@@ -64,17 +65,26 @@ export function TournamentCard({
   // Use centralized formatting utilities
   const { formatDate, formatTime } = useTournamentFormatting();
   const { tTournaments } = useTypedTranslation();
+  
+  // Registration hook
+  const { registerForTournament, isLoading: isRegistering } = useTournamentRegistration({
+    tournamentId: tournament.id,
+    onSuccess: () => {
+      // Refresh the page or update the tournament data
+      window.location.reload();
+    }
+  });
 
   // Get tournament type icon using centralized utility
   const tournamentIcon = getTournamentTypeIcon(tournament.tournament_type as TournamentType);
 
   // Utility functions
   const getCapacityColor = (current: number, max?: number) => {
-    if (!max) return 'text-gray-600';
+    if (!max) return 'text-gray-600 dark:text-gray-400';
     const percentage = (current / max) * 100;
-    if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 70) return 'text-yellow-600';
-    return 'text-green-600';
+    if (percentage >= 90) return 'text-red-600 dark:text-red-400';
+    if (percentage >= 70) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-green-600 dark:text-green-400';
   };
 
   const getRegistrationStatusBadge = (status?: ParticipantStatus) => {
@@ -113,7 +123,7 @@ export function TournamentCard({
 
   if (viewMode === 'list') {
     return (
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800 border-0">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
@@ -121,7 +131,7 @@ export function TournamentCard({
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <span className="text-lg">{tournamentIcon}</span>
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
                       {tournament.name}
                     </h3>
                     <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
@@ -129,11 +139,11 @@ export function TournamentCard({
                     </Badge>
                     {getUserRoleBadge()}
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">{tournament.tournament_type}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{tournament.tournament_type}</p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
                   <span>{formatDate(tournament.start_date)}</span>
@@ -155,22 +165,28 @@ export function TournamentCard({
                 </div>
               </div>
               
-              <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
                 {tournament.description}
               </p>
             </div>
             
             <div className="flex items-center space-x-2 ml-4">
               {canRegister && userRole === 'authenticated' && (
-                <Button size="sm">
+                <Button 
+                  size="sm" 
+                  className="text-white"
+                  onClick={registerForTournament}
+                  disabled={isRegistering}
+                >
                   <UserPlus className="h-4 w-4 mr-1" />
-                  {tTournaments('actions.register')}
+                  {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
                 </Button>
               )}
               {onViewDetails ? (
                 <Button 
                   size="sm" 
                   variant="outline"
+                  className="bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
                   onClick={() => onViewDetails(tournament)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
@@ -178,7 +194,7 @@ export function TournamentCard({
                 </Button>
               ) : (
                 <Link href={`/tournaments/${tournament.id}`}>
-                  <Button size="sm" variant="outline">
+                  <Button size="sm" variant="outline" className="bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                     <Eye className="h-4 w-4 mr-1" />
                     {tTournaments('actions.viewDetails')}
                   </Button>
@@ -191,12 +207,10 @@ export function TournamentCard({
     );
   }
 
-
-
   // Grid view
   return (
     <Card 
-      className={`hover:shadow-lg transition-shadow h-full flex flex-col ${className}`}
+      className={`hover:shadow-lg transition-shadow h-full flex flex-col bg-gray-50 dark:bg-gray-800 border-0 ${className}`}
       role="article"
       aria-labelledby={`tournament-title-${tournament.id}`}
       aria-describedby={`tournament-description-${tournament.id}`}
@@ -217,34 +231,43 @@ export function TournamentCard({
               </CardDescription>
             </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
-              {getStatusText(tournament.status as TournamentStatus)}
-            </Badge>
-            {getUserRoleBadge()}
-            {tournament.registration_status && getRegistrationStatusBadge(tournament.registration_status)}
+          <div className="flex flex-col gap-1 items-end">
+              <div className="flex flex-col gap-1">
+              <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+                  {getStatusText(tournament.status as TournamentStatus)}
+                </Badge>
+              </div>
+              <div className="flex flex-col gap-1">
+                {canRegister && (
+                  <Badge variant="outline" className="bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700">
+                    <UserPlus className="h-3 w-3 mr-1" />
+                    {tTournaments('actions.registrationOpen')}
+                  </Badge>
+                )}
+              {tournament.registration_status && getRegistrationStatusBadge(tournament.registration_status)}
+              </div>
           </div>
         </div>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col">
         <div className="space-y-3 flex-1">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="h-4 w-4" />
             <span>{formatDate(tournament.start_date)} • {formatTime(tournament.start_date)}</span>
           </div>
           
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="h-4 w-4" />
             <span>{tournament.city}, {tournament.country}</span>
           </div>
           
           <div className="flex items-center space-x-2 text-sm">
-            <Users className="h-4 w-4 text-gray-600" />
+            <Users className="h-4 w-4 text-gray-600 dark:text-gray-400" />
             <span className={getCapacityColor(tournament.current_players, tournament.max_players)}>
               {tournament.current_players} {tTournaments('actions.participants')}
               {tournament.max_players && (
-                <span className="text-gray-500"> / {tournament.max_players}</span>
+                <span className="text-gray-500 dark:text-gray-500"> / {tournament.max_players}</span>
               )}
             </span>
           </div>
@@ -266,7 +289,7 @@ export function TournamentCard({
           
           <p 
             id={`tournament-description-${tournament.id}`}
-            className="text-sm text-gray-600 line-clamp-3 flex-1"
+            className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 flex-1"
           >
             {tournament.description}
           </p>
@@ -275,9 +298,14 @@ export function TournamentCard({
         {showActions && (
           <div className="flex items-center space-x-2 mt-4 pt-4 border-t">
             {canRegister && userRole === 'authenticated' && !tournament.registration_status && (
-              <Button size="sm" className="flex-1">
+              <Button 
+                size="sm" 
+                className="flex-1 text-white"
+                onClick={registerForTournament}
+                disabled={isRegistering}
+              >
                 <UserPlus className="h-4 w-4 mr-1" />
-                {tTournaments('actions.register')}
+                {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
               </Button>
             )}
             
@@ -293,7 +321,7 @@ export function TournamentCard({
               <Button 
                 size="sm" 
                 variant="outline" 
-                className={`w-full ${tournament.user_role === 'organizer' ? '' : 'flex-1'}`}
+                className={`w-full bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white ${tournament.user_role === 'organizer' ? '' : 'flex-1'}`}
                 onClick={() => onViewDetails(tournament)}
               >
                 <Eye className="h-4 w-4 mr-1" />
@@ -301,7 +329,7 @@ export function TournamentCard({
               </Button>
             ) : (
               <Link href={`/tournaments/${tournament.id}`} className={tournament.user_role === 'organizer' ? '' : 'flex-1'}>
-                <Button size="sm" variant="outline" className="w-full">
+                <Button size="sm" variant="outline" className="w-full bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                   <Eye className="h-4 w-4 mr-1" />
                   {tTournaments('actions.viewDetails')}
                 </Button>
@@ -310,14 +338,6 @@ export function TournamentCard({
           </div>
         )}
         
-        {canRegister && (
-          <div className="mt-2">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              <UserPlus className="h-3 w-3 mr-1" />
-              {tTournaments('actions.registrationOpen')}
-            </Badge>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

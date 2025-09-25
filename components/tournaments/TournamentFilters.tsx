@@ -4,6 +4,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+// Hooks
+import { useTypedTranslation } from "@/lib/i18n";
+
 // Icons
 import { Calendar, Trophy, MapPin } from "lucide-react";
 
@@ -41,35 +44,36 @@ export function TournamentFilters({
   onFilterChange,
   loading = false,
 }: TournamentFiltersProps) {
+  const { tTournaments } = useTypedTranslation();
   // Use centralized tournament types with icons
   const tournamentTypes = [
     {
       value: TournamentType.TCG_PRERELEASE,
-      label: "TCG Prerelease",
+      label: tTournaments('filters.types.tcgPrerelease'),
       icon: getTournamentTypeIcon(TournamentType.TCG_PRERELEASE),
       color: getTournamentTypeColor(TournamentType.TCG_PRERELEASE),
     },
     {
       value: TournamentType.TCG_LEAGUE_CHALLENGE,
-      label: "TCG League Challenge",
+      label: tTournaments('filters.types.tcgLeagueChallenge'),
       icon: getTournamentTypeIcon(TournamentType.TCG_LEAGUE_CHALLENGE),
       color: getTournamentTypeColor(TournamentType.TCG_LEAGUE_CHALLENGE),
     },
     {
       value: TournamentType.TCG_LEAGUE_CUP,
-      label: "TCG League Cup",
+      label: tTournaments('filters.types.tcgLeagueCup'),
       icon: getTournamentTypeIcon(TournamentType.TCG_LEAGUE_CUP),
       color: getTournamentTypeColor(TournamentType.TCG_LEAGUE_CUP),
     },
     {
       value: TournamentType.VGC_PREMIER_EVENT,
-      label: "VGC Premier",
+      label: tTournaments('filters.types.vgcPremier'),
       icon: getTournamentTypeIcon(TournamentType.VGC_PREMIER_EVENT),
       color: getTournamentTypeColor(TournamentType.VGC_PREMIER_EVENT),
     },
         {
       value: TournamentType.GO_PREMIER_EVENT,
-      label: "GO Premier",
+      label: tTournaments('filters.types.goPremier'),
       icon: getTournamentTypeIcon(TournamentType.GO_PREMIER_EVENT),
       color: getTournamentTypeColor(TournamentType.GO_PREMIER_EVENT),
     }
@@ -153,7 +157,7 @@ export function TournamentFilters({
     <div
       className="space-y-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700"
       role="status"
-      aria-label="Cargando filtros"
+      aria-label={tTournaments('filters.loading')}
     >
       <div className="animate-pulse space-y-4">
         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
@@ -175,7 +179,7 @@ export function TournamentFilters({
           ))}
         </div>
       </div>
-      <span className="sr-only">Cargando filtros de torneos...</span>
+      <span className="sr-only">{tTournaments('filters.loadingAria')}</span>
     </div>
   );
 
@@ -188,13 +192,13 @@ export function TournamentFilters({
         <div className="flex items-center space-x-2 mb-3">
           <Trophy className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           <h4 className="font-medium text-gray-900 dark:text-gray-100">
-            Tipo de Torneo
+{tTournaments('filters.tournamentType')}
           </h4>
         </div>
         <div
           className="flex flex-wrap gap-2"
           role="group"
-          aria-label="Filtros de tipo de torneo"
+          aria-label={tTournaments('filters.tournamentTypeAria')}
         >
           {tournamentTypes.map((type) => (
             <Button
@@ -204,9 +208,9 @@ export function TournamentFilters({
               }
               size="sm"
               onClick={() => handleTypeFilter(type.value)}
-              className="text-xs"
+              className="text-xs bg-white dark:bg-gray-700"
               aria-pressed={selectedTypes.includes(type.value)}
-              aria-label={`Filtrar por ${type.label}`}
+              aria-label={`${tTournaments('filters.filterBy')} ${type.label}`}
             >
               <span className="mr-1">{type.icon}</span>
               {type.label}
@@ -220,13 +224,13 @@ export function TournamentFilters({
         <div className="flex items-center space-x-2 mb-3">
           <Calendar className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           <h4 className="font-medium text-gray-900 dark:text-gray-100">
-            Estado
+{tTournaments('filters.status')}
           </h4>
         </div>
         <div
           className="flex flex-wrap gap-2"
           role="group"
-          aria-label="Filtros de estado de torneo"
+          aria-label={tTournaments('filters.statusAria')}
         >
           {statusOptions.map((status) => (
             <Button
@@ -234,9 +238,9 @@ export function TournamentFilters({
               variant={selectedStatus === status.value ? "default" : "outline"}
               size="sm"
               onClick={() => handleStatusFilter(status.value)}
-              className="text-xs"
+              className="text-xs bg-white dark:bg-gray-700"
               aria-pressed={selectedStatus === status.value}
-              aria-label={`Filtrar por ${status.label}`}
+              aria-label={`${tTournaments('filters.filterBy')} ${status.label}`}
             >
               {status.label}
             </Button>
@@ -249,13 +253,13 @@ export function TournamentFilters({
         <div className="flex items-center space-x-2 mb-3">
           <MapPin className="h-4 w-4 text-gray-600 dark:text-gray-400" />
           <h4 className="font-medium text-gray-900 dark:text-gray-100">
-            Ubicaciones Populares
+{tTournaments('filters.popularLocations')}
           </h4>
         </div>
         <div
           className="flex flex-wrap gap-2"
           role="group"
-          aria-label="Filtros de ubicación"
+          aria-label={tTournaments('filters.locationAria')}
         >
           {popularLocations.map((location) => (
             <Button
@@ -263,8 +267,8 @@ export function TournamentFilters({
               variant="outline"
               size="sm"
               onClick={() => handleLocationFilter(location)}
-              className="text-xs"
-              aria-label={`Filtrar por ${location}`}
+              className="text-xs bg-white dark:bg-gray-700"
+              aria-label={`${tTournaments('filters.filterBy')} ${location}`}
             >
               {location}
             </Button>
@@ -278,12 +282,12 @@ export function TournamentFilters({
         searchParams.location) && (
         <div>
           <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-            Filtros Activos
+{tTournaments('filters.activeFilters')}
           </h4>
           <div
             className="flex flex-wrap gap-2"
             role="list"
-            aria-label="Filtros activos"
+            aria-label={tTournaments('filters.activeFiltersAria')}
           >
             {selectedTypes.map((type) => {
               const typeInfo = tournamentTypes.find((t) => t.value === type);
@@ -313,33 +317,6 @@ export function TournamentFilters({
         </div>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t dark:border-gray-600">
-        <div className="text-center">
-          <div className="text-lg font-bold text-blue-600">150+</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Torneos Activos
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-green-600">25</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Ciudades
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-purple-600">5K+</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Participantes
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-orange-600">12</div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Esta Semana
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

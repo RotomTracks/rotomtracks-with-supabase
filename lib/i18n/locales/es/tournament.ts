@@ -5,8 +5,6 @@
 export const tournament = {
   title: 'Torneo',
   name: 'Nombre del Torneo',
-  create: 'Crear Torneo',
-  createDescription: 'Completa los detalles para crear un nuevo torneo Pokémon',
   join: 'Unirse al Torneo',
   leave: 'Abandonar Torneo',
   participants: '{{current}}/{{max}} participantes',
@@ -35,11 +33,16 @@ export const tournament = {
     title: 'Detalles del Torneo',
     format: 'Formato',
     share: 'Compartir',
-    export: 'Exportar'
+    export: 'Exportar',
+    notFound: 'Torneo no encontrado',
+    metaDescription: 'Detalles del torneo {{name}} en {{city}}, {{country}}. Tipo: {{type}}. Fecha: {{date}}.',
+    openGraphDescription: 'Torneo {{type}} en {{city}}, {{country}}'
   },
   time: 'Hora',
+  organizer: 'Organizador',
   actions: {
     register: 'Registrarse',
+    registering: 'Registrando...',
     viewDetails: 'Ver Detalles',
     manage: 'Gestionar',
     registrationOpen: 'Registro Abierto',
@@ -107,7 +110,24 @@ export const tournament = {
     singleElimination: 'Eliminación Simple',
     doubleElimination: 'Eliminación Doble',
     locationFilter: 'Filtrar por ubicación...',
-    clearFilters: 'Limpiar Filtros'
+    clearFilters: 'Limpiar Filtros',
+    loading: 'Cargando filtros',
+    loadingAria: 'Cargando filtros de torneos...',
+    tournamentType: 'Tipo de Torneo',
+    popularLocations: 'Ubicaciones Populares',
+    activeFilters: 'Filtros Activos',
+    tournamentTypeAria: 'Filtros de tipo de torneo',
+    statusAria: 'Filtros de estado de torneo',
+    locationAria: 'Filtros de ubicación',
+    activeFiltersAria: 'Filtros activos',
+    filterBy: 'Filtrar por',
+    types: {
+      tcgPrerelease: 'TCG Prerelease',
+      tcgLeagueChallenge: 'TCG League Challenge',
+      tcgLeagueCup: 'TCG League Cup',
+      vgcPremier: 'VGC Premier',
+      goPremier: 'GO Premier'
+    }
   },
   list: {
     noTournamentsFound: 'No se encontraron torneos',
@@ -124,7 +144,8 @@ export const tournament = {
     name: 'Nombre',
     players: 'Participantes',
     location: 'Ubicación',
-    tournamentsFound: '{{count}} torneo{{count, plural, one {} other {s}}} encontrado{{count, plural, one {} other {s}}}',
+    tournamentsFound_one: '{{count}} torneo encontrado',
+    tournamentsFound_other: '{{count}} torneos encontrados',
     noTournamentsAvailable: 'No hay torneos disponibles en este momento',
     tryAdjustingFilters: 'Intenta ajustar los filtros de búsqueda',
     clearFilters: 'Limpiar filtros',
@@ -133,6 +154,7 @@ export const tournament = {
     tryAgain: 'Intentar de nuevo',
     gridView: 'Vista de cuadrícula',
     listView: 'Vista de lista',
+    changeView: 'Cambiar vista',
     searchByNameAria: 'Buscar torneos por nombre',
     searchByLocationAria: 'Buscar por ciudad o país',
     sortByAria: 'Ordenar torneos por',
@@ -263,6 +285,34 @@ export const tournament = {
     },
     recentSearch: 'Búsqueda reciente',
     noSuggestions: 'No se encontraron sugerencias',
-    tryGeneralTerms: 'Intenta con términos más generales'
+    tryGeneralTerms: 'Intenta con términos más generales',
+    loadingSuggestions: 'Cargando sugerencias...',
+    searchingTournaments: 'Buscando torneos...',
+    searching: 'Buscando',
+    categories: {
+      tournament: 'Torneo',
+      location: 'Ubicación',
+      type: 'Tipo'
+    }
+  },
+  page: {
+    title: 'Torneos',
+    description: 'Encuentra y participa en torneos de Pokémon TCG, VGC y GO en España y América Latina'
+  },
+  breadcrumbs: {
+    home: 'Inicio',
+    dashboard: 'Dashboard',
+    createTournament: 'Crear Torneo'
+  },
+  create: {
+    title: 'Crear Torneo',
+    description: 'Completa los detalles para crear un nuevo torneo Pokémon',
+    backToDashboard: 'Volver al Dashboard'
+  },
+  register: {
+    notFoundTitle: 'Registro de Torneo - RotomTracks',
+    notFoundDescription: 'Regístrate en un torneo de Pokémon',
+    title: 'Registro - {{name}} - RotomTracks',
+    description: 'Regístrate en {{name}} en {{city}}, {{country}}'
   }
 };
