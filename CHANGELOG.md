@@ -1,5 +1,28 @@
 # Changelog
 
+## [2024-12-19] - Modal de Detalles de Torneos v0.1.3
+
+### Añadido ✨
+- **Modal de Detalles de Torneos**: Componente `TournamentDetailsModal` para mostrar información completa de torneos
+- **Hook de Gestión de Modal**: `useTournamentModal` para manejar el estado del modal de torneos
+- **Funcionalidad de Compartir**: Botón para compartir torneos usando Web Share API o clipboard
+- **Vista Detallada**: Información completa del torneo incluyendo fecha, hora, ubicación, participantes y descripción
+- **Acciones Contextuales**: Botones para registrarse, gestionar (organizadores) y ver detalles completos
+- **Soporte de Roles**: Diferentes acciones según el rol del usuario (participante, organizador, invitado)
+
+### Mejorado ✨
+- **Traducciones Completas**: Todos los strings hardcodeados reemplazados con traducciones
+- **Accesibilidad**: Etiquetas ARIA apropiadas para mejor accesibilidad
+- **Integración de Modal**: Sistema de modal integrado con componentes existentes
+- **Navegación Flexible**: Soporte tanto para modal como navegación directa
+- **Vista Responsiva**: Modal optimizado para diferentes tamaños de pantalla
+
+### Técnico 🔧
+- **Componentes Nuevos**: `TournamentDetailsModal.tsx`, `useTournamentModal.ts`
+- **Traducciones**: Añadidas claves para acciones, estados de carga, errores y accesibilidad
+- **TypeScript**: Tipos mejorados para soporte de roles de usuario y estados de registro
+- **Build Exitoso**: Compilación sin errores de TypeScript
+
 ## [2024-12-19] - Corrección de Verificación de Email v0.1.2
 
 ### Corregido 🔧
