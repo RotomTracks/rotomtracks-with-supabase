@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const { user, loading } = useAuth();
-  const { tPages } = useTypedTranslation();
+  const { tUI } = useTypedTranslation();
   const [, setShowTimeout] = useState(false);
   const [forceShow, setForceShow] = useState(false);
 
@@ -45,9 +45,9 @@ export default function Home() {
           className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm"
           role="status"
           aria-live="polite"
-          aria-label={tPages('home.loadingAuth')}
+          aria-label={tUI('loadingAuth')}
         >
-          {tPages('home.loadingAuth')}
+          {tUI('loadingAuth')}
         </div>
       )}
     </main>
