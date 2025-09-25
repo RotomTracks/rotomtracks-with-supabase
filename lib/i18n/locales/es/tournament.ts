@@ -37,6 +37,14 @@ export const tournament = {
     share: 'Compartir',
     export: 'Exportar'
   },
+  time: 'Hora',
+  actions: {
+    register: 'Registrarse',
+    viewDetails: 'Ver Detalles',
+    manage: 'Gestionar',
+    registrationOpen: 'Registro Abierto',
+    participants: 'participantes'
+  },
   management: {
     title: 'Gestión de Torneo',
     description: 'Gestiona la configuración y participantes de tu torneo',
@@ -119,7 +127,17 @@ export const tournament = {
     tournamentsFound: '{{count}} torneo{{count, plural, one {} other {s}}} encontrado{{count, plural, one {} other {s}}}',
     noTournamentsAvailable: 'No hay torneos disponibles en este momento',
     tryAdjustingFilters: 'Intenta ajustar los filtros de búsqueda',
-    clearFilters: 'Limpiar filtros'
+    clearFilters: 'Limpiar filtros',
+    loading: 'Cargando torneos...',
+    errorLoading: 'Error al cargar los torneos',
+    tryAgain: 'Intentar de nuevo',
+    gridView: 'Vista de cuadrícula',
+    listView: 'Vista de lista',
+    searchByNameAria: 'Buscar torneos por nombre',
+    searchByLocationAria: 'Buscar por ciudad o país',
+    sortByAria: 'Ordenar torneos por',
+    clearAllFilters: 'Limpiar todos los filtros',
+    tournamentsList: 'Lista de torneos'
   },
   processing: {
     title: 'Procesamiento de Torneo',

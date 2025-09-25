@@ -37,6 +37,14 @@ export const tournament = {
     share: 'Share',
     export: 'Export'
   },
+  time: 'Time',
+  actions: {
+    register: 'Register',
+    viewDetails: 'View Details',
+    manage: 'Manage',
+    registrationOpen: 'Registration Open',
+    participants: 'participants'
+  },
   management: {
     title: 'Tournament Management',
     description: 'Manage your tournament settings and participants',
@@ -119,7 +127,17 @@ export const tournament = {
     tournamentsFound: '{{count}} tournament{{count, plural, one {} other {s}}} found',
     noTournamentsAvailable: 'No tournaments available at this time',
     tryAdjustingFilters: 'Try adjusting the search filters',
-    clearFilters: 'Clear filters'
+    clearFilters: 'Clear filters',
+    loading: 'Loading tournaments...',
+    errorLoading: 'Error loading tournaments',
+    tryAgain: 'Try again',
+    gridView: 'Grid view',
+    listView: 'List view',
+    searchByNameAria: 'Search tournaments by name',
+    searchByLocationAria: 'Search by city or country',
+    sortByAria: 'Sort tournaments by',
+    clearAllFilters: 'Clear all filters',
+    tournamentsList: 'Tournaments list'
   },
   processing: {
     title: 'Tournament Processing',

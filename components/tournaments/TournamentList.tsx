@@ -26,6 +26,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 // Components
 import { TournamentFilters } from './TournamentFilters';
 import { TournamentCard } from './TournamentCard';
+import { TournamentDetailsModal } from './TournamentDetailsModal';
+import { useTournamentModal } from './useTournamentModal';
 
 // Types
 import { 
@@ -69,6 +71,7 @@ export function TournamentList({
   useTournamentFormatting();
   const router = useRouter();
   const currentSearchParams = useSearchParams();
+  const { selectedTournament, isModalOpen, openModal, closeModal } = useTournamentModal();
   
   // State
   const [showFilters, setShowFilters] = useState(false);
@@ -113,7 +116,7 @@ export function TournamentList({
 
   // Render loading state
   const renderLoadingState = () => (
-    <div className="space-y-6" role="status" aria-label="Cargando torneos">
+    <div className="space-y-6" role="status" aria-label={tTournaments('list.loading')}>
       <Card>
         <CardContent className="p-6">
           <div className="animate-pulse space-y-4">
@@ -134,7 +137,7 @@ export function TournamentList({
           <div key={i} className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
         ))}
       </div>
-      <span className="sr-only">Cargando torneos...</span>
+      <span className="sr-only">{tTournaments('list.loading')}</span>
     </div>
   );
 
@@ -143,7 +146,7 @@ export function TournamentList({
     <Card>
       <CardContent className="text-center py-12" role="alert">
         <div className="text-red-500 text-lg font-medium mb-2">
-          Error al cargar los torneos
+          {tTournaments('list.errorLoading')}
         </div>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
         <Button 
@@ -151,7 +154,7 @@ export function TournamentList({
           variant="outline"
           className="text-red-600 border-red-200 hover:bg-red-50"
         >
-          Intentar de nuevo
+          {tTournaments('list.tryAgain')}
         </Button>
       </CardContent>
     </Card>
@@ -186,7 +189,7 @@ export function TournamentList({
                   size="sm"
                   onClick={() => setViewMode('grid')}
                   className="rounded-r-none"
-                  aria-label="Vista de cuadrícula"
+                  aria-label={tTournaments('list.gridView')}
                   aria-pressed={viewMode === 'grid'}
                 >
                   <Grid className="h-4 w-4" />
@@ -196,7 +199,7 @@ export function TournamentList({
                   size="sm"
                   onClick={() => setViewMode('list')}
                   className="rounded-l-none"
-                  aria-label="Vista de lista"
+                  aria-label={tTournaments('list.listView')}
                   aria-pressed={viewMode === 'list'}
                 >
                   <List className="h-4 w-4" />
@@ -216,7 +219,7 @@ export function TournamentList({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
-                  aria-label="Buscar torneos por nombre"
+                  aria-label={tTournaments('list.searchByNameAria')}
                 />
               </div>
               <div className="relative">
@@ -226,7 +229,7 @@ export function TournamentList({
                   value={locationQuery}
                   onChange={(e) => setLocationQuery(e.target.value)}
                   className="pl-10"
-                  aria-label="Buscar por ciudad o país"
+                  aria-label={tTournaments('list.searchByLocationAria')}
                 />
               </div>
               <div className="flex space-x-2">
@@ -272,7 +275,7 @@ export function TournamentList({
             value={searchParams.sort || 'date'}
             onChange={(e) => handleSortChange(e.target.value)}
             className="text-sm border rounded px-3 py-1 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
-            aria-label="Ordenar torneos por"
+            aria-label={tTournaments('list.sortByAria')}
           >
             <option value="date">{tTournaments('list.date')}</option>
             <option value="name">{tTournaments('list.name')}</option>
@@ -290,7 +293,7 @@ export function TournamentList({
             : 'space-y-4'
           }
           role="list"
-          aria-label="Lista de torneos"
+          aria-label={tTournaments('list.tournamentsList')}
         >
           {tournaments.map((tournament) => (
             <div key={tournament.id} role="listitem">
@@ -299,6 +302,7 @@ export function TournamentList({
                 viewMode={viewMode}
                 userRole={userRole}
                 showActions={true}
+                onViewDetails={openModal}
               />
             </div>
           ))}
@@ -317,7 +321,7 @@ export function TournamentList({
               }
             </p>
             {hasActiveFilters && (
-              <Button onClick={clearFilters} aria-label="Limpiar todos los filtros">
+              <Button onClick={clearFilters} aria-label={tTournaments('list.clearAllFilters')}>
                 {tTournaments('list.clearFilters')}
               </Button>
             )}
@@ -363,6 +367,14 @@ export function TournamentList({
           </Button>
         </div>
       )}
+
+      {/* Tournament Details Modal */}
+      <TournamentDetailsModal
+        tournament={selectedTournament}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        userRole={userRole}
+      />
     </div>
   );
 }

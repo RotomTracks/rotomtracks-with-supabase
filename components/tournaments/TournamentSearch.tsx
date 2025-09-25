@@ -302,7 +302,7 @@ export function TournamentSearch({
                 setShowSuggestions(true);
               }
             }}
-            className="pl-10 pr-10 py-3 text-base sm:text-lg rounded-xl bg-white dark:bg-gray-900 placeholder:text-sm sm:placeholder:text-base responsive-placeholder"
+            className="pl-10 pr-10 py-3 text-base sm:text-lg rounded-xl bg-white dark:bg-gray-800 placeholder:text-sm sm:placeholder:text-base responsive-placeholder"
             style={{
               '--mobile-placeholder': `"${mobilePlaceholder}"`,
               '--desktop-placeholder': `"${desktopPlaceholder}"`

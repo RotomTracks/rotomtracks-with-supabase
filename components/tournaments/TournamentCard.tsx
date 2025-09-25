@@ -50,6 +50,7 @@ interface TournamentCardProps {
   userRole: UserRole | 'authenticated' | 'guest';
   showActions?: boolean;
   className?: string;
+  onViewDetails?: (tournament: Tournament) => void;
 }
 
 export function TournamentCard({ 
@@ -57,7 +58,8 @@ export function TournamentCard({
   viewMode = 'grid', 
   userRole, 
   showActions = true,
-  className = ''
+  className = '',
+  onViewDetails
 }: TournamentCardProps) {
   // Use centralized formatting utilities
   const { formatDate, formatTime } = useTournamentFormatting();
@@ -162,15 +164,26 @@ export function TournamentCard({
               {canRegister && userRole === 'authenticated' && (
                 <Button size="sm">
                   <UserPlus className="h-4 w-4 mr-1" />
-                  Registrarse
+                  {tTournaments('actions.register')}
                 </Button>
               )}
-              <Link href={`/tournaments/${tournament.id}`}>
-                <Button size="sm" variant="outline">
+              {onViewDetails ? (
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => onViewDetails(tournament)}
+                >
                   <Eye className="h-4 w-4 mr-1" />
-                  Ver Detalles
+                  {tTournaments('actions.viewDetails')}
                 </Button>
-              </Link>
+              ) : (
+                <Link href={`/tournaments/${tournament.id}`}>
+                  <Button size="sm" variant="outline">
+                    <Eye className="h-4 w-4 mr-1" />
+                    {tTournaments('actions.viewDetails')}
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </CardContent>
@@ -229,7 +242,7 @@ export function TournamentCard({
           <div className="flex items-center space-x-2 text-sm">
             <Users className="h-4 w-4 text-gray-600" />
             <span className={getCapacityColor(tournament.current_players, tournament.max_players)}>
-              {tournament.current_players} participantes
+              {tournament.current_players} {tTournaments('actions.participants')}
               {tournament.max_players && (
                 <span className="text-gray-500"> / {tournament.max_players}</span>
               )}
@@ -264,24 +277,36 @@ export function TournamentCard({
             {canRegister && userRole === 'authenticated' && !tournament.registration_status && (
               <Button size="sm" className="flex-1">
                 <UserPlus className="h-4 w-4 mr-1" />
-                Registrarse
+                {tTournaments('actions.register')}
               </Button>
             )}
             
             {tournament.user_role === 'organizer' && (
               <Link href={`/tournaments/${tournament.id}/manage`} className="flex-1">
                 <Button size="sm" className="w-full">
-                  Gestionar
+                  {tTournaments('actions.manage')}
                 </Button>
               </Link>
             )}
             
-            <Link href={`/tournaments/${tournament.id}`} className={tournament.user_role === 'organizer' ? '' : 'flex-1'}>
-              <Button size="sm" variant="outline" className="w-full">
+            {onViewDetails ? (
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className={`w-full ${tournament.user_role === 'organizer' ? '' : 'flex-1'}`}
+                onClick={() => onViewDetails(tournament)}
+              >
                 <Eye className="h-4 w-4 mr-1" />
-                Ver Detalles
+                {tTournaments('actions.viewDetails')}
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/tournaments/${tournament.id}`} className={tournament.user_role === 'organizer' ? '' : 'flex-1'}>
+                <Button size="sm" variant="outline" className="w-full">
+                  <Eye className="h-4 w-4 mr-1" />
+                  {tTournaments('actions.viewDetails')}
+                </Button>
+              </Link>
+            )}
           </div>
         )}
         
@@ -289,7 +314,7 @@ export function TournamentCard({
           <div className="mt-2">
             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
               <UserPlus className="h-3 w-3 mr-1" />
-              Registro Abierto
+              {tTournaments('actions.registrationOpen')}
             </Badge>
           </div>
         )}
