@@ -248,6 +248,7 @@ export const PROTECTED_ROUTES = {
     '/auth/sign-up',
     '/auth/sign-up-success',
     '/auth/confirm',
+    '/auth/reset-password',
     '/auth/error',
     '/tournaments/search',
     '/tournaments/[id]', // Tournament details are public

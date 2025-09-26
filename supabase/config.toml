@@ -16,7 +16,9 @@ additional_redirect_urls = [
   "https://www.rotomtracks.es",
   "https://rotomtracks.cat",
   "https://www.rotomtracks.cat",
-  "https://rotomtracks-with-supabase.vercel.app"
+  "https://rotomtracks-with-supabase.vercel.app",
+  "https://rotomtracks-with-supabase.vercel.app/auth/reset-password",
+  "https://rotomtracks-with-supabase.vercel.app/auth/confirm"
 ]
 jwt_expiry = 3600
 enable_signup = true
