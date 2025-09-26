@@ -35,133 +35,6 @@ export function useFileUpload({
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [activeUploads, setActiveUploads] = useState<Set<string>>(new Set());
 
-  // Add files to upload queue
-  const addFiles = useCallback((newFiles: File[]) => {
-    const uploadFiles: UploadFile[] = newFiles.map(file => ({
-      file,
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      progress: 0,
-      status: 'pending' as const,
-    }));
-
-    setFiles(prev => [...prev, ...uploadFiles]);
-    
-    // Start uploading files (respecting concurrent limit)
-    uploadFiles.forEach(uploadFile => {
-      if (activeUploads.size < maxConcurrentUploads) {
-        startUpload(uploadFile);
-      }
-    });
-
-    return uploadFiles;
-  }, [activeUploads.size, maxConcurrentUploads]);
-
-  // Start uploading a file
-  const startUpload = useCallback(async (uploadFile: UploadFile) => {
-    if (activeUploads.has(uploadFile.id)) return;
-
-    setActiveUploads(prev => new Set([...prev, uploadFile.id]));
-    
-    // Update status to uploading
-    setFiles(prev => prev.map(f => 
-      f.id === uploadFile.id 
-        ? { ...f, status: 'uploading' as const }
-        : f
-    ));
-
-    try {
-      const formData = new FormData();
-      formData.append('file', uploadFile.file);
-      formData.append('tournamentId', tournamentId);
-
-      // Create XMLHttpRequest for progress tracking
-      const xhr = new XMLHttpRequest();
-      
-      // Track upload progress
-      xhr.upload.addEventListener('progress', (event) => {
-        if (event.lengthComputable) {
-          const progress = Math.round((event.loaded / event.total) * 100);
-          
-          setFiles(prev => prev.map(f => 
-            f.id === uploadFile.id 
-              ? { ...f, progress }
-              : f
-          ));
-
-          onUploadProgress?.(progress, uploadFile);
-        }
-      });
-
-      // Handle completion
-      xhr.addEventListener('load', () => {
-        setActiveUploads(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(uploadFile.id);
-          return newSet;
-        });
-
-        if (xhr.status === 200) {
-          try {
-            const response = JSON.parse(xhr.responseText);
-            
-            const result = {
-              fileId: response.fileId,
-              fileName: response.fileName,
-              fileSize: response.fileSize,
-              fileType: response.fileType,
-              uploadPath: response.uploadPath,
-            };
-
-            setFiles(prev => prev.map(f => 
-              f.id === uploadFile.id 
-                ? { 
-                    ...f, 
-                    status: 'completed' as const, 
-                    progress: 100,
-                    result 
-                  }
-                : f
-            ));
-
-            onUploadComplete?.(response.fileId, response.fileName, result);
-            
-            // Start next upload if there are pending files
-            startNextUpload();
-            
-          } catch (error) {
-            handleUploadError(uploadFile, 'Invalid server response');
-          }
-        } else {
-          let errorMessage = `Upload failed with status ${xhr.status}`;
-          try {
-            const errorResponse = JSON.parse(xhr.responseText);
-            errorMessage = errorResponse.message || errorMessage;
-          } catch {
-            // Use default error message
-          }
-          handleUploadError(uploadFile, errorMessage);
-        }
-      });
-
-      // Handle errors
-      xhr.addEventListener('error', () => {
-        handleUploadError(uploadFile, 'Network error during upload');
-      });
-
-      xhr.addEventListener('abort', () => {
-        handleUploadError(uploadFile, 'Upload was cancelled');
-      });
-
-      // Start upload
-      xhr.open('POST', `/api/tournaments/${tournamentId}/upload`);
-      xhr.send(formData);
-
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      handleUploadError(uploadFile, errorMessage);
-    }
-  }, [tournamentId, activeUploads, onUploadComplete, onUploadProgress]);
-
   // Handle upload errors
   const handleUploadError = useCallback((uploadFile: UploadFile, errorMessage: string) => {
     setActiveUploads(prev => {
@@ -194,7 +67,111 @@ export function useFileUpload({
     if (pendingFile) {
       startUpload(pendingFile);
     }
-  }, [files, activeUploads.size, maxConcurrentUploads, startUpload]);
+  }, [files, activeUploads.size, maxConcurrentUploads]);
+
+  // Start uploading a file
+  const startUpload = useCallback(async (uploadFile: UploadFile) => {
+    if (activeUploads.has(uploadFile.id)) return;
+
+    setActiveUploads(prev => new Set([...prev, uploadFile.id]));
+    
+    // Update status to uploading
+    setFiles(prev => prev.map(f => 
+      f.id === uploadFile.id 
+        ? { ...f, status: 'uploading' as const }
+        : f
+    ));
+
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile.file);
+      formData.append('tournamentId', tournamentId);
+
+      // Create XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      
+      // Track upload progress
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          setFiles(prev => prev.map(f => 
+            f.id === uploadFile.id 
+              ? { ...f, progress }
+              : f
+          ));
+          onUploadProgress?.(progress, uploadFile);
+        }
+      });
+
+      // Handle completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+          try {
+            const result = JSON.parse(xhr.responseText);
+            const updatedFile = {
+              ...uploadFile,
+              status: 'completed' as const,
+              progress: 100,
+              result: result.data,
+            };
+
+            setFiles(prev => prev.map(f => 
+              f.id === uploadFile.id ? updatedFile : f
+            ));
+
+            setActiveUploads(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(uploadFile.id);
+              return newSet;
+            });
+
+            onUploadComplete?.(result.data.fileId, result.data.fileName, result.data);
+            
+            // Start next upload if there are pending files
+            startNextUpload();
+          } catch (error) {
+            handleUploadError(uploadFile, 'Error parsing response');
+          }
+        } else {
+          handleUploadError(uploadFile, `Upload failed with status ${xhr.status}`);
+        }
+      });
+
+      // Handle errors
+      xhr.addEventListener('error', () => {
+        handleUploadError(uploadFile, 'Network error during upload');
+      });
+
+      // Start upload
+      xhr.open('POST', '/api/tournaments/upload');
+      xhr.send(formData);
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      handleUploadError(uploadFile, errorMessage);
+    }
+  }, [tournamentId, activeUploads, onUploadComplete, onUploadProgress, handleUploadError, startNextUpload]);
+
+  // Add files to upload queue
+  const addFiles = useCallback((newFiles: File[]) => {
+    const uploadFiles: UploadFile[] = newFiles.map(file => ({
+      file,
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      progress: 0,
+      status: 'pending' as const,
+    }));
+
+    setFiles(prev => [...prev, ...uploadFiles]);
+    
+    // Start uploading files (respecting concurrent limit)
+    uploadFiles.forEach(uploadFile => {
+      if (activeUploads.size < maxConcurrentUploads) {
+        startUpload(uploadFile);
+      }
+    });
+
+    return uploadFiles;
+  }, [activeUploads.size, maxConcurrentUploads, startUpload]);
 
   // Retry failed upload
   const retryUpload = useCallback((fileId: string) => {
@@ -222,10 +199,7 @@ export function useFileUpload({
       newSet.delete(fileId);
       return newSet;
     });
-    
-    // Start next upload if there are pending files
-    setTimeout(startNextUpload, 0);
-  }, [startNextUpload]);
+  }, []);
 
   // Clear all files
   const clearFiles = useCallback(() => {
@@ -233,32 +207,13 @@ export function useFileUpload({
     setActiveUploads(new Set());
   }, []);
 
-  // Get upload statistics
-  const getStats = useCallback(() => {
-    const total = files.length;
-    const completed = files.filter(f => f.status === 'completed').length;
-    const failed = files.filter(f => f.status === 'error').length;
-    const uploading = files.filter(f => f.status === 'uploading').length;
-    const pending = files.filter(f => f.status === 'pending').length;
-
-    return {
-      total,
-      completed,
-      failed,
-      uploading,
-      pending,
-      isComplete: total > 0 && completed === total,
-      hasErrors: failed > 0,
-      isUploading: uploading > 0 || pending > 0,
-    };
-  }, [files]);
-
   return {
     files,
     addFiles,
-    retryUpload,
     removeFile,
+    retryUpload,
     clearFiles,
-    stats: getStats(),
+    isUploading: activeUploads.size > 0,
+    uploadProgress: files.length > 0 ? files.reduce((acc, file) => acc + file.progress, 0) / files.length : 0,
   };
 }

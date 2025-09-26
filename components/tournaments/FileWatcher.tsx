@@ -66,7 +66,7 @@ export function FileWatcher({ tournamentId, onFileUpload }: FileWatcherProps) {
     }
 
     try {
-      // @ts-ignore - File System Access API
+      // @ts-expect-error - File System Access API
       const [fileHandle] = await window.showOpenFilePicker({
         types: [
           {
@@ -109,7 +109,7 @@ export function FileWatcher({ tournamentId, onFileUpload }: FileWatcherProps) {
       saveWatchedFiles(newFiles);
 
       // Store file handle for future access (limited browser support)
-      // @ts-ignore
+      // @ts-expect-error - File System Access API file handle storage
       watchedFile._fileHandle = fileHandle;
 
     } catch (error) {
@@ -126,9 +126,9 @@ export function FileWatcher({ tournamentId, onFileUpload }: FileWatcherProps) {
       const watchedFile = updatedFiles[i];
       
       try {
-        // @ts-ignore
+        // @ts-expect-error - File System Access API file handle access
         if (watchedFile._fileHandle) {
-          // @ts-ignore
+          // @ts-expect-error - File System Access API file retrieval
           const file = await watchedFile._fileHandle.getFile();
           
           // Check if file has been modified
@@ -203,9 +203,9 @@ export function FileWatcher({ tournamentId, onFileUpload }: FileWatcherProps) {
     const watchedFile = watchedFiles[index];
     
     try {
-      // @ts-ignore
+      // @ts-expect-error - File System Access API file handle access
       if (watchedFile._fileHandle) {
-        // @ts-ignore
+        // @ts-expect-error - File System Access API file retrieval
         const file = await watchedFile._fileHandle.getFile();
         
         const newFiles = [...watchedFiles];

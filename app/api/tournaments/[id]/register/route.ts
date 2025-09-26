@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
-import { TDFUtils } from '@/lib/tdf';
 import { ErrorCodes } from '@/lib/types/tournament';
 import {
-  withErrorHandling,
-  generateRequestId,
-  handleValidationError,
   handleSupabaseError,
   createErrorResponse
 } from '@/lib/utils/api-error-handler';
-import {
-  createParticipantResponse,
-  createSuccessResponse
-} from '@/lib/utils/api-response-formatter';
 
 // Validation schema for player registration - simplified since user data comes from profile
 const registrationSchema = z.object({
@@ -161,6 +153,7 @@ export async function POST(
     try {
       const { emailService } = await import('@/lib/services/email');
       await emailService.sendRegistrationConfirmation({
+        to: user.email!,
         participantName: participant.player_name || participant.email,
         tournamentName: tournament.name,
         tournamentDate: new Date(tournament.start_date).toLocaleDateString('es-ES'),

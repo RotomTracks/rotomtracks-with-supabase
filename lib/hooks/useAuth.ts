@@ -124,7 +124,7 @@ export function useAuth(): UseAuthReturn {
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchUserAndProfile, supabase.auth]);
 
   return {
     user,

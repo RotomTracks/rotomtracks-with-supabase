@@ -6,14 +6,10 @@ import {
   withErrorHandling,
   generateRequestId,
   handleSupabaseError,
-  handleFileUploadError,
   validateAuthentication,
   validateUserRole,
   createErrorResponse
 } from '@/lib/utils/api-error-handler';
-import {
-  createTournamentResponse
-} from '@/lib/utils/api-response-formatter';
 
 // POST /api/tournaments/tdf-upload - Create tournament from TDF file
 export const POST = withErrorHandling(async (request: NextRequest) => {
@@ -110,7 +106,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   let tournamentType: TournamentType;
   try {
     tournamentType = TDFParser.mapTournamentType(metadata.gametype, metadata.mode);
-  } catch (error) {
+  } catch {
     return createErrorResponse(
       ErrorCodes.INVALID_FILE_FORMAT,
       'Tipo de torneo no soportado',
@@ -149,7 +145,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   let startDate: string;
   try {
     startDate = TDFUtils.convertTDFDateToISO(metadata.startdate);
-  } catch (error) {
+  } catch {
     return createErrorResponse(
       ErrorCodes.INVALID_FILE_FORMAT,
       'Formato de fecha de inicio inválido en TDF',
@@ -223,7 +219,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     }
 
     // Process TDF players - only import those with existing accounts
-    let importReport: TDFImportReport = {
+    const importReport: TDFImportReport = {
       total_participants: players.length,
       imported_participants: 0,
       skipped_participants: 0,

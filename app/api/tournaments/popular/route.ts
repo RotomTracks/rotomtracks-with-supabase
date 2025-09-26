@@ -93,10 +93,11 @@ export async function GET(request: NextRequest) {
       const userCity = searchParams.get('city');
       const userCountry = searchParams.get('country');
       
-      const userLocation = (userCity || userCountry) ? {
-        city: userCity || undefined,
-        country: userCountry || undefined
-      } : undefined;
+      // User location is available but not currently used in the response
+      // const userLocation = (userCity || userCountry) ? {
+      //   city: userCity || undefined,
+      //   country: userCountry || undefined
+      // } : undefined;
 
       // Get popular tournament types with statistics
       const popularTypes = await getPopularTournamentTypes(supabase, maxPerCategory);
@@ -129,7 +130,7 @@ export async function GET(request: NextRequest) {
 
 // Helper function to get tournament type suggestions
 async function getTournamentTypeSuggestions(
-  supabase: any, 
+  supabase: Awaited<ReturnType<typeof createClient>>, 
   limit: number
 ): Promise<PopularSuggestion[]> {
   try {
@@ -183,7 +184,7 @@ async function getTournamentTypeSuggestions(
 
 // Helper function to get location suggestions
 async function getLocationSuggestions(
-  supabase: any, 
+  supabase: Awaited<ReturnType<typeof createClient>>, 
   limit: number, 
   userLocation?: { city?: string; country?: string }
 ): Promise<PopularSuggestion[]> {
@@ -263,7 +264,7 @@ async function getLocationSuggestions(
 
 // Helper function to get trending suggestions
 async function getTrendingSuggestions(
-  supabase: any, 
+  supabase: Awaited<ReturnType<typeof createClient>>, 
   limit: number
 ): Promise<PopularSuggestion[]> {
   try {
@@ -322,7 +323,7 @@ async function getTrendingSuggestions(
 }
 
 // Helper function to get popular tournament types with statistics
-async function getPopularTournamentTypes(supabase: any, limit: number) {
+async function getPopularTournamentTypes(supabase: Awaited<ReturnType<typeof createClient>>, limit: number) {
   try {
     const { data: typeCounts, error } = await supabase
       .from('tournaments')
@@ -379,7 +380,7 @@ async function getPopularTournamentTypes(supabase: any, limit: number) {
 }
 
 // Helper function to get recent activity
-async function getRecentActivity(supabase: any, limit: number) {
+async function getRecentActivity(supabase: Awaited<ReturnType<typeof createClient>>, limit: number) {
   try {
     const { data: recentTournaments, error } = await supabase
       .from('tournaments')
@@ -443,7 +444,7 @@ function getFallbackLocationSuggestions(
   limit: number, 
   userLocation?: { city?: string; country?: string }
 ): PopularSuggestion[] {
-  let fallbackLocations = [
+  const fallbackLocations = [
     { id: 'location-madrid', name: 'Madrid', count: 38, icon: '🏛️' },
     { id: 'location-barcelona', name: 'Barcelona', count: 29, icon: '🏖️' },
     { id: 'location-valencia', name: 'Valencia', count: 18, icon: '🍊' },

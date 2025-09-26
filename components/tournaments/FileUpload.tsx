@@ -53,7 +53,7 @@ export function FileUpload({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { files, addFiles, retryUpload, removeFile, clearFiles, stats } = useFileUpload({
+  const { files, addFiles, retryUpload, removeFile, clearFiles } = useFileUpload({
     tournamentId,
     onUploadComplete: (fileId, fileName, result) => {
       onUploadComplete(fileId, fileName);
@@ -196,21 +196,21 @@ export function FileUpload({
       </div>
 
       {/* Upload Statistics */}
-      {stats.total > 0 && (
+      {files.length > 0 && (
         <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div className="flex items-center space-x-4 text-sm">
             <span className="text-gray-600 dark:text-gray-400">
-              {stats.completed}/{stats.total} completados
+              {files.filter(f => f.status === 'completed').length}/{files.length} completados
             </span>
-            {stats.failed > 0 && (
+            {files.filter(f => f.status === 'error').length > 0 && (
               <span className="text-red-600">
-                {stats.failed} fallidos
+                {files.filter(f => f.status === 'error').length} fallidos
               </span>
             )}
-            {stats.uploading > 0 && (
+            {files.filter(f => f.status === 'uploading').length > 0 && (
               <span className="text-blue-600 flex items-center">
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                {stats.uploading} subiendo
+                {files.filter(f => f.status === 'uploading').length} subiendo
               </span>
             )}
           </div>
@@ -219,7 +219,7 @@ export function FileUpload({
             size="sm"
             variant="outline"
             onClick={clearFiles}
-            disabled={stats.isUploading}
+            disabled={files.some(f => f.status === 'uploading')}
             aria-label="Limpiar todos los archivos"
           >
             Limpiar todo
@@ -317,7 +317,7 @@ export function FileUpload({
       )}
 
       {/* Upload Status */}
-      {stats.isUploading && (
+      {files.some(f => f.status === 'uploading') && (
         <Alert role="status">
           <Upload className="h-4 w-4" />
           <AlertDescription>
@@ -326,7 +326,7 @@ export function FileUpload({
         </Alert>
       )}
 
-      {stats.hasErrors && (
+      {files.some(f => f.status === 'error') && (
         <Alert variant="destructive" role="alert">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -335,7 +335,7 @@ export function FileUpload({
         </Alert>
       )}
 
-      {stats.isComplete && stats.total > 0 && (
+      {files.length > 0 && files.every(f => f.status === 'completed') && (
         <Alert role="status">
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>

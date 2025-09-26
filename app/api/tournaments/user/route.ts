@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { withErrorHandling, generateRequestId, handleSupabaseError, validateAuthentication } from '@/lib/utils/api-error-handler';
 
 // GET /api/tournaments/user - Get user's tournaments (both organizing and participating)
-export const GET = withErrorHandling(async (request: NextRequest) => {
+export const GET = withErrorHandling(async () => {
   const requestId = generateRequestId();
   const supabase = await createClient();
 

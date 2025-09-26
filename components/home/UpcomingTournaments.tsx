@@ -79,7 +79,7 @@ export function UpcomingTournaments({ user, userLocation, limit = 6, onTournamen
     };
 
     fetchUpcomingTournaments();
-  }, [userLocation, limit, tCommon, tTournaments]);
+  }, [userLocation, limit, tCommon, tTournaments, tUI]);
 
   if (loading) {
     return (

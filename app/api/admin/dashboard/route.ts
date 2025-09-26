@@ -7,7 +7,7 @@
  * @author RotomTracks Development Team
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { AdminDashboardMetrics, AdminActivity, AdminActionType, OrganizerRequestStatus } from '@/lib/types/tournament';
 import {

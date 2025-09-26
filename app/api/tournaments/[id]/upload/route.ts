@@ -114,7 +114,7 @@ export async function POST(
         if (summary.name !== tournament.name) {
           // Tournament name mismatch - could be intentional
         }
-      } catch (error) {
+      } catch {
         // Could not extract tournament summary - not critical
       }
     }

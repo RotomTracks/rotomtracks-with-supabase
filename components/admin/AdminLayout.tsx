@@ -3,9 +3,8 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Shield, BarChart3, Users, Settings, Home, ArrowLeft } from 'lucide-react';
+import { Shield, BarChart3, Users, Settings, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useTypedTranslation } from '@/lib/i18n';

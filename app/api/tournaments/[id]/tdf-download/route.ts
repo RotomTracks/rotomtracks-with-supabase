@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TDFGenerator, mapTournamentTypeToTDF, generateOrganizerPOPID } from '@/lib/tdf';
 import { formatTDFDate, formatTDFTimestamp } from '@/lib/tdf/utils';
+import { Tournament, TournamentParticipant } from '@/lib/types/tournament';
 
 /**
  * Generate a unique TDF user ID for players
@@ -352,7 +353,7 @@ export async function POST(
 
         const originalXMLContent = await originalTDFData!.text();
         generatedTDF = TDFGenerator.updateTDFWithPlayers(originalXMLContent, tdfParticipants);
-      } catch (error) {
+      } catch {
         generatedTDF = generateTDFFromScratch(tournament, tdfParticipants);
       }
     } else {

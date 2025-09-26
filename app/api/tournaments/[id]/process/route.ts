@@ -248,14 +248,14 @@ export async function GET(
 
 // Process tournament file and update database
 async function processTournamentFile(
-  supabase: any,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   tournamentId: string,
   fileContent: string,
   options: { generateReport: boolean; updateData: boolean }
-): Promise<{ success: boolean; error?: string; data?: any }> {
+): Promise<{ success: boolean; error?: string; data?: { updatedParticipants: number; updatedMatches: number; updatedResults: number; reportUrl?: string; processingTime?: string } }> {
   try {
     // Parse TDF file
-    const { tournament, players: participants, matches, standings: results } = TDFParser.parse(fileContent);
+    const { players: participants, matches, standings: results } = TDFParser.parse(fileContent);
 
     let updatedParticipants = 0;
     let updatedMatches = 0;
@@ -355,56 +355,57 @@ async function processTournamentFile(
         }
 
         // Convert TDF data to database format for report generation
-        const mappedParticipants = participants.map((p, index) => ({
-          id: `temp-${index}`,
-          tournament_id: tournamentId,
-          user_id: `temp-user-${index}`,
-          player_name: p.name,
-          player_id: p.id,
-          registration_date: new Date().toISOString(),
-          status: ParticipantStatus.CHECKED_IN
-        }));
+        // TODO: Implement report generation with mapped data
+        // const mappedParticipants = participants.map((p, index) => ({
+        //   id: `temp-${index}`,
+        //   tournament_id: tournamentId,
+        //   user_id: `temp-user-${index}`,
+        //   player_name: p.name,
+        //   player_id: p.id,
+        //   registration_date: new Date().toISOString(),
+        //   status: ParticipantStatus.CHECKED_IN
+        // }));
 
         // Function to map TDF result to MatchOutcome
-        const mapTDFResultToOutcome = (result: string): MatchOutcome => {
-          switch (result) {
-            case '1-0':
-              return MatchOutcome.PLAYER1_WINS;
-            case '0-1':
-              return MatchOutcome.PLAYER2_WINS;
-            case '0.5-0.5':
-              return MatchOutcome.DRAW;
-            case 'bye':
-              return MatchOutcome.BYE;
-            default:
-              return MatchOutcome.PLAYER1_WINS; // Default fallback
-          }
-        };
+        // const mapTDFResultToOutcome = (result: string): MatchOutcome => {
+        //   switch (result) {
+        //     case '1-0':
+        //       return MatchOutcome.PLAYER1_WINS;
+        //     case '0-1':
+        //       return MatchOutcome.PLAYER2_WINS;
+        //     case '0.5-0.5':
+        //       return MatchOutcome.DRAW;
+        //     case 'bye':
+        //       return MatchOutcome.BYE;
+        //     default:
+        //       return MatchOutcome.PLAYER1_WINS; // Default fallback
+        //   }
+        // };
 
-        const mappedMatches = matches.map((m, index) => ({
-          id: `temp-${index}`,
-          tournament_id: tournamentId,
-          round_number: m.round,
-          table_number: m.table,
-          player1_id: m.player1,
-          player2_id: m.player2,
-          outcome: mapTDFResultToOutcome(m.result),
-          match_status: MatchStatus.COMPLETED,
-          created_at: new Date().toISOString()
-        }));
+        // const mappedMatches = matches.map((m, index) => ({
+        //   id: `temp-${index}`,
+        //   tournament_id: tournamentId,
+        //   round_number: m.round,
+        //   table_number: m.table,
+        //   player1_id: m.player1,
+        //   player2_id: m.player2,
+        //   outcome: mapTDFResultToOutcome(m.result),
+        //   match_status: MatchStatus.COMPLETED,
+        //   created_at: new Date().toISOString()
+        // }));
 
-        const mappedResults = results.map((r, index) => ({
-          id: `temp-${index}`,
-          tournament_id: tournamentId,
-          participant_id: r.id,
-          wins: r.wins,
-          losses: r.losses,
-          draws: r.draws,
-          byes: 0,
-          final_standing: r.placement,
-          points: r.points,
-          created_at: new Date().toISOString()
-        }));
+        // const mappedResults = results.map((r, index) => ({
+        //   id: `temp-${index}`,
+        //   tournament_id: tournamentId,
+        //   participant_id: r.id,
+        //   wins: r.wins,
+        //   losses: r.losses,
+        //   draws: r.draws,
+        //   byes: 0,
+        //   final_standing: r.placement,
+        //   points: r.points,
+        //   created_at: new Date().toISOString()
+        // }));
 
         const htmlContent = await generateHTMLReport({
           tournament: fullTournament,
@@ -447,7 +448,7 @@ async function processTournamentFile(
               uploaded_by: null, // System generated
             });
         }
-      } catch (reportError) {
+      } catch {
         // HTML report generation failed - not critical for processing
       }
     }
@@ -455,10 +456,10 @@ async function processTournamentFile(
     return {
       success: true,
       data: {
-        participants: updatedParticipants,
-        matches: updatedMatches,
-        results: updatedResults,
-        reportUrl,
+        updatedParticipants,
+        updatedMatches,
+        updatedResults,
+        reportUrl: reportUrl || undefined,
         processingTime: new Date().toISOString(),
       },
     };

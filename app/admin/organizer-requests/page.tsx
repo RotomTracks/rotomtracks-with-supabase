@@ -113,7 +113,7 @@ function AdminOrganizerRequestsContent() {
 
   useEffect(() => {
     fetchRequests();
-  }, [currentPage, statusFilter, searchTerm]);
+  }, [currentPage, statusFilter, searchTerm, fetchRequests]);
 
   const getStatusBadge = (status: OrganizerRequestStatus) => {
     switch (status) {

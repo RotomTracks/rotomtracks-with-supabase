@@ -10,7 +10,6 @@ import {
   CheckCircle, 
   XCircle, 
   Eye, 
-  TrendingUp,
   Activity,
   AlertCircle,
   RefreshCw,
@@ -93,7 +92,7 @@ export function AdminDashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [fetchDashboardData]);
 
   const getStatusIcon = (status: OrganizerRequestStatus) => {
     switch (status) {

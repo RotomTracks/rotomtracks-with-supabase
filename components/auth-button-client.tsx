@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "./ui/button";
 import { useTypedTranslation } from "@/lib/i18n";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { UserMenu } from "./user-menu";

@@ -294,7 +294,7 @@ async function handleUpdateExistingTournament(
     }
 
     // Re-process tournament data
-    const { tournament: updatedTournament, players: participants, matches, standings: results } = TDFParser.parse(fileContent);
+    const { players: participants, matches, standings: results } = TDFParser.parse(fileContent);
 
     // Update participants (replace existing)
     await supabase

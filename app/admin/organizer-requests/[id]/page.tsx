@@ -158,7 +158,7 @@ export default function AdminOrganizerRequestDetailPage() {
     if (requestId) {
       fetchRequest();
     }
-  }, [requestId]);
+  }, [requestId, fetchRequest]);
 
   const getStatusBadge = (status: OrganizerRequestStatus) => {
     switch (status) {

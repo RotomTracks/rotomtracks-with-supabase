@@ -155,7 +155,7 @@ export function ProcessingStatus({
       setError(tTournaments('processing.connectionError'));
       setIsProcessing(false);
     }
-  }, [tournamentId, fileId, onProcessingComplete, loadJobs]);
+  }, [tournamentId, fileId, onProcessingComplete, loadJobs, tTournaments]);
 
   // Cancel processing
   const cancelProcessing = useCallback(async () => {
@@ -179,7 +179,7 @@ export function ProcessingStatus({
     } catch (error) {
       setError(tTournaments('processing.connectionError'));
     }
-  }, [activeJob, tournamentId, loadJobs]);
+  }, [activeJob, tournamentId, loadJobs, tTournaments]);
 
   // Load jobs on mount
   useEffect(() => {

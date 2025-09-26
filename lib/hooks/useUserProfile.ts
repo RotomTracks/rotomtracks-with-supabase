@@ -129,7 +129,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
 
   useEffect(() => {
     fetchProfile();
-  }, [user?.id]);
+  }, [user?.id, fetchProfile]);
 
   return {
     profile,

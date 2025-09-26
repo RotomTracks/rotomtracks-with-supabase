@@ -93,10 +93,10 @@ export const PUT = withErrorHandling(async (
   
   // Remove fields that shouldn't be updated directly
   const { 
-    id: _, 
-    organizer_id, 
-    created_at, 
-    current_players, // This should be managed by the system
+    id: _id, 
+    organizer_id: _organizer_id, 
+    created_at: _created_at, 
+    current_players: _current_players, // This should be managed by the system
     ...updateData 
   } = body;
   
