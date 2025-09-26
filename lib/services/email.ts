@@ -8,6 +8,7 @@ interface EmailData {
 }
 
 interface RegistrationEmailData {
+  to: string;
   participantName: string;
   tournamentName: string;
   tournamentDate: string;
@@ -162,7 +163,7 @@ export class EmailService {
     `;
 
     return {
-      to: data.participantName, // This should be the email address
+      to: data.to, // Use the email address from data.to
       subject,
       html,
       text
@@ -170,29 +171,44 @@ export class EmailService {
   }
 
   /**
-   * Send email using Supabase Edge Functions or external service
+   * Send email using MailerSend via Supabase function
    */
   private async sendEmail(emailData: EmailData): Promise<boolean> {
     try {
-      // For now, we'll use a simple approach with Supabase Edge Functions
-      // In a real implementation, you would use a service like SendGrid, Resend, or similar
+      // Use MailerSend function in Supabase
+      const { createClient } = await import('@/lib/supabase/server');
+      const supabase = await createClient();
       
-      // Log the email for development purposes
-      console.log('Email would be sent:', {
-        to: emailData.to,
-        subject: emailData.subject,
-        // Don't log the full content for privacy
-        hasContent: !!emailData.html
+      const { data, error } = await supabase.rpc('send_email_mailersend', {
+        message: {
+          sender: 'no-reply@rotomtracks.es',
+          recipient: emailData.to,
+          subject: emailData.subject,
+          text_body: emailData.text || '',
+          html_body: emailData.html || ''
+        }
       });
 
-      // TODO: Implement actual email sending
-      // This could be done with:
-      // 1. Supabase Edge Functions calling an email service
-      // 2. Direct integration with SendGrid, Resend, etc.
-      // 3. Using a service like Postmark or Mailgun
+      if (error) {
+        console.error('Error sending email via MailerSend:', error);
+        return false;
+      }
+
+      // Check if the response indicates success (202 = accepted)
+      const response = typeof data === 'string' ? parseInt(data) : data;
+      const isSuccess = response === 202 || (typeof response === 'object' && response?.status === 202);
       
-      // For now, we'll simulate success
-      return true;
+      if (isSuccess) {
+        console.log('Email sent successfully via MailerSend:', {
+          to: emailData.to,
+          subject: emailData.subject,
+          messageId: typeof response === 'object' ? response?.content : 'unknown'
+        });
+        return true;
+      } else {
+        console.error('MailerSend returned non-success status:', response);
+        return false;
+      }
       
     } catch (error) {
       console.error('Error sending email:', error);

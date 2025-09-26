@@ -177,7 +177,10 @@ export const auth = {
     sessionExpired: "Your session has expired. Please sign in again",
     emailNotConfirmed: "Confirm your email before continuing",
     accountDisabled: "Your account has been disabled. Contact support",
-    passwordsDoNotMatch: "Passwords do not match"
+    passwordsDoNotMatch: "Passwords do not match",
+    rateLimitExceeded: "You have reached the email sending limit. Please wait a few minutes before trying again",
+    invalidEmail: "The provided email is not valid",
+    userNotFound: "No account found with this email"
   },
 
   // Success Messages

@@ -177,7 +177,10 @@ export const auth = {
     sessionExpired: "Tu sesión ha expirado. Inicia sesión nuevamente",
     emailNotConfirmed: "Confirma tu correo electrónico antes de continuar",
     accountDisabled: "Tu cuenta ha sido deshabilitada. Contacta soporte",
-    passwordsDoNotMatch: "Las contraseñas no coinciden"
+    passwordsDoNotMatch: "Las contraseñas no coinciden",
+    rateLimitExceeded: "Has alcanzado el límite de envío de emails. Por favor, espera unos minutos antes de intentar de nuevo",
+    invalidEmail: "El email proporcionado no es válido",
+    userNotFound: "No se encontró una cuenta con este email"
   },
 
   // Success Messages

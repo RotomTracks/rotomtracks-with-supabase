@@ -60,11 +60,11 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
       
       if (error instanceof Error) {
         if (error.message.includes('rate limit')) {
-          errorMessage = 'Has alcanzado el límite de envío de emails. Por favor, espera unos minutos antes de intentar de nuevo.';
+          errorMessage = tAuth('errors.rateLimitExceeded');
         } else if (error.message.includes('Invalid email')) {
-          errorMessage = 'El email proporcionado no es válido.';
+          errorMessage = tAuth('errors.invalidEmail');
         } else if (error.message.includes('User not found')) {
-          errorMessage = 'No se encontró una cuenta con este email.';
+          errorMessage = tAuth('errors.userNotFound');
         } else {
           errorMessage = error.message;
         }
@@ -92,7 +92,7 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
         <DialogTrigger asChild>
           {trigger || children || defaultTrigger}
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
@@ -118,7 +118,7 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
             </div>
             
             {error && (
-              <div className="text-sm text-red-500 bg-red-50 p-3 rounded-md border border-red-200">
+              <div className="text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-900/20 p-3 rounded-md border border-red-200 dark:border-red-800">
                 {error}
               </div>
             )}

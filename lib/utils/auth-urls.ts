@@ -38,7 +38,7 @@ export function getAuthBaseUrl(): string {
 export function getPasswordResetUrl(): string {
   // Always use production URL for password reset emails
   const productionUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rotomtracks-with-supabase.vercel.app';
-  return `${productionUrl}/auth/confirm?next=/auth/update-password`;
+  return `${productionUrl}/auth/confirm?type=recovery&next=/auth/update-password`;
 }
 
 /**
