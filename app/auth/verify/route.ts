@@ -14,11 +14,20 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
 
   try {
-    // Verify the token using Supabase
-    const { data, error } = await supabase.auth.verifyOtp({
-      type: type as any,
-      token_hash: token,
-    });
+    let data, error;
+
+    // Handle password recovery flow
+    if (type === 'recovery') {
+      // Use exchangeCodeForSession for password recovery
+      const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(token);
+      data = sessionData;
+      error = sessionError;
+    } else {
+      // For other types, try exchangeCodeForSession first
+      const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(token);
+      data = sessionData;
+      error = sessionError;
+    }
 
     if (error || !data.user) {
       console.error('Token verification error:', error);
