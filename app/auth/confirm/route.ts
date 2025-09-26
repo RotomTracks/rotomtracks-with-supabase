@@ -58,8 +58,8 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Redirect to the next URL or protected page
-      const redirectUrl = next.startsWith('/') ? next : '/protected'
+      // Redirect to the next URL or dashboard
+      const redirectUrl = next.startsWith('/') ? next : '/dashboard'
       return NextResponse.redirect(new URL(redirectUrl, request.url))
     } else {
       // Handle specific error cases

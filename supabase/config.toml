@@ -10,10 +10,13 @@ max_rows = 1000
 [auth]
 enabled = true
 port = 54324
-site_url = "http://localhost:3000"
+site_url = "https://rotomtracks.es"
 additional_redirect_urls = [
-  "https://localhost:3000",
-  "https://rotomtracks.vercel.app",
+  "http://localhost:3000",
+  "https://rotomtracks.es",
+  "https://www.rotomtracks.es",
+  "https://rotomtracks.cat",
+  "https://www.rotomtracks.cat",
   "https://rotomtracks-with-supabase.vercel.app"
 ]
 jwt_expiry = 3600
