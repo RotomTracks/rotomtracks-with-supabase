@@ -56,7 +56,21 @@ export function ForgotPasswordDialog({ trigger, children }: ForgotPasswordDialog
       setShowSuccessAlert(true);
       setEmail(""); // Reset form
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : tAuth('errors.generic'));
+      let errorMessage = tAuth('errors.generic');
+      
+      if (error instanceof Error) {
+        if (error.message.includes('rate limit')) {
+          errorMessage = 'Has alcanzado el límite de envío de emails. Por favor, espera unos minutos antes de intentar de nuevo.';
+        } else if (error.message.includes('Invalid email')) {
+          errorMessage = 'El email proporcionado no es válido.';
+        } else if (error.message.includes('User not found')) {
+          errorMessage = 'No se encontró una cuenta con este email.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

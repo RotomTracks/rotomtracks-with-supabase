@@ -63,13 +63,21 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(redirectUrl, request.url))
     } else {
       // Handle specific error cases
+      console.error('Token verification error:', error)
+      
       if (type === 'recovery') {
         // For recovery errors, redirect to forgot password with error message
         const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('error', 'expired_token')
-        loginUrl.searchParams.set('message', 'The recovery link has expired. Please request a new one.')
+        loginUrl.searchParams.set('message', 'The recovery link has expired or is invalid. Please request a new one.')
         return NextResponse.redirect(loginUrl)
       }
+      
+      // For other types, redirect to login with error
+      const loginUrl = new URL('/auth/login', request.url)
+      loginUrl.searchParams.set('error', 'invalid_token')
+      loginUrl.searchParams.set('message', 'The confirmation link is invalid or has expired.')
+      return NextResponse.redirect(loginUrl)
     }
   }
 
