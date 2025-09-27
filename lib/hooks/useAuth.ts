@@ -34,11 +34,8 @@ export function useAuth(): UseAuthReturn {
       setLoading(true);
       setError(null);
 
-      // Set user to null initially for faster loading
       setUser(null);
       setProfile(null);
-
-      // Get current user
       const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
       
       if (userError) {
@@ -49,7 +46,6 @@ export function useAuth(): UseAuthReturn {
 
       setUser(currentUser);
 
-      // If user exists, fetch their profile
       if (currentUser) {
         try {
           const { data: userProfile, error: profileError } = await supabase
@@ -92,7 +88,6 @@ export function useAuth(): UseAuthReturn {
     }
   };
 
-  // Helper functions
   const isAuthenticated = !!user;
   const isOrganizer = profile?.user_role === UserRole.ORGANIZER;
   const isPlayer = profile?.user_role === UserRole.PLAYER;
@@ -103,7 +98,6 @@ export function useAuth(): UseAuthReturn {
   };
 
   const canManageTournament = (organizerId: string): boolean => {
-    // Admins can manage any tournament, organizers can manage their own
     return isAuthenticated && (isAdmin || user?.id === organizerId);
   };
 
@@ -114,7 +108,6 @@ export function useAuth(): UseAuthReturn {
   useEffect(() => {
     fetchUserAndProfile();
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
@@ -124,7 +117,7 @@ export function useAuth(): UseAuthReturn {
     );
 
     return () => subscription.unsubscribe();
-  }, [fetchUserAndProfile, supabase.auth]);
+  }, []);
 
   return {
     user,

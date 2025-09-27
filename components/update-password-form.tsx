@@ -13,108 +13,64 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTypedTranslation } from "@/lib/i18n";
+
+interface UpdatePasswordFormProps extends React.ComponentPropsWithoutRef<"div"> {
+  userId: string;
+}
 
 export function UpdatePasswordForm({
   className,
+  userId,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: UpdatePasswordFormProps) {
   const { tAuth } = useTypedTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionValid, setSessionValid] = useState<boolean | null>(null);
   const router = useRouter();
-
-  // Verify session on component mount
-  useEffect(() => {
-    const checkSession = async () => {
-      const supabase = createClient();
-      const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error || !user) {
-        setSessionValid(false);
-        router.push(`/auth/login?error=no_session&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
-      } else {
-        setSessionValid(true);
-      }
-    };
-
-    checkSession();
-  }, [router, tAuth]);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validate password confirmation
     if (password !== confirmPassword) {
       setError(tAuth('validation.passwordsNoMatch'));
       return;
     }
 
-    // Validate password strength
     if (password.length < 6) {
       setError(tAuth('validation.passwordTooShort'));
       return;
     }
 
-    const supabase = createClient();
     setIsLoading(true);
 
     try {
-      // Double-check session before updating
-      const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+      const supabase = createClient();
       
-      if (sessionError || !user) {
-        throw new Error(tAuth('errors.sessionExpired'));
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+      
+      if (error) {
+        throw error;
       }
-
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
       
-      // Password updated successfully, redirect to profile
-      router.push("/profile");
+      router.push("/auth/login?message=Password updated successfully. Please log in with your new password.");
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : tAuth('errors.generic');
       setError(errorMessage);
-      
-      // If session is invalid, redirect to forgot password
-      if (errorMessage.includes(tAuth('errors.sessionExpired'))) {
-        setTimeout(() => {
-          router.push(`/auth/login?error=session_expired&message=${encodeURIComponent(tAuth('errors.sessionExpired'))}`);
-        }, 2000);
-      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Show loading state while checking session
-  if (sessionValid === null) {
-    return (
-      <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">{tAuth('updatePassword.loadingSession')}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Don't render form if session is invalid (will redirect)
-  if (sessionValid === false) {
-    return null;
-  }
-
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="border-0">
         <CardHeader>
           <CardTitle className="text-2xl">{tAuth('updatePassword.title')}</CardTitle>
           <CardDescription>

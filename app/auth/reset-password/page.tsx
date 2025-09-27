@@ -23,10 +23,13 @@ function ResetPasswordContent() {
   const [success, setSuccess] = useState(false);
 
   const token = searchParams.get('token');
+  const code = searchParams.get('code');
   const type = searchParams.get('type');
 
   const handlePasswordReset = async () => {
-    if (!token) {
+    const authToken = token || code;
+    
+    if (!authToken) {
       setError('Token de recuperación no encontrado');
       return;
     }
@@ -37,8 +40,7 @@ function ResetPasswordContent() {
     try {
       const supabase = createClient();
       
-      // Exchange the code for a session
-      const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(token);
+      const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(authToken);
       
       if (exchangeError) {
         throw exchangeError;
@@ -46,7 +48,6 @@ function ResetPasswordContent() {
 
       if (data.user) {
         setSuccess(true);
-        // Redirect to update password page after a short delay
         setTimeout(() => {
           router.push('/auth/update-password');
         }, 2000);
@@ -54,7 +55,6 @@ function ResetPasswordContent() {
         throw new Error('No se pudo verificar el token de recuperación');
       }
     } catch (error: any) {
-      console.error('Password reset error:', error);
       setError(
         error.message || 
         'El enlace de recuperación ha expirado o es inválido. Por favor, solicita uno nuevo.'
@@ -65,11 +65,10 @@ function ResetPasswordContent() {
   };
 
   useEffect(() => {
-    // If we have the token and type, automatically process the reset
-    if (token && type === 'recovery') {
+    if ((token || code) && type === 'recovery') {
       handlePasswordReset();
     }
-  }, [token, type, handlePasswordReset]);
+  }, [token, code, type, handlePasswordReset]);
 
   const handleManualReset = () => {
     router.push('/auth/login?error=expired_token&message=El enlace de recuperación ha expirado. Por favor, solicita uno nuevo.');
@@ -130,7 +129,7 @@ function ResetPasswordContent() {
             <div className="space-y-3">
               <Button 
                 onClick={handlePasswordReset}
-                disabled={isLoading || !token}
+                disabled={isLoading || (!token && !code)}
                 className="w-full"
               >
                 {isLoading ? (

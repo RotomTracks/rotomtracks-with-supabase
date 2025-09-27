@@ -29,7 +29,7 @@ export function getAuthBaseUrl(): string {
 
 /**
  * Get the password reset redirect URL
- * This URL is used in the password reset email and should point to the confirmation handler
+ * This URL is used in the password reset email and should point to the verification handler
  * which will validate the token and then redirect to the update password page
  * 
  * IMPORTANT: This should ALWAYS use the production URL for emails, 
@@ -38,7 +38,7 @@ export function getAuthBaseUrl(): string {
 export function getPasswordResetUrl(): string {
   // Always use production URL for password reset emails
   const productionUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rotomtracks-with-supabase.vercel.app';
-  return `${productionUrl}/auth/reset-password`;
+  return `${productionUrl}/auth/verify`;
 }
 
 /**
