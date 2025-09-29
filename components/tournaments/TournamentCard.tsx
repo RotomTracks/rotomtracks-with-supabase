@@ -15,9 +15,7 @@ import {
   UserMinus,
   Eye,
   Settings,
-  Trophy,
-  Mail
-} from 'lucide-react';
+  Trophy} from 'lucide-react';
 
 // Hooks
 import { useTypedTranslation } from '@/lib/i18n';
@@ -54,6 +52,7 @@ interface TournamentCardProps {
   showActions?: boolean;
   className?: string;
   onViewDetails?: (tournament: TournamentWithOrganizer) => void;
+  onManage?: (tournament: TournamentWithOrganizer) => void;
 }
 
 export function TournamentCard({ 
@@ -62,7 +61,8 @@ export function TournamentCard({
   userRole, 
   showActions = true,
   className = '',
-  onViewDetails
+  onViewDetails,
+  onManage
 }: TournamentCardProps) {
   
   // Use centralized formatting utilities
@@ -126,7 +126,7 @@ export function TournamentCard({
 
   if (viewMode === 'list') {
     return (
-      <Card className="hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800 border-0">
+      <Card className={`hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800 border-0 ${className}`}>
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
@@ -332,11 +332,23 @@ export function TournamentCard({
             )}
             
             {tournament.user_role === 'organizer' && (
-              <Link href={`/tournaments/${tournament.id}/manage`} className="flex-1">
-                <Button size="sm" className="w-full">
+              onManage ? (
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => onManage(tournament)}
+                >
+                  <Settings className="h-4 w-4 mr-1" />
                   {tTournaments('actions.manage')}
                 </Button>
-              </Link>
+              ) : (
+                <Link href={`/tournaments/${tournament.id}/manage`} className="flex-1">
+                  <Button size="sm" className="w-full">
+                    <Settings className="h-4 w-4 mr-1" />
+                    {tTournaments('actions.manage')}
+                  </Button>
+                </Link>
+              )
             )}
             
             {onViewDetails ? (

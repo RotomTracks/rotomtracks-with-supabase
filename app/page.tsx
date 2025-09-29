@@ -32,6 +32,7 @@ export default function Home() {
       setForceShow(false);
     }
   }, [loading]);
+  
   return (
     <main id="main-content" className="min-h-screen flex flex-col" role="main">
       <HomeNavigation user={user} />

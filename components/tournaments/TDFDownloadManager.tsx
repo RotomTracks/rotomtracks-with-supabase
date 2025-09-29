@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Download, 
   FileText, 
@@ -17,6 +15,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { TournamentParticipant, Tournament } from '@/lib/types/tournament';
+import { useTypedTranslation } from '@/lib/i18n/hooks/useTypedTranslation';
 
 interface LocalTournament extends Omit<Tournament, 'status'> {
   status: string;
@@ -36,6 +35,7 @@ export default function TDFDownloadManager({
   participants, 
   onDownloadComplete 
 }: TDFDownloadManagerProps) {
+  const { tTournaments } = useTypedTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -115,147 +115,150 @@ export default function TDFDownloadManager({
   const handleCustomDownload = () => handleDownload(true);
 
   return (
-    <Card className="w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          TDF File Generation
-        </CardTitle>
-        <CardDescription>
-          Generate and download TDF files compatible with TOM software for tournament management
+    <Card className="w-full bg-transparent border-0">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+  {tTournaments('management.tdfGeneration')}
+          </CardTitle>
+          
+          {/* Status Indicator */}
+          {totalActiveCount === 0 && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+{tTournaments('management.noParticipants')}
+              </span>
+            </div>
+          )}
+          
+          {downloadError && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-red-100 dark:bg-red-900/30 rounded-full">
+              <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              <span className="text-xs font-medium text-red-700 dark:text-red-300">
+{tTournaments('management.error')}
+              </span>
+            </div>
+          )}
+          
+          {downloadSuccess && (
+            <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-xs font-medium text-green-700 dark:text-green-300">
+{tTournaments('management.downloaded')}
+              </span>
+            </div>
+          )}
+        </div>
+        
+        <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+          {totalActiveCount > 0 
+            ? tTournaments('management.tdfDescription')
+            : tTournaments('management.registerParticipants')
+          }
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="space-y-6">
-        {/* Tournament Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">
-              <strong>{totalActiveCount}</strong> registered players
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">
-              {new Date(tournament.start_date).toLocaleDateString()}
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {(tournament as LocalTournament).original_tdf_file_path ? (
-              <Badge variant="secondary">Has Original TDF</Badge>
-            ) : (
-              <Badge variant="outline">Generated from Scratch</Badge>
-            )}
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Participant Statistics */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium">Participant Breakdown</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{registeredCount}</div>
-              <div className="text-sm text-green-700">Registered</div>
+      <CardContent className="space-y-4">
+        {/* Tournament Summary */}
+        <div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                  <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+{tTournaments('management.participantsCount', { count: totalActiveCount })}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+{tTournaments('management.registered')}: {registeredCount} • {tTournaments('management.confirmed')}: {confirmedCount}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {new Date(tournament.start_date).toLocaleDateString('es-ES', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+{tTournaments('management.tournamentDate')}
+                  </p>
+                </div>
+              </div>
             </div>
             
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{confirmedCount}</div>
-              <div className="text-sm text-blue-700">Confirmed</div>
+            <div className="flex items-center gap-2">
+              {(tournament as LocalTournament).original_tdf_file_path ? (
+                <Badge variant="secondary" className="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+✓ {tTournaments('management.originalTdf')}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="px-3 py-1 text-xs font-medium border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">
+📄 {tTournaments('management.toGenerate')}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
 
-        <Separator />
 
-        {/* Download Options */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Download Options
-          </h4>
-          
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              TDF will include all registered and confirmed participants.
+        {/* Download Section */}
+        <div className="space-y-6">
+          <div className="text-center">
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-lg mx-auto">
+              {totalActiveCount > 0 
+                ? tTournaments('management.generateDescription')
+                : tTournaments('management.registerParticipants')
+              }
             </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Download Buttons */}
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={handleQuickDownload}
-              disabled={isDownloading || totalActiveCount === 0}
-              className="flex-1"
-            >
-              {isDownloading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 mr-2" />
-              )}
-              Quick Download
-            </Button>
             
-            <Button 
-              variant="outline"
-              onClick={handleCustomDownload}
-              disabled={isDownloading || totalActiveCount === 0}
-              className="flex-1"
-            >
-              {isDownloading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Settings className="h-4 w-4 mr-2" />
-              )}
-              Download with Options
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+              <Button 
+                onClick={handleQuickDownload}
+                disabled={isDownloading || totalActiveCount === 0}
+                className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                size="lg"
+              >
+                {isDownloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+{tTournaments('management.quickDownload')}
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={handleCustomDownload}
+                disabled={isDownloading || totalActiveCount === 0}
+                className="flex-1 h-11 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium"
+                size="lg"
+              >
+                {isDownloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Settings className="h-4 w-4 mr-2" />
+                )}
+{tTournaments('management.withOptions')}
+              </Button>
+            </div>
           </div>
 
-          {totalActiveCount === 0 && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                No registered players found. TDF file cannot be generated without participants.
-              </AlertDescription>
-            </Alert>
-          )}
-        </div>
-
-        {/* Status Messages */}
-        {downloadError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Download Failed:</strong> {downloadError}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {downloadSuccess && (
-          <Alert className="border-green-200 bg-green-50">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">
-              TDF file downloaded successfully! The file is compatible with TOM software.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Info Box */}
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h5 className="text-sm font-medium text-blue-900 mb-2">About TDF Files</h5>
-          <p className="text-sm text-blue-800">
-            TDF (Tournament Director File) files are XML files compatible with TOM (Tournament Operations Manager) software. 
-            The generated file includes all registered players with their information and maintains the original tournament 
-            structure and settings.
-          </p>
         </div>
       </CardContent>
     </Card>

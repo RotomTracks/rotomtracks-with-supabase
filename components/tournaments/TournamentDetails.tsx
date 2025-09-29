@@ -13,6 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
+// Components
+import TournamentManagementModal from '@/components/tournaments/TournamentManagementModal';
+
 // Icons
 import { 
   Trophy, 
@@ -25,7 +28,8 @@ import {
   Eye,
   Clock,
   Target,
-  Award
+  Award,
+  Settings
 } from 'lucide-react';
 
 // Local Components
@@ -94,6 +98,7 @@ export function TournamentDetails({
 }: TournamentDetailsProps) {
   // State
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [showManagementModal, setShowManagementModal] = useState(false);
   
   // Translations
   const { tTournaments, tCommon } = useTypedTranslation();
@@ -116,24 +121,42 @@ export function TournamentDetails({
   const userParticipation = userId ? participants.find(p => p.user_id === userId) : null;
   const userResult = userParticipation ? results.find(r => r.participant_id === userParticipation.id) : null;
 
+  const handleTournamentDelete = async () => {
+    try {
+      const response = await fetch(`/api/tournaments/${tournament.id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete tournament');
+      }
+
+      // Redirect to tournaments page after successful deletion
+      window.location.href = '/tournaments';
+      
+    } catch (error) {
+      console.error('Error deleting tournament:', error);
+      alert('Error deleting tournament: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Tournament Header */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <Trophy className="h-6 w-6 text-yellow-600" />
-                <div>
-                  <CardTitle className="text-2xl">{tournament.name}</CardTitle>
-                  <CardDescription className="text-lg">
-                    {tournament.tournament_type}
-                  </CardDescription>
-                </div>
+                <CardTitle className="text-2xl">{tournament.name}</CardTitle>
               </div>
               
-              <div className="flex items-center space-x-6 text-sm text-gray-600">
+              <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-300">
                 <div className="flex items-center space-x-1">
                   <MapPin className="h-4 w-4" />
                   <span>{tournament.city}, {tournament.country}</span>
@@ -146,6 +169,10 @@ export function TournamentDetails({
                   <Users className="h-4 w-4" />
                   <span>{stats.totalParticipants} jugadores</span>
                 </div>
+                <div className="flex items-center space-x-1">
+                  <Trophy className="h-4 w-4" />
+                  <span>{tournament.tournament_type}</span>
+                </div>
                 {organizer && (
                   <div className="flex items-center space-x-1">
                     <User className="h-4 w-4" />
@@ -155,33 +182,50 @@ export function TournamentDetails({
               </div>
             </div>
 
-            <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
-              {getStatusText(tournament.status as TournamentStatus)}
-            </Badge>
+            {/* Organizer actions */}
+            {userRole === 'organizer' && (
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={() => setShowManagementModal(true)}
+                  className="text-white dark:text-white"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Manage Tournament
+                </Button>
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent>
           {/* Tournament Statistics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <Users className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-              <div className="text-xl font-bold text-blue-600">{stats.activeParticipants}</div>
-              <div className="text-xs text-gray-600">Participantes Activos</div>
+            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-center space-x-2 mb-1">
+                <Users className="h-5 w-5 text-blue-600" />
+                <div className="text-xl font-bold text-blue-600">{stats.activeParticipants}</div>
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 text-center">Participantes Activos</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <Target className="h-6 w-6 text-green-600 mx-auto mb-2" />
-              <div className="text-xl font-bold text-green-600">{stats.completedMatches}</div>
-              <div className="text-xs text-gray-600">Partidas Completadas</div>
+            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-center space-x-2 mb-1">
+                <Target className="h-5 w-5 text-green-600" />
+                <div className="text-xl font-bold text-green-600">{stats.completedMatches}</div>
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 text-center">Partidas Completadas</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <Clock className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-              <div className="text-xl font-bold text-purple-600">{stats.totalRounds}</div>
-              <div className="text-xs text-gray-600">Rondas Totales</div>
+            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-center space-x-2 mb-1">
+                <Clock className="h-5 w-5 text-purple-600" />
+                <div className="text-xl font-bold text-purple-600">{stats.totalRounds}</div>
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 text-center">Rondas Totales</div>
             </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
-              <Award className="h-6 w-6 text-orange-600 mx-auto mb-2" />
-              <div className="text-xl font-bold text-orange-600">{results.length}</div>
-              <div className="text-xs text-gray-600">Resultados Finales</div>
+            <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-center space-x-2 mb-1">
+                <Award className="h-5 w-5 text-orange-600" />
+                <div className="text-xl font-bold text-orange-600">{results.length}</div>
+              </div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 text-center">Resultados Finales</div>
             </div>
           </div>
 
@@ -201,12 +245,12 @@ export function TournamentDetails({
 
       {/* Tournament Content Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Resumen</TabsTrigger>
-          <TabsTrigger value="participants">Participantes</TabsTrigger>
-          <TabsTrigger value="standings">Clasificación</TabsTrigger>
-          <TabsTrigger value="matches">Partidas</TabsTrigger>
-          <TabsTrigger value="reports">Reportes</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-5 bg-gray-200 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-600">Resumen</TabsTrigger>
+          <TabsTrigger value="participants" className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-600">Participantes</TabsTrigger>
+          <TabsTrigger value="standings" className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-600">Clasificación</TabsTrigger>
+          <TabsTrigger value="matches" className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-600">Partidas</TabsTrigger>
+          <TabsTrigger value="reports" className="data-[state=active]:bg-gray-300 dark:data-[state=active]:bg-gray-600">Reportes</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -232,7 +276,7 @@ export function TournamentDetails({
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tournament Information */}
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle>Información del Torneo</CardTitle>
               </CardHeader>
@@ -275,7 +319,7 @@ export function TournamentDetails({
             </Card>
 
             {/* Quick Stats */}
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle>Estadísticas Rápidas</CardTitle>
               </CardHeader>
@@ -318,7 +362,7 @@ export function TournamentDetails({
 
           {/* Description */}
           {tournament.description && (
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle>Descripción</CardTitle>
               </CardHeader>
@@ -361,7 +405,7 @@ export function TournamentDetails({
         <TabsContent value="reports" className="space-y-6">
           {/* HTML Reports */}
           {reports.length > 0 && (
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle>Reportes HTML</CardTitle>
                 <CardDescription>
@@ -416,7 +460,7 @@ export function TournamentDetails({
 
           {/* Tournament Files */}
           {files.length > 0 && (
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader>
                 <CardTitle>Archivos del Torneo</CardTitle>
                 <CardDescription>
@@ -457,7 +501,7 @@ export function TournamentDetails({
 
           {/* No reports message */}
           {reports.length === 0 && files.length === 0 && (
-            <Card>
+            <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardContent className="text-center py-8">
                 <FileText className="h-12 w-12 mx-auto text-gray-300 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">No hay reportes disponibles aún</p>
@@ -469,6 +513,25 @@ export function TournamentDetails({
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Tournament Management Modal */}
+      {userRole === 'organizer' && showManagementModal && (
+        <TournamentManagementModal
+          isOpen={showManagementModal}
+          onClose={() => setShowManagementModal(false)}
+          tournament={tournament as any}
+          participants={participants}
+          onParticipantUpdate={() => {
+            // Refresh data if needed
+            window.location.reload();
+          }}
+          onTournamentUpdate={() => {
+            // Refresh data if needed
+            window.location.reload();
+          }}
+          onTournamentDelete={handleTournamentDelete}
+        />
+      )}
     </div>
   );
 }

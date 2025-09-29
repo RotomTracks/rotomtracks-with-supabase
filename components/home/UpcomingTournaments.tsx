@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
+import { TournamentDetailsModal } from '@/components/tournaments/TournamentDetailsModal';
+import { useTournamentModal } from '@/components/tournaments/useTournamentModal';
 import { Tournament, TournamentStatus, TournamentWithOrganizer } from '@/lib/types/tournament';
 import { useTypedTranslation } from '@/lib/i18n';
 import { User } from '@supabase/supabase-js';
@@ -20,6 +22,12 @@ export function UpcomingTournaments({ user, userLocation, limit = 6, onTournamen
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { selectedTournament, isModalOpen, openModal, closeModal } = useTournamentModal();
+
+  // Handle opening tournament details modal
+  const handleViewDetails = (tournament: TournamentWithOrganizer) => {
+    openModal(tournament);
+  };
 
   // Notify parent component about tournament changes
   useEffect(() => {
@@ -159,19 +167,31 @@ export function UpcomingTournaments({ user, userLocation, limit = 6, onTournamen
   }
 
   return (
-    <div className="space-y-6">
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tournaments.map((tournament) => (
-          <TournamentCard 
-            key={tournament.id} 
-            tournament={{...tournament, official_tournament_id: tournament.id} as TournamentWithOrganizer}
-            viewMode="grid"
-            userRole="authenticated"
-          />
-        ))}
+    <>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tournaments.map((tournament) => (
+            <TournamentCard 
+              key={tournament.id} 
+              tournament={{...tournament, official_tournament_id: tournament.official_tournament_id} as TournamentWithOrganizer}
+              viewMode="grid"
+              userRole="guest"
+              className="!bg-white dark:!bg-gray-700"
+              onViewDetails={handleViewDetails}
+            />
+          ))}
+        </div>
       </div>
 
-    </div>
+      {/* Tournament Details Modal */}
+      {selectedTournament && (
+        <TournamentDetailsModal
+          tournament={selectedTournament}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          userRole="guest"
+        />
+      )}
+    </>
   );
 }

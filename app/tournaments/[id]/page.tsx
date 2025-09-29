@@ -1,13 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { TournamentDetails } from '@/components/tournaments/TournamentDetails';
-import { BackToTournamentsButton } from '@/components/tournaments/BackToTournamentsButton';
+import { PageNavigation } from '@/components/navigation/PageNavigation';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
-import Link from 'next/link';
 
 interface TournamentPageProps {
   params: Promise<{
@@ -101,34 +98,20 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
   })) || [];
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4">
+        <div className="max-w-6xl mx-auto">
         {/* Header with navigation */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <BackToTournamentsButton />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {tournament.name}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {tournament.city}, {tournament.country} • {new Date(tournament.start_date).toLocaleDateString('es-ES')}
-              </p>
-            </div>
-          </div>
-
-          {/* Organizer actions */}
-          {isOrganizer && (
-            <div className="flex items-center space-x-2">
-              <Link href={`/tournaments/${tournamentId}/manage`}>
-                <Button>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage Tournament
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
+        <PageNavigation
+          title=""
+          className="mb-4"
+          breadcrumbs={[
+            { label: "Inicio", href: "/" },
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Ver Torneos", href: "/tournaments" },
+            { label: tournament.name, href: `/tournaments/${tournamentId}`, current: true }
+          ]}
+        />
 
         {/* Tournament details component */}
         <TournamentDetails
@@ -142,6 +125,7 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
           userRole={isOrganizer ? 'organizer' : isParticipant ? 'participant' : 'viewer'}
           userId={user?.id}
         />
+        </div>
       </div>
     </div>
   );

@@ -135,38 +135,38 @@ export function ParticipantsList({
     <div className="space-y-6">
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Users className="h-6 w-6 text-blue-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-            <div className="text-sm text-gray-600">Total</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Total</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <UserCheck className="h-6 w-6 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-            <div className="text-sm text-gray-600">Activos</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Activos</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <UserX className="h-6 w-6 text-red-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-red-600">{stats.dropped}</div>
-            <div className="text-sm text-gray-600">Abandonaron</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Abandonaron</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Trophy className="h-6 w-6 text-purple-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-purple-600">{results.length}</div>
-            <div className="text-sm text-gray-600">Con Resultados</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Con Resultados</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Participants List */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Users className="h-5 w-5" />
@@ -185,13 +185,14 @@ export function ParticipantsList({
                 placeholder="Buscar por nombre o ID de jugador..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
               />
             </div>
             <div className="flex space-x-2">
               <Button
                 variant={statusFilter === 'all' ? 'default' : 'outline'}
                 size="sm"
+                className={statusFilter !== 'all' ? 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600' : 'text-white dark:text-white'}
                 onClick={() => setStatusFilter('all')}
               >
                 Todos
@@ -199,6 +200,7 @@ export function ParticipantsList({
               <Button
                 variant={statusFilter === 'active' ? 'default' : 'outline'}
                 size="sm"
+                className={statusFilter !== 'active' ? 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600' : 'text-white dark:text-white'}
                 onClick={() => setStatusFilter('active')}
               >
                 Activos
@@ -206,6 +208,7 @@ export function ParticipantsList({
               <Button
                 variant={statusFilter === 'dropped' ? 'default' : 'outline'}
                 size="sm"
+                className={statusFilter !== 'dropped' ? 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600' : 'text-white dark:text-white'}
                 onClick={() => setStatusFilter('dropped')}
               >
                 Abandonaron

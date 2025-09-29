@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -18,15 +17,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { 
-  Settings, 
   FileText,
   Save,
   AlertCircle,
   CheckCircle,
   Loader2,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Pencil
 } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/i18n/hooks/useTypedTranslation';
 
 interface Tournament {
   id: string;
@@ -57,13 +57,14 @@ export default function TournamentSettings({
   tournament, 
   onTournamentUpdate 
 }: TournamentSettingsProps) {
+  const { tTournaments } = useTypedTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     name: tournament.name,
-    description: tournament.description,
+    description: tournament.description || '',
     city: tournament.city,
     state: tournament.state || '',
     country: tournament.country,
@@ -131,7 +132,7 @@ export default function TournamentSettings({
   const handleCancel = () => {
     setFormData({
       name: tournament.name,
-      description: tournament.description,
+      description: tournament.description || '',
       city: tournament.city,
       state: tournament.state || '',
       country: tournament.country,
@@ -166,95 +167,31 @@ export default function TournamentSettings({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Tournament Status Management */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Tournament Status
-          </CardTitle>
-          <CardDescription>
-            Manage tournament status and registration settings
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label>Current Status</Label>
-              <div className="mt-1">
-                <Badge className={getStatusColor(tournament.status)}>
-                  {tournament.status}
-                </Badge>
-              </div>
-            </div>
-            
-            <div>
-              <Label>Registration</Label>
-              <div className="mt-1">
-                <Badge variant={tournament.registration_open ? 'default' : 'secondary'}>
-                  {tournament.registration_open ? 'Open' : 'Closed'}
-                </Badge>
-              </div>
-            </div>
-            
-            <div>
-              <Label>Participants</Label>
-              <div className="mt-1">
-                <span className="text-sm font-medium">
-                  {tournament.current_players}
-                  {tournament.max_players && ` / ${tournament.max_players}`}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-4">
-            <div>
-              <Label>Registration Link</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <Input
-                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/tournaments/${tournament.id}/register`}
-                  readOnly
-                  className="font-mono text-sm"
-                />
-                <Button size="sm" variant="outline" onClick={copyRegistrationLink}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-                <Button size="sm" variant="outline" asChild>
-                  <a 
-                    href={`/tournaments/${tournament.id}/register`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
+    <div>
       {/* Tournament Settings */}
-      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Tournament Settings
-            </div>
+      <Card className="bg-transparent border-0">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+  {tTournaments('management.settings')}
+            </CardTitle>
+            
             {!isEditing && (
-              <Button onClick={() => setIsEditing(true)}>
-                Edit Settings
+              <Button onClick={() => setIsEditing(true)} className="text-white dark:text-white">
+                <Pencil className="h-4 w-4 mr-2" />
+{tTournaments('management.editSettings')}
               </Button>
             )}
-          </CardTitle>
-          <CardDescription>
-            Modify tournament details, dates, and capacity settings
+          </div>
+          
+          <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+            {isEditing 
+              ? tTournaments('management.settingsDescription')
+              : tTournaments('management.settingsDescription')
+            }
           </CardDescription>
         </CardHeader>
         
@@ -276,13 +213,40 @@ export default function TournamentSettings({
             </Alert>
           )}
 
+          {/* Registration Link */}
+          <div className="space-y-4">
+            <h4 className="font-medium">{tTournaments('management.registrationLink')}</h4>
+            <div>
+              <Label>{tTournaments('management.shareRegistrationLink')}</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <Input
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/tournaments/${tournament.id}/register`}
+                  readOnly
+                  className="font-mono text-sm bg-white dark:bg-gray-900"
+                />
+                <Button className="bg-white dark:bg-gray-900" size="sm" variant="outline" onClick={copyRegistrationLink}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+                <Button className="bg-white dark:bg-gray-900" size="sm" variant="outline" asChild>
+                  <a 
+                    href={`/tournaments/${tournament.id}/register`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Basic Information */}
           <div className="space-y-4">
-            <h4 className="font-medium">Basic Information</h4>
+            <h4 className="font-medium">{tTournaments('management.basicInformation')}</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Tournament Name</Label>
+                <Label htmlFor="name">{tTournaments('management.tournamentName')}</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -292,7 +256,7 @@ export default function TournamentSettings({
               </div>
               
               <div>
-                <Label htmlFor="tournament-id">Tournament ID</Label>
+                <Label htmlFor="tournament-id">{tTournaments('management.tournamentId')}</Label>
                 <Input
                   id="tournament-id"
                   value={tournament.official_tournament_id || tournament.id.substring(0, 8)}
@@ -303,7 +267,7 @@ export default function TournamentSettings({
             </div>
             
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{tTournaments('management.description')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -318,11 +282,11 @@ export default function TournamentSettings({
 
           {/* Location and Dates */}
           <div className="space-y-4">
-            <h4 className="font-medium">Location and Dates</h4>
+            <h4 className="font-medium">{tTournaments('management.locationAndDates')}</h4>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">{tTournaments('management.city')}</Label>
                 <Input
                   id="city"
                   value={formData.city}
@@ -332,18 +296,18 @@ export default function TournamentSettings({
               </div>
               
               <div>
-                <Label htmlFor="state">State/Province</Label>
+                <Label htmlFor="state">{tTournaments('management.stateProvince')}</Label>
                 <Input
                   id="state"
                   value={formData.state}
                   onChange={(e) => handleInputChange('state', e.target.value)}
                   disabled={!isEditing}
-                  placeholder="Optional"
+                  placeholder="Opcional"
                 />
               </div>
               
               <div>
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">{tTournaments('management.country')}</Label>
                 <Input
                   id="country"
                   value={formData.country}
@@ -351,29 +315,15 @@ export default function TournamentSettings({
                   disabled={!isEditing}
                 />
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
               <div>
-                <Label htmlFor="start-date">Start Date</Label>
+                <Label htmlFor="start-date">{tTournaments('management.startDate')}</Label>
                 <Input
                   id="start-date"
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => handleInputChange('start_date', e.target.value)}
                   disabled={!isEditing}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="end-date">End Date</Label>
-                <Input
-                  id="end-date"
-                  type="date"
-                  value={formData.end_date}
-                  onChange={(e) => handleInputChange('end_date', e.target.value)}
-                  disabled={!isEditing}
-                  placeholder="Optional"
                 />
               </div>
             </div>
@@ -383,24 +333,24 @@ export default function TournamentSettings({
 
           {/* Tournament Configuration */}
           <div className="space-y-4">
-            <h4 className="font-medium">Tournament Configuration</h4>
+            <h4 className="font-medium">{tTournaments('management.tournamentConfiguration')}</h4>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="max-players">Maximum Players</Label>
+                <Label htmlFor="max-players">{tTournaments('management.maximumPlayers')}</Label>
                 <Input
                   id="max-players"
                   type="number"
                   value={formData.max_players}
                   onChange={(e) => handleInputChange('max_players', e.target.value)}
                   disabled={!isEditing}
-                  placeholder="Unlimited"
+                  placeholder="Ilimitado"
                   min="1"
                 />
               </div>
               
               <div>
-                <Label htmlFor="status">Tournament Status</Label>
+                <Label htmlFor="status">{tTournaments('management.tournamentStatus')}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(value) => handleInputChange('status', value)}
@@ -410,10 +360,10 @@ export default function TournamentSettings({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="ongoing">Ongoing</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="upcoming">{tTournaments('management.upcoming')}</SelectItem>
+                    <SelectItem value="ongoing">{tTournaments('management.ongoing')}</SelectItem>
+                    <SelectItem value="completed">{tTournaments('management.completed')}</SelectItem>
+                    <SelectItem value="cancelled">{tTournaments('management.cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -426,13 +376,13 @@ export default function TournamentSettings({
                 onCheckedChange={(checked) => handleInputChange('registration_open', checked)}
                 disabled={!isEditing}
               />
-              <Label htmlFor="registration-open">Registration Open</Label>
+              <Label htmlFor="registration-open">{tTournaments('management.registrationOpen')}</Label>
             </div>
           </div>
 
           {/* Action Buttons */}
           {isEditing && (
-            <div className="flex items-center gap-2 pt-4">
+            <div className="flex items-center justify-end gap-2 pt-4">
               <Button 
                 onClick={handleSave}
                 disabled={isSaving}
@@ -442,7 +392,7 @@ export default function TournamentSettings({
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                Save Changes
+{tTournaments('management.saveChanges')}
               </Button>
               
               <Button 
@@ -450,7 +400,7 @@ export default function TournamentSettings({
                 onClick={handleCancel}
                 disabled={isSaving}
               >
-                Cancel
+{tTournaments('management.cancel')}
               </Button>
             </div>
           )}
@@ -459,48 +409,50 @@ export default function TournamentSettings({
 
       {/* TDF Information */}
       {tournament.tdf_metadata && (
-        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              TDF Information
+        <Card className="bg-transparent border-0">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              {tTournaments('management.tdfInformation')}
             </CardTitle>
-            <CardDescription>
-              Information from the original TDF file
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+              {tTournaments('management.tdfInformationDescription')}
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <Label>Game Type</Label>
+                <Label>{tTournaments('management.gameType')}</Label>
                 <p className="mt-1">{tournament.tdf_metadata.gametype || 'N/A'}</p>
               </div>
               
               <div>
-                <Label>Mode</Label>
+                <Label>{tTournaments('management.mode')}</Label>
                 <p className="mt-1">{tournament.tdf_metadata.mode || 'N/A'}</p>
               </div>
               
               <div>
-                <Label>Round Time</Label>
-                <p className="mt-1">{tournament.tdf_metadata.roundtime || 'N/A'} minutes</p>
+                <Label>{tTournaments('management.roundTime')}</Label>
+                <p className="mt-1">{tournament.tdf_metadata.roundtime || 'N/A'} {tTournaments('management.minutes')}</p>
               </div>
               
               <div>
-                <Label>Finals Round Time</Label>
-                <p className="mt-1">{tournament.tdf_metadata.finalsroundtime || 'N/A'} minutes</p>
+                <Label>{tTournaments('management.finalsRoundTime')}</Label>
+                <p className="mt-1">{tournament.tdf_metadata.finalsroundtime || 'N/A'} {tTournaments('management.minutes')}</p>
               </div>
               
               {tournament.tdf_metadata.organizer && (
                 <>
                   <div>
-                    <Label>Organizer Name</Label>
+                    <Label>{tTournaments('management.organizer')}</Label>
                     <p className="mt-1">{tournament.tdf_metadata.organizer.name || 'N/A'}</p>
                   </div>
                   
                   <div>
-                    <Label>Organizer POP ID</Label>
+                    <Label>{tTournaments('management.organizerId')}</Label>
                     <p className="mt-1 font-mono">{tournament.tdf_metadata.organizer.popid || 'N/A'}</p>
                   </div>
                 </>

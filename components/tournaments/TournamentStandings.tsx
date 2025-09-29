@@ -125,13 +125,13 @@ export function TournamentStandings({
 
   if (results.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="text-center py-12">
           <Trophy className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
             Clasificación No Disponible
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Los resultados se mostrarán aquí una vez que se procesen los datos
             del torneo
           </p>
@@ -144,7 +144,7 @@ export function TournamentStandings({
     <div className="space-y-6">
       {/* Top 8 */}
       {sortedResults.length >= 8 && (
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Trophy className="h-5 w-5 text-yellow-500" />
@@ -252,7 +252,7 @@ export function TournamentStandings({
 
       {/* Top 3 Podium (fallback for tournaments with less than 8 players) */}
       {sortedResults.length >= 3 && sortedResults.length < 8 && (
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Trophy className="h-5 w-5 text-yellow-500" />
@@ -312,7 +312,7 @@ export function TournamentStandings({
       )}
 
       {/* Full Standings Table */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <TrendingUp className="h-5 w-5" />
@@ -435,7 +435,7 @@ export function TournamentStandings({
       </Card>
 
       {/* Statistics Summary */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Target className="h-5 w-5" />
@@ -444,15 +444,15 @@ export function TournamentStandings({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
               <div className="text-2xl font-bold text-blue-600">
                 {sortedResults.length}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 Jugadores Clasificados
               </div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
               <div className="text-2xl font-bold text-green-600">
                 {Math.round(
                   (sortedResults.reduce((sum, r) => sum + r.wins, 0) /
@@ -460,9 +460,9 @@ export function TournamentStandings({
                     10
                 ) / 10}
               </div>
-              <div className="text-sm text-gray-600">Victorias Promedio</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Victorias Promedio</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
               <div className="text-2xl font-bold text-purple-600">
                 {Math.round(
                   (sortedResults.reduce((sum, r) => sum + r.points, 0) /
@@ -470,9 +470,9 @@ export function TournamentStandings({
                     10
                 ) / 10}
               </div>
-              <div className="text-sm text-gray-600">Puntos Promedio</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">Puntos Promedio</div>
             </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
+            <div className="text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
               <div className="text-2xl font-bold text-orange-600">
                 {Math.round(
                   sortedResults.reduce(

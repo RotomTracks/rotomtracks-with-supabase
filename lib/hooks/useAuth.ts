@@ -77,15 +77,16 @@ export function useAuth(): UseAuthReturn {
     await fetchUserAndProfile();
   };
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await supabase.auth.signOut();
-      // Let onAuthStateChange handle the state updates
+      setUser(null);
+      setProfile(null);
     } catch (err) {
       console.error('Error signing out:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign out');
     }
-  };
+  }, [supabase]);
 
   const isAuthenticated = !!user;
   const isOrganizer = profile?.user_role === UserRole.ORGANIZER;
@@ -109,13 +110,7 @@ export function useAuth(): UseAuthReturn {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
-        if (event === 'SIGNED_OUT') {
-          // Handle sign out immediately without loading state
-          setUser(null);
-          setProfile(null);
-          setLoading(false);
-          setError(null);
-        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           await fetchUserAndProfile();
         }
       }

@@ -127,13 +127,13 @@ export function MatchHistory({
 
   if (matches.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="text-center py-12">
           <Swords className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
             No hay partidas registradas
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Las partidas aparecerán aquí una vez que se procesen los datos del torneo
           </p>
         </CardContent>
@@ -145,32 +145,32 @@ export function MatchHistory({
     <div className="space-y-6">
       {/* Statistics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Swords className="h-6 w-6 text-blue-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-600">{stats.totalMatches}</div>
-            <div className="text-sm text-gray-600">Total Partidas</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Total Partidas</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Trophy className="h-6 w-6 text-green-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-green-600">{stats.completedMatches}</div>
-            <div className="text-sm text-gray-600">Completadas</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Completadas</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Clock className="h-6 w-6 text-purple-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-purple-600">{stats.totalRounds}</div>
-            <div className="text-sm text-gray-600">Rondas</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Rondas</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardContent className="p-4 text-center">
             <Target className="h-6 w-6 text-orange-600 mx-auto mb-2" />
             <div className="text-2xl font-bold text-orange-600">{stats.averageMatchesPerRound}</div>
-            <div className="text-sm text-gray-600">Partidas/Ronda</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Partidas/Ronda</div>
           </CardContent>
         </Card>
       </div>
@@ -183,7 +183,7 @@ export function MatchHistory({
           const completedInRound = roundMatches.filter(m => m.match_status === 'completed').length;
 
           return (
-            <Card key={round}>
+            <Card key={round} className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <CardHeader 
                 className="cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => toggleRound(round)}

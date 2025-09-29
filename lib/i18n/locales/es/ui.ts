@@ -163,6 +163,46 @@ export const ui = {
     }
   },
 
+  // Tournament Management
+  tournamentManagement: {
+    title: "Gestión del Torneo",
+    settings: "Configuración del Torneo",
+    participants: "Gestión de Participantes",
+    tdfGeneration: "Generación de Archivos TDF",
+    settingsDescription: "Gestiona la configuración del torneo, incluyendo información básica y enlaces de registro",
+    participantsDescription: "Gestiona los participantes del torneo, confirmaciones y estados de los jugadores",
+    tdfDescription: "Genera y descarga archivos TDF compatibles con el software TOM para la gestión de torneos",
+    editSettings: "Editar Configuración",
+    cancelEdit: "Cancelar",
+    saveChanges: "Guardar Cambios",
+    registrationLink: "Enlace de Registro",
+    basicInformation: "Información Básica",
+    tdfInformation: "Información TDF",
+    tournamentDetails: "Detalles del torneo y configuración",
+    downloadFiles: "Descargar archivos del torneo",
+    participantsCount: "{{count}} participantes",
+    noParticipants: "Sin participantes",
+    error: "Error",
+    downloaded: "Descargado",
+    readyToGenerate: "Listo para generar archivo TDF",
+    generateDescription: "El archivo TDF incluirá todos los participantes registrados y confirmados con su información completa",
+    registerParticipants: "Registra participantes en el torneo para poder generar el archivo TDF",
+    quickDownload: "Descarga Rápida",
+    withOptions: "Con Opciones",
+    total: "Total",
+    registered: "Registrados",
+    confirmed: "Confirmados",
+    dropped: "Retirados",
+    searchParticipants: "Buscar Participantes",
+    filterByStatus: "Filtrar por Estado",
+    allStatuses: "Todos los Estados",
+    noParticipantsFound: "No se encontraron participantes",
+    clearSearch: "Limpiar búsqueda para ver todos los participantes",
+    tournamentDate: "Fecha del torneo",
+    originalTdf: "TDF Original",
+    toGenerate: "Por Generar"
+  },
+
   // Pagination
   pagination: {
     pageOfTotal: "Página {{page}} de {{totalPages}}",

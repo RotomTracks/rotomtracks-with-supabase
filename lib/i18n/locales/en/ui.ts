@@ -163,6 +163,46 @@ export const ui = {
     }
   },
 
+  // Tournament Management
+  tournamentManagement: {
+    title: "Tournament Management",
+    settings: "Tournament Settings",
+    participants: "Participants Management",
+    tdfGeneration: "TDF File Generation",
+    settingsDescription: "Manage tournament configuration, including basic information and registration links",
+    participantsDescription: "Manage tournament participants, check-ins, and player status",
+    tdfDescription: "Generate and download TDF files compatible with TOM software for tournament management",
+    editSettings: "Edit Settings",
+    cancelEdit: "Cancel",
+    saveChanges: "Save Changes",
+    registrationLink: "Registration Link",
+    basicInformation: "Basic Information",
+    tdfInformation: "TDF Information",
+    tournamentDetails: "Tournament details and configuration",
+    downloadFiles: "Download tournament files",
+    participantsCount: "{{count}} participants",
+    noParticipants: "No participants",
+    error: "Error",
+    downloaded: "Downloaded",
+    readyToGenerate: "Ready to generate TDF file",
+    generateDescription: "The TDF file will include all registered and confirmed participants with their complete information",
+    registerParticipants: "Register participants in the tournament to generate the TDF file",
+    quickDownload: "Quick Download",
+    withOptions: "With Options",
+    total: "Total",
+    registered: "Registered",
+    confirmed: "Confirmed",
+    dropped: "Dropped",
+    searchParticipants: "Search Participants",
+    filterByStatus: "Filter by Status",
+    allStatuses: "All Statuses",
+    noParticipantsFound: "No participants found",
+    clearSearch: "Clear search to see all participants",
+    tournamentDate: "Tournament date",
+    originalTdf: "Original TDF",
+    toGenerate: "To Generate"
+  },
+
   // Pagination
   pagination: {
     pageOfTotal: "Page {{page}} of {{totalPages}}",

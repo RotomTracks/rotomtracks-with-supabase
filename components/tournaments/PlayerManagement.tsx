@@ -45,6 +45,7 @@ import { TournamentParticipant, ParticipantStatus, UserRole } from '@/lib/types/
 
 // Utilities
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
+import { useTypedTranslation } from '@/lib/i18n/hooks/useTypedTranslation';
 import { 
   TournamentStatusManager
 } from '@/lib/utils/tournament-status';
@@ -67,6 +68,7 @@ export default function PlayerManagement({
   error: externalError = null
 }: PlayerManagementProps) {
   // Hooks
+  const { tTournaments } = useTypedTranslation();
   const { formatDate, formatDateTime } = useTournamentFormatting();
   
   // State
@@ -158,18 +160,18 @@ export default function PlayerManagement({
 
   // Render loading state
   const renderLoadingState = () => (
-    <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+    <Card className="bg-transparent border-0">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          Player Management
+{tTournaments('management.participants')}
         </CardTitle>
         <CardDescription>
-          Manage tournament participants, approve registrations, and update player status
+          {tTournaments('management.participantsDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4" role="status" aria-label="Cargando participantes">
+        <div className="space-y-4" role="status" aria-label={tTournaments('management.loadingParticipants')}>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse">
@@ -183,7 +185,7 @@ export default function PlayerManagement({
               <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
             ))}
           </div>
-          <span className="sr-only">Cargando participantes...</span>
+          <span className="sr-only">{tTournaments('management.loadingParticipants')}</span>
         </div>
       </CardContent>
     </Card>
@@ -192,138 +194,153 @@ export default function PlayerManagement({
   if (loading) return renderLoadingState();
 
   return (
-    <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Gestión de Participantes
+    <Card className="bg-transparent border-0">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-lg">
+          <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+            <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          </div>
+{tTournaments('management.participants')}
         </CardTitle>
-        <CardDescription>
-          Gestiona los participantes del torneo, aprueba registros y actualiza estados
+        <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+{tTournaments('management.participantsDescription')}
         </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-6">
         {/* Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">{stats.total}</div>
-            <div className="text-sm text-gray-700 dark:text-gray-300">Total</div>
+          <div className="text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div className="text-3xl font-bold text-gray-800 dark:text-gray-200">{stats.total}</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">{tTournaments('management.total')}</div>
           </div>
-          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{stats.registered}</div>
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              Registrados
+          <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+            <div className="text-3xl font-bold text-blue-700 dark:text-blue-300">{stats.registered}</div>
+            <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">
+              {tTournaments('management.registered')}
             </div>
           </div>
-          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">
-              Confirmados
+          <div className="text-center p-4 bg-green-100 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-700">
+            <div className="text-3xl font-bold text-green-700 dark:text-green-300">{stats.confirmed}</div>
+            <div className="text-sm font-medium text-green-600 dark:text-green-400 mt-1">
+              {tTournaments('management.confirmed')}
             </div>
           </div>
-          <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <div className="text-2xl font-bold text-red-600">{stats.dropped}</div>
-            <div className="text-sm text-red-700 dark:text-red-300">
-              Retirados
+          <div className="text-center p-4 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-700">
+            <div className="text-3xl font-bold text-red-700 dark:text-red-300">{stats.dropped}</div>
+            <div className="text-sm font-medium text-red-600 dark:text-red-400 mt-1">
+              {tTournaments('management.dropped')}
             </div>
           </div>
         </div>
 
-        <Separator />
-
-        {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <Label htmlFor="search">Buscar Participantes</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="search"
-                placeholder="Buscar por nombre o ID de jugador..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-                aria-label="Buscar participantes"
-              />
+        {/* Search, Filter and Participants List */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          {/* Search and Filter Header */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Label htmlFor="search" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+{tTournaments('management.searchParticipants')}
+                </Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <Input
+                    id="search"
+                    placeholder={tTournaments('management.searchPlaceholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                    aria-label={tTournaments('management.searchAriaLabel')}
+                  />
+                </div>
+              </div>
+              
+              <div className="sm:w-48">
+                <Label htmlFor="status-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+{tTournaments('management.filterByStatus')}
+                </Label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800" 
+                      aria-label={tTournaments('management.filterAriaLabel')}
+                    >
+                      <Filter className="h-4 w-4 mr-2" />
+                      {statusFilter === 'all' ? tTournaments('management.allStatuses') : 
+                       statusFilter === ParticipantStatus.REGISTERED ? tTournaments('management.registered') :
+                       statusFilter === ParticipantStatus.CHECKED_IN ? tTournaments('management.confirmed') :
+                       statusFilter === ParticipantStatus.DROPPED ? tTournaments('management.dropped') : statusFilter}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48">
+                    <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+{tTournaments('management.allStatuses')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.REGISTERED)}>
+{tTournaments('management.registered')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.CHECKED_IN)}>
+{tTournaments('management.confirmed')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.DROPPED)}>
+{tTournaments('management.dropped')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
-          
-          <div>
-            <Label htmlFor="status-filter">Filtrar por Estado</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full sm:w-auto" aria-label="Filtrar por estado">
-                  <Filter className="h-4 w-4 mr-2" />
-                  {statusFilter === 'all' ? 'Todos los Estados' : 
-                   statusFilter === ParticipantStatus.REGISTERED ? 'Registrados' :
-                   statusFilter === ParticipantStatus.CHECKED_IN ? 'Confirmados' :
-                   statusFilter === ParticipantStatus.DROPPED ? 'Retirados' : statusFilter}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                  Todos los Estados
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.REGISTERED)}>
-                  Registrados
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.CHECKED_IN)}>
-                  Confirmados
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter(ParticipantStatus.DROPPED)}>
-                  Retirados
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
 
-        {/* Error Display */}
-        {currentError && (
-          <Alert variant="destructive" role="alert">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{currentError}</AlertDescription>
-          </Alert>
-        )}
+          {/* Error Display */}
+          {currentError && (
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <Alert variant="destructive" role="alert">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{currentError}</AlertDescription>
+              </Alert>
+            </div>
+          )}
 
-        {/* Participants List */}
-        <div className="space-y-3" role="list" aria-label="Lista de participantes">
+          {/* Participants List */}
+          <div className="p-4">
+            <div className="space-y-2" role="list" aria-label={tTournaments('management.participantsList')}>
           {filteredParticipants.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No se encontraron participantes</p>
+            <div className="text-center py-8 bg-gray-50 dark:bg-gray-800">
+              <Users className="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+              <p className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">{tTournaments('management.noParticipantsFound')}</p>
               {searchTerm && (
-                <p className="text-sm">Intenta ajustar tu búsqueda o criterios de filtro</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">{tTournaments('management.clearSearch')}</p>
               )}
             </div>
           ) : (
             filteredParticipants.map((participant, index) => (
               <div 
                 key={participant.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 role="listitem"
               >
                 <div className="flex items-center gap-4 flex-1">
-                  <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-sm font-medium">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
                     {index + 1}
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium truncate">{participant.player_name}</h4>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-lg">{participant.player_name}</h4>
                       {getParticipantStatusBadge(participant.status as ParticipantStatus)}
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       {participant.player_id && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs">ID:</span>
-                          <span>{participant.player_id}</span>
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                          <span className="text-xs font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">{tTournaments('management.playerId')}:</span>
+                          <span className="font-mono">{participant.player_id}</span>
                         </div>
                       )}
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <Calendar className="h-4 w-4" />
                         <span>{formatDate(participant.registration_date, 'short')}</span>
                       </div>
                     </div>
@@ -337,36 +354,36 @@ export default function PlayerManagement({
                         variant="outline" 
                         size="sm"
                         onClick={() => setSelectedParticipant(participant)}
-                        aria-label={`Ver detalles de ${participant.player_name}`}
+                        aria-label={`${tTournaments('management.participantDetails')} - ${participant.player_name}`}
                       >
-                        Ver Detalles
+{tTournaments('management.participantDetails')}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Detalles del Participante</DialogTitle>
+                        <DialogTitle>{tTournaments('management.participantDetails')}</DialogTitle>
                         <DialogDescription>
-                          Información completa de {participant.player_name}
+                          {tTournaments('management.participantDetails')} - {participant.player_name}
                         </DialogDescription>
                       </DialogHeader>
                       
                       {selectedParticipant && (
                         <div className="space-y-4">
                           <div>
-                            <Label>Nombre</Label>
+                            <Label>{tTournaments('management.playerName')}</Label>
                             <p className="text-sm">{selectedParticipant.player_name}</p>
                           </div>
                           
                           {selectedParticipant.player_id && (
                             <div>
-                              <Label>ID de Jugador</Label>
+                              <Label>{tTournaments('management.playerIdLabel')}</Label>
                               <p className="text-sm">{selectedParticipant.player_id}</p>
                             </div>
                           )}
                           
                           {selectedParticipant.player_birthdate && (
                             <div>
-                              <Label>Fecha de Nacimiento</Label>
+                              <Label>{tTournaments('management.birthDate')}</Label>
                               <p className="text-sm">
                                 {formatDate(selectedParticipant.player_birthdate, 'long')}
                               </p>
@@ -374,18 +391,18 @@ export default function PlayerManagement({
                           )}
                           
                           <div>
-                            <Label>Fecha de Registro</Label>
+                            <Label>{tTournaments('management.registrationDate')}</Label>
                             <p className="text-sm">
                               {formatDateTime(selectedParticipant.registration_date)}
                             </p>
                           </div>
                           
                           <div>
-                            <Label>Estado</Label>
+                            <Label>{tTournaments('management.status')}</Label>
                             <p className="text-sm">
-                              {selectedParticipant.status === ParticipantStatus.REGISTERED ? 'Registrado' :
-                               selectedParticipant.status === ParticipantStatus.CHECKED_IN ? 'Confirmado' :
-                               selectedParticipant.status === ParticipantStatus.DROPPED ? 'Retirado' : 
+                              {selectedParticipant.status === ParticipantStatus.REGISTERED ? tTournaments('management.registered') :
+                               selectedParticipant.status === ParticipantStatus.CHECKED_IN ? tTournaments('management.confirmed') :
+                               selectedParticipant.status === ParticipantStatus.DROPPED ? tTournaments('management.dropped') : 
                                selectedParticipant.status}
                             </p>
                           </div>
@@ -414,7 +431,7 @@ export default function PlayerManagement({
                           onClick={() => updateParticipantStatus(participant.id, ParticipantStatus.CHECKED_IN)}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Confirmar Registro
+{tTournaments('management.confirmParticipant')}
                         </DropdownMenuItem>
                       )}
                       
@@ -434,7 +451,7 @@ export default function PlayerManagement({
                         className="text-red-600"
                       >
                         <XCircle className="h-4 w-4 mr-2" />
-                        Eliminar Participante
+{tTournaments('management.dropParticipant')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -442,6 +459,8 @@ export default function PlayerManagement({
               </div>
             ))
           )}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

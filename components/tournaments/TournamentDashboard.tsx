@@ -24,6 +24,7 @@ import Link from 'next/link';
 // Local Components
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
 import { CreateTournamentButton } from '@/components/tournaments/CreateTournamentButton';
+import TournamentManagementModal from '@/components/tournaments/TournamentManagementModal';
 
 // Types
 import { 
@@ -78,6 +79,9 @@ export function TournamentDashboard({
   const [tournaments, setTournaments] = useState<UserTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedTournament, setSelectedTournament] = useState<UserTournament | null>(null);
+  const [showManagementModal, setShowManagementModal] = useState(false);
+  const [tournamentParticipants, setTournamentParticipants] = useState<any[]>([]);
   const userRole = user?.user_profiles?.user_role || 'player';
   const isOrganizer = userRole === 'organizer' || userRole === 'admin';
   
@@ -91,6 +95,70 @@ export function TournamentDashboard({
   useEffect(() => {
     fetchUserTournaments();
   }, [user]);
+
+  const handleManageTournament = async (tournament: any) => {
+    setSelectedTournament(tournament);
+    setShowManagementModal(true);
+    
+    // Fetch participants for the selected tournament
+    try {
+      const response = await fetch(`/api/tournaments/${tournament.id}/participants`);
+      if (response.ok) {
+        const data = await response.json();
+        setTournamentParticipants(data.participants || []);
+      } else {
+        setTournamentParticipants([]);
+      }
+    } catch (error) {
+      console.error('Error fetching participants:', error);
+      setTournamentParticipants([]);
+    }
+  };
+
+  const handleCloseManagementModal = () => {
+    setShowManagementModal(false);
+    setSelectedTournament(null);
+  };
+
+  const handleParticipantUpdate = async () => {
+    // Refresh tournaments data
+    await fetchUserTournaments();
+  };
+
+  const handleTournamentUpdate = async () => {
+    // Refresh tournaments data
+    await fetchUserTournaments();
+  };
+
+  const handleTournamentDelete = async () => {
+    if (!selectedTournament) return;
+    
+    try {
+      const response = await fetch(`/api/tournaments/${selectedTournament.id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete tournament');
+      }
+
+      // Refresh tournaments data
+      await fetchUserTournaments();
+      
+      // Close the modal
+      setShowManagementModal(false);
+      setSelectedTournament(null);
+      
+    } catch (error) {
+      console.error('Error deleting tournament:', error);
+      // You might want to show a toast notification here
+      alert('Error deleting tournament: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
 
   const fetchUserTournaments = async () => {
     try {
@@ -434,6 +502,7 @@ export function TournamentDashboard({
                         userRole="authenticated"
                         showActions={true}
                         className="h-full"
+                        onManage={handleManageTournament}
                       />
                     </div>
                   ))}
@@ -490,6 +559,7 @@ export function TournamentDashboard({
                       userRole="authenticated"
                       showActions={true}
                       className="h-full"
+                      onManage={handleManageTournament}
                     />
                   </div>
                 ))}
@@ -540,6 +610,7 @@ export function TournamentDashboard({
                     userRole="authenticated"
                     showActions={true}
                     className="h-full"
+                    onManage={handleManageTournament}
                   />
                 </div>
               ))}
@@ -548,6 +619,19 @@ export function TournamentDashboard({
         </TabsContent>
       </Tabs>
       </div>
+
+      {/* Tournament Management Modal */}
+      {selectedTournament && (
+        <TournamentManagementModal
+          isOpen={showManagementModal}
+          onClose={handleCloseManagementModal}
+          tournament={selectedTournament as any}
+          participants={tournamentParticipants}
+          onParticipantUpdate={handleParticipantUpdate}
+          onTournamentUpdate={handleTournamentUpdate}
+          onTournamentDelete={handleTournamentDelete}
+        />
+      )}
     </div>
   );
 }

@@ -12,10 +12,6 @@ const PopularTournaments = dynamic(() => import('@/components/home/PopularTourna
   ssr: true,
   loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-32 rounded-xl shadow-lg"></div>
 });
-const MyTournaments = dynamic(() => import('@/components/home/MyTournaments').then(m => m.MyTournaments), { 
-  ssr: true,
-  loading: () => <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-32 rounded-xl shadow-lg"></div>
-});
 import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { useAuthModalContext } from "@/components/auth/AuthModalContext";
@@ -350,17 +346,9 @@ export function HomeContent({ user }: HomeContentProps) {
         </div>
       )}
 
-      {/* My Tournaments Section - Only for authenticated users */}
-      {user && (
-        <section className="py-16 bg-gray-100 dark:bg-gray-800">
-          <div className="max-w-7xl mx-auto px-5">
-            <MyTournaments />
-          </div>
-        </section>
-      )}
 
       {/* Featured Tournaments */}
-      <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 py-16">
+      <section className="bg-gray-50 dark:bg-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -413,7 +401,7 @@ export function HomeContent({ user }: HomeContentProps) {
       </section>
 
       {/* Popular Tournaments and Recent Activity */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+      <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
