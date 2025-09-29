@@ -59,7 +59,7 @@ export default function TournamentActivityFeed({
 
   const { activities, isLoading, error, refresh } = useTournamentActivity(
     tournamentId,
-    true
+    false
   );
 
   // Use external loading/error states if provided
@@ -102,7 +102,7 @@ export default function TournamentActivityFeed({
   const displayedActivities = activities.slice(0, maxItems);
 
   return (
-    <Card className={className}>
+    <Card className={`bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${className}`}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>

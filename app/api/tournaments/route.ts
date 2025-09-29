@@ -109,89 +109,120 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
 });
 
 // POST /api/tournaments - Create a new tournament
-export const POST = withErrorHandling(async (request: NextRequest) => {
-  const requestId = generateRequestId();
-  const supabase = await createClient();
-  
-  // Validate authentication
-  const authResult = await validateAuthentication(supabase, requestId);
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-  const { user } = authResult;
-
-  // Validate user role
-  const roleResult = await validateUserRole(supabase, user.id as string, 'organizer', requestId);
-  if (roleResult instanceof NextResponse) {
-    return roleResult;
-  }
-
-  // Parse and validate request body
-  const body = await request.json();
-  let validatedData: z.infer<typeof createTournamentSchema>;
-  
+export async function POST(request: NextRequest) {
   try {
-    validatedData = createTournamentSchema.parse(body);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return handleValidationError(error, requestId);
+    const supabase = await createClient();
+    
+    // Get the authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized', message: 'Authentication required' },
+        { status: 401 }
+      );
     }
-    throw error;
-  }
 
-  // Check for duplicate official tournament ID
-  const { data: existingTournament, error: duplicateError } = await supabase
-    .from('tournaments')
-    .select('id')
-    .eq('official_tournament_id', validatedData.official_tournament_id)
-    .single();
+    // Parse request body
+    const body = await request.json();
 
-  if (duplicateError && duplicateError.code !== 'PGRST116') {
-    return handleSupabaseError(duplicateError, 'verificación de duplicados', requestId);
-  }
+    // Basic validation
+    if (!body.name || !body.tournament_type || !body.official_tournament_id || !body.city || !body.country || !body.start_date) {
+      return NextResponse.json(
+        { error: 'Validation error', message: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
 
-  if (existingTournament) {
-    return createErrorResponse(
-      ErrorCodes.DUPLICATE_TOURNAMENT_ID,
-      'Ya existe un torneo con este ID oficial',
-      undefined,
-      'official_tournament_id',
-      requestId
+    // Check for duplicate official tournament ID
+    const { data: existingTournament, error: duplicateError } = await supabase
+      .from('tournaments')
+      .select('id')
+      .eq('official_tournament_id', body.official_tournament_id)
+      .single();
+
+    if (duplicateError && duplicateError.code !== 'PGRST116') {
+      console.error('Duplicate check error:', duplicateError);
+      return NextResponse.json(
+        { error: 'Database error', message: duplicateError.message },
+        { status: 500 }
+      );
+    }
+
+    if (existingTournament) {
+      return NextResponse.json(
+        { error: 'Duplicate tournament ID', message: 'Ya existe un torneo con este ID oficial' },
+        { status: 400 }
+      );
+    }
+
+    // Create tournament data
+    const tournamentData = {
+      name: body.name,
+      tournament_type: body.tournament_type,
+      official_tournament_id: body.official_tournament_id,
+      city: body.city,
+      country: body.country,
+      state: body.state || null,
+      start_date: body.start_date,
+      max_players: body.max_players || null,
+      description: body.description || null,
+      organizer_id: user.id,
+      status: TournamentStatus.UPCOMING,
+      current_players: 0,
+      registration_open: true
+    };
+
+    // Insert tournament
+    const { data: tournament, error: createError } = await supabase
+      .from('tournaments')
+      .insert([tournamentData])
+      .select('*')
+      .single();
+
+    if (createError) {
+      console.error('Database error:', createError);
+      return NextResponse.json(
+        { error: 'Database error', message: createError.message },
+        { status: 500 }
+      );
+    }
+
+    // Get organizer information separately
+    const { data: organizerProfile, error: organizerError } = await supabase
+      .from('user_profiles')
+      .select('first_name, last_name, organization_name')
+      .eq('user_id', tournament.organizer_id)
+      .single();
+
+    if (organizerError && organizerError.code !== 'PGRST116') {
+      console.warn('Organizer profile not found:', organizerError);
+    }
+
+    // Add organizer information to tournament response
+    const tournamentWithOrganizer = {
+      ...tournament,
+      organizer: organizerProfile || {
+        first_name: null,
+        last_name: null,
+        organization_name: null
+      }
+    };
+
+    return NextResponse.json(
+      { 
+        success: true, 
+        message: 'Torneo creado exitosamente',
+        tournament: tournamentWithOrganizer
+      },
+      { status: 201 }
+    );
+
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', message: 'An unexpected error occurred' },
+      { status: 500 }
     );
   }
-
-  // Create tournament with consistent data structure
-  const tournamentData = {
-    ...validatedData,
-    organizer_id: user.id,
-    status: TournamentStatus.UPCOMING,
-    current_players: 0,
-    registration_open: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
-  const { data: tournament, error: createError } = await supabase
-    .from('tournaments')
-    .insert([tournamentData])
-    .select(`
-      *,
-      organizer:user_profiles!tournaments_organizer_id_fkey(
-        first_name,
-        last_name,
-        organization_name
-      )
-    `)
-    .single();
-
-  if (createError) {
-    return handleSupabaseError(createError, 'creación de torneo', requestId);
-  }
-
-  return createTournamentResponse(
-    tournament,
-    'Torneo creado exitosamente',
-    201,
-    requestId
-  );
-});
+}

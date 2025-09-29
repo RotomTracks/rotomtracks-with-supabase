@@ -88,7 +88,6 @@ function AdminSettingsContent() {
       if (result.success) {
         // Settings saved successfully
         // You could add a toast notification here
-        console.log('Settings saved successfully');
       }
     } catch (error) {
       console.error('Error saving settings:', error);

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Tournament } from '@/lib/types/tournament';
+import { TournamentWithOrganizer } from '@/lib/types/tournament';
 
 export function useTournamentModal() {
-  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [selectedTournament, setSelectedTournament] = useState<TournamentWithOrganizer | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = (tournament: Tournament) => {
+  const openModal = (tournament: TournamentWithOrganizer) => {
     setSelectedTournament(tournament);
     setIsModalOpen(true);
   };

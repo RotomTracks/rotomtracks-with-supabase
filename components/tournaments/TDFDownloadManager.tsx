@@ -115,7 +115,7 @@ export default function TDFDownloadManager({
   const handleCustomDownload = () => handleDownload(true);
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />

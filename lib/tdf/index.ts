@@ -8,6 +8,8 @@
  * - Player data management
  */
 
+import { TournamentType } from '@/lib/types/tournament';
+
 // Parser exports
 export {
   TDFParser,
@@ -55,7 +57,7 @@ export class TDFManager {
   static async extractSummaryFromFile(file: File): Promise<{
     name: string;
     id: string;
-    type: string;
+    type: TournamentType;
     location: string;
     date: string;
     playerCount: number;

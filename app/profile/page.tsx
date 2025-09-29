@@ -89,6 +89,7 @@ export default function ProfilePage() {
         variant={isEditing ? "default" : "outline"}
         onClick={() => setIsEditing(true)}
         disabled={isEditing}
+        className={isEditing ? "" : "!bg-gray-100 hover:!bg-gray-200 !border-gray-300 !text-gray-700 dark:!bg-gray-700 dark:hover:!bg-gray-600 dark:!border-gray-600 dark:!text-gray-200"}
       >
         <Edit className="w-4 h-4 mr-2" />
         {tUI('buttons.edit')}
@@ -106,7 +107,8 @@ export default function ProfilePage() {
   ) : undefined;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
       <HomePageNavigation
         title={navConfig.title}
         description={welcomeMessage || navConfig.description}
@@ -146,6 +148,7 @@ export default function ProfilePage() {
           </div>
         )
       )}
+      </div>
     </div>
   );
 }

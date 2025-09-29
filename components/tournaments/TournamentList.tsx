@@ -31,7 +31,7 @@ import { useTournamentModal } from './useTournamentModal';
 
 // Types
 import { 
-  Tournament, 
+  TournamentWithOrganizer,
   UserRole} from '@/lib/types/tournament';
 
 // Hooks and Utilities
@@ -39,7 +39,7 @@ import { useTypedTranslation } from '@/lib/i18n';
 import { useTournamentFormatting } from '@/lib/utils/tournament-formatting';
 
 interface TournamentListProps {
-  tournaments: Tournament[];
+  tournaments: TournamentWithOrganizer[];
   totalTournaments: number;
   currentPage: number;
   totalPages: number;
@@ -262,8 +262,8 @@ export function TournamentList({
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {totalTournaments === 1 
-              ? tTournaments('list.tournamentsFound_one', { count: totalTournaments })
-              : tTournaments('list.tournamentsFound_other', { count: totalTournaments })
+              ? tTournaments('list.tournamentsFoundOne', { count: totalTournaments })
+              : tTournaments('list.tournamentsFoundOther', { count: totalTournaments })
             }
           </h2>
           {hasActiveFilters && (

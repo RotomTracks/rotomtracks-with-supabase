@@ -158,7 +158,7 @@ export default function PlayerManagement({
 
   // Render loading state
   const renderLoadingState = () => (
-    <Card>
+    <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
@@ -192,7 +192,7 @@ export default function PlayerManagement({
   if (loading) return renderLoadingState();
 
   return (
-    <Card>
+    <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />

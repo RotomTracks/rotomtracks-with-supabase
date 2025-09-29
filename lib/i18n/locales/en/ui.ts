@@ -18,6 +18,7 @@ export const ui = {
     clear: "Clear",
     close: "Close",
     open: "Open",
+    copy: "Copy",
     view: "View",
     download: "Download",
     upload: "Upload",
@@ -123,7 +124,8 @@ export const ui = {
       sent: "Message sent successfully",
       accountCreated: "Account created successfully! Check your email to confirm your account.",
       registrationSuccess: "Registration successful!",
-      registrationComplete: "You have been successfully registered for the tournament"
+      registrationComplete: "You have been successfully registered for the tournament",
+      copied: "Copied!"
     },
     error: {
       generic: "An error occurred",
@@ -141,7 +143,12 @@ export const ui = {
       registrationClosed: "Registration is closed for this tournament",
       onlyUpcomingTournaments: "Registration is only available for upcoming tournaments",
       alreadyRegistered: "You are already registered for this tournament",
-      registrationError: "Registration error"
+      registrationNotFound: "You are not registered for this tournament",
+      registrationError: "Registration error",
+      unregistrationError: "Unregistration error",
+      unregistrationSuccess: "Unregistration successful!",
+      unregistrationComplete: "You have been successfully unregistered from the tournament",
+      copyError: "Error copying to clipboard"
     },
     warning: {
       unsavedChanges: "You have unsaved changes",

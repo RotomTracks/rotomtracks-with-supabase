@@ -172,7 +172,7 @@ export function HomeContent({ user }: HomeContentProps) {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 py-20">
+      <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 py-20">
         <div className="max-w-7xl mx-auto px-5 text-center">
           <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
             {tPages('home.hero.title')}
@@ -226,7 +226,7 @@ export function HomeContent({ user }: HomeContentProps) {
 
           {/* Central Search Component */}
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-700 rounded-2xl shadow-xl px-8 pt-8 pb-4 border border-gray-200 dark:border-gray-600">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl shadow-xl px-8 pt-8 pb-4 border border-gray-200 dark:border-gray-600">
               <div className="mb-6">
                 <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
                   {tPages('home.search.title')}
@@ -283,19 +283,19 @@ export function HomeContent({ user }: HomeContentProps) {
             
             {/* Quick Stats */}
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-              <div className="bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                   {stats.tournaments > 0 ? `${stats.tournaments}+` : '0'}
                 </div>
                 <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{tPages('home.stats.tournaments')}</div>
               </div>
-              <div className="bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
                   {stats.players > 0 ? `${stats.players}+` : '0'}
                 </div>
                 <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{tPages('home.stats.players')}</div>
               </div>
-              <div className="bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-200">
                 <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                   {stats.cities > 0 ? `${stats.cities}+` : '0'}
                 </div>
@@ -352,7 +352,7 @@ export function HomeContent({ user }: HomeContentProps) {
 
       {/* My Tournaments Section - Only for authenticated users */}
       {user && (
-        <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <section className="py-16 bg-gray-100 dark:bg-gray-800">
           <div className="max-w-7xl mx-auto px-5">
             <MyTournaments />
           </div>
@@ -360,7 +360,7 @@ export function HomeContent({ user }: HomeContentProps) {
       )}
 
       {/* Featured Tournaments */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800 py-16">
+      <section className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -380,7 +380,7 @@ export function HomeContent({ user }: HomeContentProps) {
           {/* Call to Action for Tournament Discovery - Only show when there are upcoming tournaments */}
           {hasUpcomingTournaments && (
             <div className="text-center mt-12">
-              <div className="bg-blue-50 dark:bg-gray-700 rounded-2xl p-8 border border-blue-100 dark:border-gray-600">
+              <div className="bg-white dark:bg-gray-700 rounded-2xl p-8 border border-gray-200 dark:border-gray-600">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                   {tPages('home.sections.notFound')}
                 </h3>
@@ -413,7 +413,7 @@ export function HomeContent({ user }: HomeContentProps) {
       </section>
 
       {/* Popular Tournaments and Recent Activity */}
-      <section className="py-16 bg-white dark:bg-gray-800">
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">

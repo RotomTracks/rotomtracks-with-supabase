@@ -52,10 +52,11 @@ export default function CompleteProfilePage() {
   }
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-2xl">
         <div className="flex flex-col gap-6">
-          <Card>
+          <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardHeader className="text-center">
               <div className="w-16 h-16 mx-auto bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-4">
                 <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -84,6 +85,7 @@ export default function CompleteProfilePage() {
 
           <ProfileForm user={user} initialProfile={profile} />
         </div>
+      </div>
       </div>
     </div>
   );

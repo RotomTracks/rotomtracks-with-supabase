@@ -12,9 +12,11 @@ import {
   Users, 
   Clock,
   UserPlus,
+  UserMinus,
   Eye,
   Settings,
-  Trophy
+  Trophy,
+  Mail
 } from 'lucide-react';
 
 // Hooks
@@ -26,7 +28,7 @@ import Link from 'next/link';
 
 // Types
 import { 
-  Tournament, 
+  TournamentWithOrganizer,
   TournamentStatus, 
   ParticipantStatus,
   TournamentType,
@@ -43,7 +45,7 @@ import {
 } from '@/lib/utils/tournament-status';
 
 interface TournamentCardProps {
-  tournament: Tournament & {
+  tournament: TournamentWithOrganizer & {
     user_role?: 'participant' | 'organizer';
     registration_status?: ParticipantStatus;
   };
@@ -51,7 +53,7 @@ interface TournamentCardProps {
   userRole: UserRole | 'authenticated' | 'guest';
   showActions?: boolean;
   className?: string;
-  onViewDetails?: (tournament: Tournament) => void;
+  onViewDetails?: (tournament: TournamentWithOrganizer) => void;
 }
 
 export function TournamentCard({ 
@@ -62,12 +64,13 @@ export function TournamentCard({
   className = '',
   onViewDetails
 }: TournamentCardProps) {
+  
   // Use centralized formatting utilities
   const { formatDate, formatTime } = useTournamentFormatting();
   const { tTournaments } = useTypedTranslation();
   
   // Registration hook
-  const { registerForTournament, isLoading: isRegistering } = useTournamentRegistration({
+  const { registerForTournament, unregisterFromTournament, isLoading: isRegistering } = useTournamentRegistration({
     tournamentId: tournament.id,
     onSuccess: () => {
       // Refresh the page or update the tournament data
@@ -119,7 +122,7 @@ export function TournamentCard({
 
   // Tournament state checks
   const isUpcoming = tournament.status === TournamentStatus.UPCOMING;
-  const canRegister = tournament.registration_open && isUpcoming;
+  const canRegister = tournament.registration_open && isUpcoming && !tournament.is_organizer;
 
   if (viewMode === 'list') {
     return (
@@ -165,7 +168,7 @@ export function TournamentCard({
                 </div>
               </div>
               
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
                 {tournament.description}
               </p>
             </div>
@@ -175,11 +178,20 @@ export function TournamentCard({
                 <Button 
                   size="sm" 
                   className="text-white"
-                  onClick={registerForTournament}
+                  onClick={tournament.user_registration_status === 'not_registered' ? registerForTournament : unregisterFromTournament}
                   disabled={isRegistering}
                 >
-                  <UserPlus className="h-4 w-4 mr-1" />
-                  {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                  {tournament.user_registration_status === 'not_registered' ? (
+                    <>
+                      <UserPlus className="h-4 w-4 mr-1" />
+                      {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                    </>
+                  ) : (
+                    <>
+                      <UserMinus className="h-4 w-4 mr-1" />
+                      {isRegistering ? tTournaments('actions.unregistering') : tTournaments('actions.unregister')}
+                    </>
+                  )}
                 </Button>
               )}
               {onViewDetails ? (
@@ -272,6 +284,7 @@ export function TournamentCard({
             </span>
           </div>
           
+          
           {tournament.max_players && (
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -297,15 +310,24 @@ export function TournamentCard({
         
         {showActions && (
           <div className="flex items-center space-x-2 mt-4 pt-4 border-t">
-            {canRegister && userRole === 'authenticated' && !tournament.registration_status && (
+            {canRegister && userRole === 'authenticated' && (
               <Button 
                 size="sm" 
                 className="flex-1 text-white"
-                onClick={registerForTournament}
+                onClick={tournament.user_registration_status === 'not_registered' ? registerForTournament : unregisterFromTournament}
                 disabled={isRegistering}
               >
-                <UserPlus className="h-4 w-4 mr-1" />
-                {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                {tournament.user_registration_status === 'not_registered' ? (
+                  <>
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                  </>
+                ) : (
+                  <>
+                    <UserMinus className="h-4 w-4 mr-1" />
+                    {isRegistering ? tTournaments('actions.unregistering') : tTournaments('actions.unregister')}
+                  </>
+                )}
               </Button>
             )}
             
@@ -321,14 +343,14 @@ export function TournamentCard({
               <Button 
                 size="sm" 
                 variant="outline" 
-                className={`w-full bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white ${tournament.user_role === 'organizer' ? '' : 'flex-1'}`}
+                className={`w-full bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white ${tournament.user_role === 'organizer' ? 'flex-1' : 'flex-1'}`}
                 onClick={() => onViewDetails(tournament)}
               >
                 <Eye className="h-4 w-4 mr-1" />
                 {tTournaments('actions.viewDetails')}
               </Button>
             ) : (
-              <Link href={`/tournaments/${tournament.id}`} className={tournament.user_role === 'organizer' ? '' : 'flex-1'}>
+              <Link href={`/tournaments/${tournament.id}`} className="flex-1">
                 <Button size="sm" variant="outline" className="w-full bg-transparent border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                   <Eye className="h-4 w-4 mr-1" />
                   {tTournaments('actions.viewDetails')}

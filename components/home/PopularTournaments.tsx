@@ -68,7 +68,6 @@ export function PopularTournaments() {
           setPopularTypes([]);
           setRecentActivity([]);
         }
-        
       } catch (error) {
         console.error('Error fetching popular tournaments data:', error);
         // Set empty data on error

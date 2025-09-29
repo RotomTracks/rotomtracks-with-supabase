@@ -71,7 +71,7 @@ export default function RealTimePlayerCount({
     recentRegistrations,
     isLoading,
     error
-  } = useRealTimePlayerCount(tournamentId, true);
+  } = useRealTimePlayerCount(tournamentId, false);
   
   // Use external loading/error states if provided
   const currentLoading = externalLoading || isLoading;
@@ -135,7 +135,7 @@ export default function RealTimePlayerCount({
   }
 
   return (
-    <Card className={className}>
+    <Card className={`bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 ${className}`}>
       <CardContent className="p-4">
         <div className="space-y-4">
           {/* Header */}

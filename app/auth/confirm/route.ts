@@ -8,14 +8,6 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type')
   const next = searchParams.get('next') ?? '/'
 
-  // Debug logging
-  console.log('Auth confirm route called with:', {
-    token_hash: token_hash ? `${token_hash.substring(0, 10)}...` : null,
-    token: token ? `${token.substring(0, 10)}...` : null,
-    type,
-    next,
-    url: request.url
-  })
 
   if ((token_hash || token) && type) {
     const supabase = await createClient()
@@ -24,21 +16,14 @@ export async function GET(request: NextRequest) {
 
     // Handle password recovery flow specifically
     if (type === 'recovery') {
-      console.log('Processing password recovery flow')
       
       // For password recovery, we need to exchange the code for a session
       if (token) {
-        console.log('Using exchangeCodeForSession with token')
         // Use exchangeCodeForSession for password recovery
         const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(token)
         data = sessionData
         error = sessionError
-        console.log('exchangeCodeForSession result:', { 
-          hasUser: !!sessionData?.user, 
-          error: sessionError?.message 
-        })
       } else if (token_hash) {
-        console.log('Using verifyOtp with token_hash')
         // Fallback to verifyOtp if token_hash is provided
         const { data: otpData, error: otpError } = await supabase.auth.verifyOtp({
           type: type as any,
@@ -46,22 +31,15 @@ export async function GET(request: NextRequest) {
         })
         data = otpData
         error = otpError
-        console.log('verifyOtp result:', { 
-          hasUser: !!otpData?.user, 
-          error: otpError?.message 
-        })
       }
 
       if (!error && data?.user) {
-        console.log('Password recovery successful, redirecting to update password page')
         // For password recovery, redirect directly to update password page
         // The user now has an active session and can update their password
         const updatePasswordUrl = next.startsWith('/auth/update-password') 
           ? next 
           : '/auth/update-password'
         return NextResponse.redirect(new URL(updatePasswordUrl, request.url))
-      } else {
-        console.log('Password recovery failed:', error?.message)
       }
     } else {
       // Handle other confirmation types (signup, email change, etc.)
@@ -137,7 +115,5 @@ export async function GET(request: NextRequest) {
   }
 
   // Return the user to an error page with instructions
-  console.log('No valid token or type found, redirecting to auth-code-error')
-  console.log('Final params:', { token_hash: !!token_hash, token: !!token, type })
   return NextResponse.redirect(new URL('/auth/auth-code-error', request.url))
 }

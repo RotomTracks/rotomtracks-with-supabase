@@ -70,7 +70,7 @@ export default function NotificationCenter({
     error, 
     markAsRead, 
     markAllAsRead 
-  } = useRealTimeNotifications({ enabled: true });
+  } = useRealTimeNotifications({ enabled: false });
 
   // State
   const [isOpen, setIsOpen] = useState(false);

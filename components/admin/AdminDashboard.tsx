@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ export function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setError(null);
       setLoading(true);
@@ -57,7 +57,6 @@ export function AdminDashboard() {
         
         // If it's a 404, it might mean the tables don't exist yet
         if (response.status === 404) {
-          console.log('Dashboard endpoint returned 404, showing empty state');
           setMetrics({
             totalRequests: 0,
             pendingRequests: 0,
@@ -88,7 +87,7 @@ export function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tAdmin, tUI]);
 
   useEffect(() => {
     fetchDashboardData();

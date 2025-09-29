@@ -168,7 +168,7 @@ export default function TournamentSettings({
   return (
     <div className="space-y-6">
       {/* Tournament Status Management */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
@@ -240,7 +240,7 @@ export default function TournamentSettings({
       </Card>
 
       {/* Tournament Settings */}
-      <Card>
+      <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ export default function TournamentSettings({
 
       {/* TDF Information */}
       {tournament.tdf_metadata && (
-        <Card>
+        <Card className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />

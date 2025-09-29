@@ -34,7 +34,9 @@ export const admin = {
       approved: "Aprobadas",
       approvedDescription: "Solicitudes aprobadas",
       underReview: "En Revisión",
-      underReviewDescription: "Siendo revisadas"
+      underReviewDescription: "Siendo revisadas",
+      rejected: "Rechazadas",
+      rejectedDescription: "Solicitudes rechazadas"
     },
     recentActivity: {
       title: "Actividad Reciente",
@@ -87,7 +89,9 @@ export const admin = {
       title: "No se encontraron solicitudes de organizador",
       description: "No hay solicitudes de organizador en este momento.",
       descriptionFiltered: "No hay solicitudes que coincidan con tus filtros actuales. Intenta ajustar tus criterios de búsqueda."
-    }
+    },
+    requestedOn: "Solicitado el",
+    viewDetails: "Ver Detalles"
   },
 
   // Settings

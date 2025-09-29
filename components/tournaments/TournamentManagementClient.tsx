@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,20 +10,17 @@ import TournamentSettings from '@/components/tournaments/TournamentSettings';
 import RealTimePlayerCount from '@/components/tournaments/RealTimePlayerCount';
 import TournamentActivityFeed from '@/components/tournaments/TournamentActivityFeed';
 import NotificationCenter from '@/components/tournaments/NotificationCenter';
+import { TournamentDetailsModal } from '@/components/tournaments/TournamentDetailsModal';
 import { 
-  Calendar, 
-  MapPin, 
-  Users, 
   ArrowLeft,
-  Trophy,
-  FileText
+  Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { TournamentParticipant, Tournament } from '@/lib/types/tournament';
+import { TournamentParticipant, TournamentWithOrganizer } from '@/lib/types/tournament';
 
 interface TournamentManagementClientProps {
-  tournament: Tournament;
+  tournament: TournamentWithOrganizer;
   participants: TournamentParticipant[];
 }
 
@@ -35,6 +31,9 @@ export default function TournamentManagementClient({
   const router = useRouter();
   const tournament = initialTournament;
   const participants = initialParticipants;
+  
+  // State for tournament details modal
+  const [showTournamentDetails, setShowTournamentDetails] = useState(false);
 
   // Calculate statistics
   const registeredCount = participants.filter(p => p.status === 'registered').length;
@@ -55,7 +54,8 @@ export default function TournamentManagementClient({
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="container mx-auto py-8 px-4">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
@@ -68,9 +68,20 @@ export default function TournamentManagementClient({
         </div>
         
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">{tournament.name}</h1>
-            <p className="text-muted-foreground mt-1">Tournament Management</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">{tournament.name}</h1>
+              <p className="text-muted-foreground mt-1">Tournament Management</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTournamentDetails(true)}
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              Ver como jugador
+            </Button>
           </div>
           
           <div className="flex items-center gap-2">
@@ -87,59 +98,6 @@ export default function TournamentManagementClient({
         </div>
       </div>
 
-      {/* Tournament Overview */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Tournament Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Start Date</p>
-                <p className="font-medium">
-                  {new Date(tournament.start_date).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Location</p>
-                <p className="font-medium">
-                  {tournament.city}, {tournament.country}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Participants</p>
-                <p className="font-medium">
-                  {registeredCount + confirmedCount}
-                  {tournament.max_players && ` / ${tournament.max_players}`}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Tournament ID</p>
-                <p className="font-medium font-mono text-sm">
-                  {tournament.official_tournament_id || tournament.id.substring(0, 8)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Real-time Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -180,7 +138,7 @@ export default function TournamentManagementClient({
         {/* TDF Generation Tab */}
         <TabsContent value="tdf" className="space-y-6">
           <TDFDownloadManager 
-            tournament={tournament as any}
+            tournament={tournament as TournamentWithOrganizer}
             participants={participants}
           />
         </TabsContent>
@@ -193,6 +151,15 @@ export default function TournamentManagementClient({
           />
         </TabsContent>
       </Tabs>
+      </div>
+      
+      {/* Tournament Details Modal */}
+      <TournamentDetailsModal
+        isOpen={showTournamentDetails}
+        onClose={() => setShowTournamentDetails(false)}
+        tournament={tournament as TournamentWithOrganizer}
+        userRole="authenticated"
+      />
     </div>
   );
 }

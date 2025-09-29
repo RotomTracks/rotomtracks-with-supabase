@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { UserRole, UserProfile } from '@/lib/types/tournament';
 import { User } from '@supabase/supabase-js';
@@ -29,7 +29,7 @@ export function useAuth(): UseAuthReturn {
   
   const supabase = createClient();
 
-  const fetchUserAndProfile = async () => {
+  const fetchUserAndProfile = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -71,7 +71,7 @@ export function useAuth(): UseAuthReturn {
       setProfile(null);
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   const refreshAuth = async () => {
     await fetchUserAndProfile();
@@ -80,8 +80,7 @@ export function useAuth(): UseAuthReturn {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      setUser(null);
-      setProfile(null);
+      // Let onAuthStateChange handle the state updates
     } catch (err) {
       console.error('Error signing out:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign out');
@@ -110,14 +109,20 @@ export function useAuth(): UseAuthReturn {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_OUT') {
+          // Handle sign out immediately without loading state
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+          setError(null);
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           await fetchUserAndProfile();
         }
       }
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchUserAndProfile]);
 
   return {
     user,

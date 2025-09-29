@@ -3,7 +3,7 @@ import { TournamentList } from '@/components/tournaments/TournamentList';
 import { getCurrentUser } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 import { getNavigationConfig } from '@/lib/navigation/config';
-import { TournamentType, TournamentStatus } from '@/lib/types/tournament';
+import { createClient } from '@/lib/supabase/server';
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
 
@@ -21,128 +21,88 @@ interface TournamentsPageProps {
 export default async function TournamentsPage({ searchParams }: TournamentsPageProps) {
   const user = await getCurrentUser();
   const params = await searchParams;
-  
-  // For now, we'll use mock data until Supabase is properly configured
-  const mockTournaments = [
-    {
-      id: '1',
-      official_tournament_id: '24-03-000247',
-      name: 'Campeonato Regional Madrid 2024',
-      tournament_type: TournamentType.VGC_PREMIER_EVENT,
-      city: 'Madrid',
-      country: 'España',
-      start_date: '2024-03-15T10:00:00Z',
-      end_date: '2024-03-15T18:00:00Z',
-      status: TournamentStatus.COMPLETED,
-      current_players: 128,
-      max_players: 150,
-      registration_open: false,
-      organizer_id: 'org1',
-      description: 'El campeonato regional más importante de Madrid con los mejores jugadores de VGC.',
-      created_at: '2024-02-01T10:00:00Z',
-      updated_at: '2024-03-15T18:00:00Z'
-    },
-    {
-      id: '2',
-      official_tournament_id: '24-03-000156',
-      name: 'Liga Cup Barcelona TCG',
-      tournament_type: TournamentType.TCG_LEAGUE_CUP,
-      city: 'Barcelona',
-      country: 'España',
-      start_date: '2024-03-20T09:00:00Z',
-      end_date: '2024-03-20T17:00:00Z',
-      status: TournamentStatus.ONGOING,
-      current_players: 64,
-      max_players: 80,
-      registration_open: false,
-      organizer_id: 'org2',
-      description: 'Liga Cup oficial de TCG en Barcelona con premios increíbles.',
-      created_at: '2024-02-10T10:00:00Z',
-      updated_at: '2024-03-20T12:00:00Z'
-    },
-    {
-      id: '3',
-      official_tournament_id: '24-04-000089',
-      name: 'Torneo GO Valencia Spring',
-      tournament_type: TournamentType.GO_PREMIER_EVENT,
-      city: 'Valencia',
-      country: 'España',
-      start_date: '2024-04-05T11:00:00Z',
-      end_date: '2024-04-05T16:00:00Z',
-      status: TournamentStatus.UPCOMING,
-      current_players: 32,
-      max_players: 50,
-      registration_open: true,
-      organizer_id: 'org3',
-      description: 'Primer torneo de Pokémon GO de la temporada primavera en Valencia.',
-      created_at: '2024-03-01T10:00:00Z',
-      updated_at: '2024-03-25T10:00:00Z'
-    },
-    {
-      id: '4',
-      official_tournament_id: '24-04-000123',
-      name: 'Challenge Sevilla TCG',
-      tournament_type: TournamentType.TCG_LEAGUE_CHALLENGE,
-      city: 'Sevilla',
-      country: 'España',
-      start_date: '2024-04-12T10:00:00Z',
-      end_date: '2024-04-12T15:00:00Z',
-      status: TournamentStatus.UPCOMING,
-      current_players: 24,
-      max_players: 40,
-      registration_open: true,
-      organizer_id: 'org4',
-      description: 'League Challenge mensual en Sevilla para jugadores de todos los niveles.',
-      created_at: '2024-03-15T10:00:00Z',
-      updated_at: '2024-03-25T10:00:00Z'
-    },
-    {
-      id: '5',
-      official_tournament_id: '24-04-000201',
-      name: 'Prerelease Bilbao',
-      tournament_type: TournamentType.TCG_PRERELEASE,
-      city: 'Bilbao',
-      country: 'España',
-      start_date: '2024-04-20T12:00:00Z',
-      end_date: '2024-04-20T17:00:00Z',
-      status: TournamentStatus.UPCOMING,
-      current_players: 18,
-      max_players: 30,
-      registration_open: true,
-      organizer_id: 'org5',
-      description: 'Evento prerelease de la nueva expansión con sobres gratuitos.',
-      created_at: '2024-03-20T10:00:00Z',
-      updated_at: '2024-03-25T10:00:00Z'
-    },
-    {
-      id: '6',
-      official_tournament_id: '24-05-000078',
-      name: 'VGC Regional Zaragoza',
-      tournament_type: TournamentType.VGC_PREMIER_EVENT,
-      city: 'Zaragoza',
-      country: 'España',
-      start_date: '2024-05-01T09:00:00Z',
-      end_date: '2024-05-01T19:00:00Z',
-      status: TournamentStatus.UPCOMING,
-      current_players: 96,
-      max_players: 120,
-      registration_open: true,
-      organizer_id: 'org6',
-      description: 'Regional de VGC en Zaragoza con clasificación para el campeonato mundial.',
-      created_at: '2024-03-10T10:00:00Z',
-      updated_at: '2024-03-25T10:00:00Z'
-    }
-  ];
+  const supabase = await createClient();
+
+  // Fetch tournaments from database
+  const { data: tournaments, error: tournamentsError } = await supabase
+    .from('tournaments')
+    .select('*')
+    .order('start_date', { ascending: false });
+
+  if (tournamentsError) {
+    console.error('Error fetching tournaments:', tournamentsError);
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto py-8">
+          <div className="max-w-7xl mx-auto">
+            <PageNavigation
+              title="Torneos de Pokémon"
+              description="Encuentra y participa en torneos de TCG, VGC y GO"
+              breadcrumbs={[
+                { label: "Inicio", href: "/" },
+                { label: "Dashboard", href: "/dashboard" },
+                { label: "Torneos de Pokémon", href: "/tournaments", current: true }
+              ]}
+              backButtonHref="/dashboard"
+              backButtonText="Volver al Dashboard"
+            />
+            <div className="text-center py-12">
+              <p className="text-red-600">Error al cargar los torneos. Inténtalo de nuevo más tarde.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Get current user for registration status
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+  // Fetch organizer information and registration status for each tournament
+  const tournamentsWithOrganizers = await Promise.all(
+    (tournaments || []).map(async (tournament) => {
+      const { data: organizer, error: organizerError } = await supabase
+        .from('user_profiles')
+        .select('first_name, last_name, organization_name, email')
+        .eq('user_id', tournament.organizer_id)
+        .single();
+
+      // Check if current user is the organizer
+      const is_organizer = currentUser && tournament.organizer_id === currentUser.id;
+
+      // Check user registration status if user is authenticated and not organizer
+        let user_registration_status: 'registered' | 'waitlist' | 'not_registered' = 'not_registered';
+        if (currentUser && !is_organizer) {
+          const { data: registration, error: registrationError } = await supabase
+            .from('tournament_participants')
+            .select('status')
+            .eq('tournament_id', tournament.id)
+            .eq('user_id', currentUser.id)
+            .single();
+          
+          if (registration) {
+            user_registration_status = registration.status === 'waitlist' ? 'waitlist' : 'registered';
+          }
+        }
+
+      return {
+        ...tournament,
+        organizer: organizer || null,
+        is_organizer,
+        user_registration_status
+      };
+    })
+  );
 
   // Apply basic filtering based on search params
-  let filteredTournaments = mockTournaments;
+  let filteredTournaments = tournamentsWithOrganizers || [];
 
   if (params.q) {
     const query = params.q.toLowerCase();
     filteredTournaments = filteredTournaments.filter(t => 
       t.name.toLowerCase().includes(query) ||
       t.tournament_type.toLowerCase().includes(query) ||
-      t.description.toLowerCase().includes(query)
+      (t.description && t.description.toLowerCase().includes(query))
     );
   }
 

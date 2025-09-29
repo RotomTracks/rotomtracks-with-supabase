@@ -181,6 +181,27 @@
     font-size: 1.5rem;
     line-height: 1.4;
   }
+  
+  /* Custom button styles with maximum specificity */
+  .custom-edit-button {
+    background-color: rgb(243 244 246) !important; /* gray-100 */
+    border-color: rgb(209 213 219) !important; /* gray-300 */
+    color: rgb(55 65 81) !important; /* gray-700 */
+  }
+  
+  .custom-edit-button:hover {
+    background-color: rgb(229 231 235) !important; /* gray-200 */
+  }
+  
+  .dark .custom-edit-button {
+    background-color: rgb(55 65 81) !important; /* gray-700 */
+    border-color: rgb(75 85 99) !important; /* gray-600 */
+    color: rgb(229 231 235) !important; /* gray-200 */
+  }
+  
+  .dark .custom-edit-button:hover {
+    background-color: rgb(75 85 99) !important; /* gray-600 */
+  }
 }
 
 /* Responsive placeholder for search input */

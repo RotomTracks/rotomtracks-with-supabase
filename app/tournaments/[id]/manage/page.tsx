@@ -25,6 +25,13 @@ async function getTournamentData(tournamentId: string, userId: string) {
     return null;
   }
 
+  // Get organizer information
+  const { data: organizer } = await supabase
+    .from('user_profiles')
+    .select('first_name, last_name, organization_name, email')
+    .eq('user_id', tournament.organizer_id)
+    .single();
+
   // Get participants
   const { data: participants, error: participantsError } = await supabase
     .from('tournament_participants')
@@ -35,24 +42,24 @@ async function getTournamentData(tournamentId: string, userId: string) {
       player_name,
       player_id,
       player_birthdate,
-      email,
-      phone,
       status,
-      registration_date,
-      tdf_userid,
-      registration_source,
-      emergency_contact,
-      emergency_phone
+      registration_date
     `)
     .eq('tournament_id', tournamentId)
     .order('registration_date', { ascending: true });
 
   if (participantsError) {
     console.error('Error fetching participants:', participantsError);
-    return { tournament, participants: [] };
+    return { tournament, participants: [], organizer: organizer || null };
   }
 
-  return { tournament, participants: participants || [] };
+  return { 
+    tournament: {
+      ...tournament,
+      organizer: organizer || null
+    }, 
+    participants: participants || [] 
+  };
 }
 
 export default async function TournamentManagePage({ params }: PageProps) {

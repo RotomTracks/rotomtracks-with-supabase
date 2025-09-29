@@ -31,12 +31,10 @@ export async function GET(
         id,
         player_name,
         status,
-        registration_date,
-        created_at,
-        updated_at
+        registration_date
       `)
       .eq('tournament_id', tournamentId)
-      .order('updated_at', { ascending: false })
+      .order('registration_date', { ascending: false })
       .limit(50);
 
     if (participantError) {
@@ -45,34 +43,19 @@ export async function GET(
 
     // Transform participant data into activity feed
     const activities = (participantActivities || []).map(participant => {
-      const isNewRegistration = new Date(participant.created_at).getTime() === new Date(participant.updated_at).getTime();
-      
-      if (isNewRegistration) {
-        return {
-          id: `registration-${participant.id}`,
-          type: 'registration',
-          description: `${participant.player_name} registered for the tournament`,
-          timestamp: participant.registration_date,
-          player_name: participant.player_name,
-          details: {
-            status: participant.status,
-            participant_id: participant.id
-          }
-        };
-      } else {
-        // Status change activity
-        return {
-          id: `status-change-${participant.id}-${participant.updated_at}`,
-          type: 'status_change',
-          description: `${participant.player_name} status changed to ${participant.status}`,
-          timestamp: participant.updated_at,
-          player_name: participant.player_name,
-          details: {
-            status: participant.status,
-            participant_id: participant.id
-          }
-        };
-      }
+      // Since we don't have created_at/updated_at, we'll treat all as registrations
+      // and use registration_date as the timestamp
+      return {
+        id: `registration-${participant.id}`,
+        type: 'registration',
+        description: `${participant.player_name} registered for the tournament`,
+        timestamp: participant.registration_date,
+        player_name: participant.player_name,
+        details: {
+          status: participant.status,
+          participant_id: participant.id
+        }
+      };
     });
 
     // Sort activities by timestamp (most recent first)

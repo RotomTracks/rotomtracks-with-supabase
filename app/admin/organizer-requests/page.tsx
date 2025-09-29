@@ -85,7 +85,6 @@ function AdminOrganizerRequestsContent() {
         
         // If it's a 404, it might mean the tables don't exist yet
         if (response.status === 404) {
-          console.log('Organizer requests endpoint returned 404, showing empty state');
           setRequests([]);
           setPagination({
             page: 1,

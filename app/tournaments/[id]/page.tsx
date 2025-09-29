@@ -80,8 +80,8 @@ export default async function TournamentPage({ params }: TournamentPageProps) {
   // Get organizer information
   const { data: organizer } = await supabase
     .from('user_profiles')
-    .select('full_name, organization_name')
-    .eq('id', tournament.organizer_id)
+    .select('first_name, last_name, organization_name, email')
+    .eq('user_id', tournament.organizer_id)
     .single();
 
   // Get HTML reports from storage

@@ -96,14 +96,14 @@ export async function POST(
       .from('tournament_participants')
       .select('id, status')
       .eq('tournament_id', tournamentId)
-      .eq('user_id', userProfile.id)
+      .eq('user_id', user.id)
       .single();
 
     if (existingRegistration) {
       return createErrorResponse(
         ErrorCodes.DUPLICATE_REGISTRATION,
         'Ya estás registrado en este torneo',
-        { user_id: userProfile.id },
+        { user_id: user.id },
         'user_id'
       );
     }
@@ -111,7 +111,7 @@ export async function POST(
     // Prepare participant data using user profile information
     const participantData = {
       tournament_id: tournamentId,
-      user_id: userProfile.id, // Always use authenticated user
+      user_id: user.id, // Use auth.users.id for RLS policy compliance
       player_name: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
       player_id: userProfile.player_id || validatedData.player_id, // Required field
       registration_date: new Date().toISOString(),
@@ -252,6 +252,91 @@ export async function GET(
 
   } catch (error) {
     console.error('Error fetching registration info:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/tournaments/[id]/register - Unregister from tournament
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = await createClient();
+    const { id: tournamentId } = await params;
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return createErrorResponse(
+        ErrorCodes.UNAUTHORIZED,
+        'Debes tener una cuenta para desregistrarte de torneos'
+      );
+    }
+
+    // Check if user is registered
+    const { data: existingRegistration, error: registrationError } = await supabase
+      .from('tournament_participants')
+      .select('id, status')
+      .eq('tournament_id', tournamentId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (registrationError || !existingRegistration) {
+      return createErrorResponse(
+        ErrorCodes.NOT_FOUND,
+        'No estás registrado en este torneo'
+      );
+    }
+
+    // Delete registration
+    const { error: deleteError } = await supabase
+      .from('tournament_participants')
+      .delete()
+      .eq('id', existingRegistration.id);
+
+    if (deleteError) {
+      console.error('Error unregistering participant:', deleteError);
+      return NextResponse.json(
+        { error: 'Failed to unregister participant', details: deleteError.message },
+        { status: 500 }
+      );
+    }
+
+    // Update tournament player count if not waitlisted
+    if (existingRegistration.status === 'registered') {
+      const { data: tournament } = await supabase
+        .from('tournaments')
+        .select('current_players')
+        .eq('id', tournamentId)
+        .single();
+
+      if (tournament) {
+        const { error: updateError } = await supabase
+          .from('tournaments')
+          .update({ 
+            current_players: Math.max(0, tournament.current_players - 1),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', tournamentId);
+
+        if (updateError) {
+          console.error('Error updating tournament player count:', updateError);
+          // Don't fail the unregistration, just log the error
+        }
+      }
+    }
+
+    return NextResponse.json({
+      message: 'Te has desregistrado exitosamente del torneo',
+      timestamp: new Date().toISOString()
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Unexpected error in tournament unregistration:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

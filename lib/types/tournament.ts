@@ -113,7 +113,10 @@ export interface TournamentWithOrganizer extends Tournament {
     first_name: string;
     last_name: string;
     organization_name?: string;
+    email?: string;
   };
+  user_registration_status?: 'registered' | 'waitlist' | 'not_registered';
+  is_organizer?: boolean;
 }
 
 // Tournament Participant Interface

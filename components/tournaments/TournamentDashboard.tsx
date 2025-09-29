@@ -81,12 +81,6 @@ export function TournamentDashboard({
   const userRole = user?.user_profiles?.user_role || 'player';
   const isOrganizer = userRole === 'organizer' || userRole === 'admin';
   
-  console.log('Dashboard user data:', {
-    user: user,
-    userRole: userRole,
-    isOrganizer: isOrganizer,
-    userProfiles: user?.user_profiles
-  });
   
   const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null as any;
   const initialTab = (searchParams?.get('tab') as string) || (isOrganizer ? 'organizing' : 'participating');
@@ -105,12 +99,9 @@ export function TournamentDashboard({
 
       // Check if user is available
       if (!user?.id) {
-        console.log('No user available, skipping tournament fetch');
         setLoading(false);
         return;
       }
-
-      console.log('Fetching user tournaments for user:', user.id);
       const response = await fetch('/api/tournaments/user', {
         method: 'GET',
         headers: {
@@ -118,7 +109,6 @@ export function TournamentDashboard({
         },
       });
 
-      console.log('Response status:', response.status);
 
       if (!response.ok) {
         let errorMessage = tTournaments('dashboard.error.loading');
@@ -143,7 +133,6 @@ export function TournamentDashboard({
         
         // If it's a 404 or empty response, show empty state
         if (response.status === 404 || (errorDetails && Object.keys(errorDetails).length === 0)) {
-          console.log('API returned empty data, showing empty state');
           setTournaments([]);
           setLoading(false);
           return;
@@ -153,13 +142,10 @@ export function TournamentDashboard({
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
       
       if (data.success && data.data) {
-        console.log(`Found ${data.data.tournaments?.length || 0} tournaments`);
         setTournaments(data.data.tournaments || []);
       } else {
-        console.log('API returned unsuccessful response or no data');
         setTournaments([]);
       }
     } catch (err) {
@@ -444,7 +430,7 @@ export function TournamentDashboard({
                   .map((tournament) => (
                     <div key={tournament.id} role="listitem">
                       <TournamentCard
-                        tournament={tournament as any}
+                        tournament={{...tournament, is_organizer: true} as any}
                         userRole="authenticated"
                         showActions={true}
                         className="h-full"
@@ -550,7 +536,7 @@ export function TournamentDashboard({
               {filteredTournaments.map((tournament) => (
                 <div key={tournament.id} role="listitem">
                   <TournamentCard
-                    tournament={tournament as any}
+                    tournament={{...tournament, is_organizer: tournament.user_role === 'organizer'} as any}
                     userRole="authenticated"
                     showActions={true}
                     className="h-full"

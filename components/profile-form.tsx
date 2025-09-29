@@ -64,7 +64,7 @@ export function ProfileForm({
   
   const supabase = createClient();
   const router = useRouter();
-  const { tCommon } = useTypedTranslation();
+  const { tUI, tPages } = useTypedTranslation();
 
 
 
@@ -73,16 +73,16 @@ export function ProfileForm({
 
     // Validar nombre
     if (!formData.first_name.trim()) {
-      newErrors.first_name = tCommon('validation.firstNameRequired');
+      newErrors.first_name = tUI('validation.firstNameRequired');
     } else if (formData.first_name.trim().length < 2) {
-      newErrors.first_name = tCommon('validation.firstNameMinLength');
+      newErrors.first_name = tUI('validation.firstNameMinLength');
     }
 
     // Validar apellidos
     if (!formData.last_name.trim()) {
-      newErrors.last_name = tCommon('validation.lastNameRequired');
+      newErrors.last_name = tUI('validation.lastNameRequired');
     } else if (formData.last_name.trim().length < 2) {
-      newErrors.last_name = tCommon('validation.lastNameMinLength');
+      newErrors.last_name = tUI('validation.lastNameMinLength');
     }
 
     // Validar Player ID
@@ -94,31 +94,31 @@ export function ProfileForm({
 
     // Validar año de nacimiento
     if (!formData.birth_year) {
-      newErrors.birth_year = tCommon('validation.birthYearRequired');
+      newErrors.birth_year = tUI('validation.birthYearRequired');
     } else {
       const year = parseInt(formData.birth_year.toString(), 10);
       const currentYear = new Date().getFullYear();
       if (isNaN(year) || year < 1900 || year > currentYear) {
-        newErrors.birth_year = tCommon('validation.birthYearInvalid');
+        newErrors.birth_year = tUI('validation.birthYearInvalid');
       }
     }
 
     // Validar campos específicos de organizador
     if (formData.user_role === UserRole.ORGANIZER) {
       if (!formData.organization_name.trim()) {
-        newErrors.organization_name = tCommon('validation.organizationNameRequired');
+        newErrors.organization_name = tUI('validation.organizationNameRequired');
       } else if (formData.organization_name.trim().length < 3) {
-        newErrors.organization_name = tCommon('validation.firstNameMinLength'); // Reutilizamos la validación de longitud mínima
+        newErrors.organization_name = tUI('validation.firstNameMinLength'); // Reutilizamos la validación de longitud mínima
       }
 
       if (formData.pokemon_league_url && formData.pokemon_league_url.trim()) {
         try {
           const url = new URL(formData.pokemon_league_url.trim());
           if (!url.protocol.startsWith('http')) {
-            newErrors.pokemon_league_url = tCommon('validation.invalidProtocol');
+            newErrors.pokemon_league_url = tUI('validation.invalidProtocol');
           }
         } catch {
-          newErrors.pokemon_league_url = tCommon('validation.invalidUrl');
+          newErrors.pokemon_league_url = tUI('validation.invalidUrl');
         }
       }
     }
@@ -236,7 +236,7 @@ export function ProfileForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Información personal */}
-        <Card className="p-6">
+        <Card className="p-6 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Información Personal
           </h3>
@@ -343,7 +343,7 @@ export function ProfileForm({
         </Card>
 
         {/* Role Information */}
-        <Card className="p-6">
+        <Card className="p-6 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Información de Cuenta
           </h3>
@@ -403,7 +403,7 @@ export function ProfileForm({
               <div className="space-y-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="flex items-center gap-2 text-sm font-medium text-green-700 dark:text-green-300 mb-2">
                   <CheckCircle className="w-4 h-4" />
-                  {tCommon('account.organizerApproved')}
+                  {tPages('profile.display.organizerApproved')}
                 </div>
                 
                 <div>

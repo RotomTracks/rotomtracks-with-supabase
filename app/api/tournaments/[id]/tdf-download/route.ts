@@ -406,7 +406,6 @@ export async function POST(
           xmlContent: modifiedXML
         };
         
-        console.log('Custom settings applied successfully');
       } catch (error) {
         console.warn('Failed to apply custom settings, using original TDF:', error);
         // Continue with original TDF if custom settings application fails

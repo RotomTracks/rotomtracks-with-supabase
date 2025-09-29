@@ -34,7 +34,9 @@ export const admin = {
       approved: "Approved",
       approvedDescription: "Approved requests",
       underReview: "Under Review",
-      underReviewDescription: "Being reviewed"
+      underReviewDescription: "Being reviewed",
+      rejected: "Rejected",
+      rejectedDescription: "Rejected requests"
     },
     recentActivity: {
       title: "Recent Activity",
@@ -87,7 +89,9 @@ export const admin = {
       title: "No organizer requests found",
       description: "There are no organizer requests at the moment.",
       descriptionFiltered: "No requests match your current filters. Try adjusting your search criteria."
-    }
+    },
+    requestedOn: "Requested on",
+    viewDetails: "View Details"
   },
 
   // Settings

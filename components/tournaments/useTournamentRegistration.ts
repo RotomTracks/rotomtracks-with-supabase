@@ -84,8 +84,65 @@ export function useTournamentRegistration({
     }
   };
 
+  const unregisterFromTournament = async () => {
+    if (isLoading || !tournamentId) return;
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`/api/tournaments/${tournamentId}/register`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        let errorMessage = result.error || tUI('messages.error.unexpectedError');
+        
+        if (result.code === 'UNAUTHORIZED') {
+          errorMessage = tUI('messages.error.unauthorized');
+        } else if (result.code === 'NOT_FOUND') {
+          errorMessage = tUI('messages.error.registrationNotFound');
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Success
+      onSuccess?.();
+      
+      // Show success toast
+      addToast({
+        type: 'success',
+        title: tUI('messages.success.unregistrationSuccess'),
+        message: result.message || tUI('messages.success.unregistrationComplete')
+      });
+
+    } catch (error) {
+      console.error('Unregistration error:', error);
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : tUI('messages.error.unexpectedError');
+      
+      // Show error toast
+      addToast({
+        type: 'error',
+        title: tUI('messages.error.unregistrationError'),
+        message: errorMessage
+      });
+      
+      onError?.(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     registerForTournament,
+    unregisterFromTournament,
     isLoading
   };
 }

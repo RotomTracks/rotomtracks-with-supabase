@@ -12,11 +12,12 @@ import {
   Users, 
   Clock,
   UserPlus,
+  UserMinus,
   Eye,
   Settings,
   Trophy,
   Share2,
-  ExternalLink
+  Mail
 } from 'lucide-react';
 
 // Hooks
@@ -28,7 +29,7 @@ import Link from 'next/link';
 
 // Types
 import { 
-  Tournament, 
+  TournamentWithOrganizer,
   TournamentStatus, 
   ParticipantStatus,
   TournamentType,
@@ -45,7 +46,7 @@ import {
 } from '@/lib/utils/tournament-status';
 
 interface TournamentDetailsModalProps {
-  tournament: (Tournament & {
+  tournament: (TournamentWithOrganizer & {
     user_role?: 'participant' | 'organizer';
     registration_status?: ParticipantStatus;
   }) | null;
@@ -60,11 +61,12 @@ export function TournamentDetailsModal({
   onClose, 
   userRole 
 }: TournamentDetailsModalProps) {
+  
   const { tTournaments } = useTypedTranslation();
   const { formatDate, formatTime } = useTournamentFormatting();
   
   // Registration hook - must be called before any conditional returns
-  const { registerForTournament, isLoading: isRegistering } = useTournamentRegistration({
+  const { registerForTournament, unregisterFromTournament, isLoading: isRegistering } = useTournamentRegistration({
     tournamentId: tournament?.id || '',
     onSuccess: () => {
       // Close modal and refresh
@@ -119,7 +121,7 @@ export function TournamentDetailsModal({
 
   // Tournament state checks
   const isUpcoming = tournament.status === TournamentStatus.UPCOMING;
-  const canRegister = tournament.registration_open && isUpcoming;
+  const canRegister = tournament.registration_open && isUpcoming && !tournament.is_organizer;
 
   const handleShare = () => {
     if (navigator.share) {
@@ -162,7 +164,7 @@ export function TournamentDetailsModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Basic Information */}
             <Card className="bg-gray-800 dark:bg-gray-700 border-0">
-              <CardHeader>
+              <CardHeader className="py-4">
                 <CardTitle className="text-lg flex items-center space-x-2 text-white">
                   <Calendar className="h-5 w-5" />
                   <span>{tTournaments('details.title')}</span>
@@ -223,65 +225,106 @@ export function TournamentDetailsModal({
 
             {/* Format Information */}
             <Card className="bg-gray-800 dark:bg-gray-700 border-0">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2 text-white">
-                  <Trophy className="h-5 w-5" />
-                  <span>{tTournaments('details.format')}</span>
-                </CardTitle>
+              <CardHeader className="py-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center space-x-2 text-white">
+                    <Trophy className="h-5 w-5" />
+                    <span>{tTournaments('details.format')}</span>
+                  </CardTitle>
+                  <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
+                    {getStatusText(tournament.status as TournamentStatus)}
+                  </Badge>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-200">
-                  <div className="flex justify-between">
+              <CardContent className="pt-0">
+                <div className="text-sm text-gray-200">
+                  <div className="flex justify-between mb-2">
                     <span className="font-medium">{tTournaments('name')}:</span>
                     <span>{tournament.name}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mb-2">
                     <span className="font-medium">Tipo:</span>
                     <span>{tournament.tournament_type}</span>
                   </div>
                   {tournament.official_tournament_id && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between mb-5">
                       <span className="font-medium">ID Oficial:</span>
-                      <span className="font-mono text-xs">{tournament.official_tournament_id}</span>
+                      <span className="font-mono text-sm">{tournament.official_tournament_id}</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span className="font-medium">{tTournaments('management.status')}:</span>
-                    <Badge className={getStatusColor(tournament.status as TournamentStatus)}>
-                      {getStatusText(tournament.status as TournamentStatus)}
-                    </Badge>
-                  </div>
+                  {/* Organizer Information - Integrated */}
+                  {tournament.organizer && (
+                    <>
+                      <div className="border-t border-gray-600 pt-5">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center space-x-2">
+                            <Settings className="h-4 w-4 text-gray-300" />
+                            <span className="font-medium">Liga:</span>
+                          </div>
+                          <span className="text-gray-200">
+                            {tournament.organizer.organization_name || 
+                             `${tournament.organizer.first_name} ${tournament.organizer.last_name}`}
+                          </span>
+                        </div>
+                        {tournament.organizer.email && (
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="flex items-center space-x-2">
+                              <Mail className="h-4 w-4 text-gray-300" />
+                              <span className="font-medium">Email:</span>
+                            </div>
+                            <a 
+                              href={`mailto:${tournament.organizer.email}`}
+                              className="text-blue-400 hover:text-blue-300 underline text-sm"
+                            >
+                              {tournament.organizer.email}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Description */}
-          <Card className="bg-gray-800 dark:bg-gray-700 border-0">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center space-x-2 text-white">
-                <Eye className="h-5 w-5" />
-                <span>{tTournaments('description')}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-200 leading-relaxed">
-                {tournament.description}
-              </p>
-            </CardContent>
-          </Card>
+          {/* Description - Only show if there's content */}
+          {tournament.description && tournament.description.trim().length > 0 && (
+            <Card className="bg-gray-800 dark:bg-gray-700 border-0">
+              <CardHeader className="py-4">
+                <CardTitle className="text-lg flex items-center space-x-2 text-white">
+                  <Eye className="h-5 w-5" />
+                  <span>{tTournaments('description')}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-200 leading-relaxed">
+                  {tournament.description}
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Actions - Aligned to the right on PC */}
           <div className="flex justify-end">
             <div className="flex flex-wrap gap-3">
-              {canRegister && userRole === 'authenticated' && !tournament.registration_status && (
+              {canRegister && userRole === 'authenticated' && (
                 <Button 
                   className="text-white"
-                  onClick={registerForTournament}
+                  onClick={tournament.user_registration_status === 'not_registered' ? registerForTournament : unregisterFromTournament}
                   disabled={isRegistering}
                 >
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                  {tournament.user_registration_status === 'not_registered' ? (
+                    <>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      {isRegistering ? tTournaments('actions.registering') : tTournaments('actions.register')}
+                    </>
+                  ) : (
+                    <>
+                      <UserMinus className="h-4 w-4 mr-2" />
+                      {isRegistering ? tTournaments('actions.unregistering') : tTournaments('actions.unregister')}
+                    </>
+                  )}
                 </Button>
               )}
               

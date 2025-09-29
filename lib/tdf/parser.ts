@@ -284,7 +284,7 @@ export class TDFParser {
       }
 
       // Check required data fields
-      const requiredDataFields = ['name', 'id', 'city', 'country', 'startdate', 'organizer'];
+      const requiredDataFields = ['name', 'id', 'city', 'country', 'startdate'];
       requiredDataFields.forEach(field => {
         const element = data.querySelector(field);
         if (!element || !element.textContent?.trim()) {
@@ -292,9 +292,11 @@ export class TDFParser {
         }
       });
 
-      // Check organizer attributes
+      // Check organizer separately (it's an empty element with attributes)
       const organizer = data.querySelector('organizer');
-      if (organizer) {
+      if (!organizer) {
+        errors.push('Missing or empty required field: organizer');
+      } else {
         if (!organizer.getAttribute('popid')) {
           errors.push('Missing organizer popid attribute');
         }
@@ -364,7 +366,7 @@ export class TDFParser {
   static extractSummary(xmlContent: string): {
     name: string;
     id: string;
-    type: string;
+    type: TournamentType;
     location: string;
     date: string;
     playerCount: number;
@@ -374,10 +376,13 @@ export class TDFParser {
       const metadata = this.parseMetadata(xmlContent);
       const players = this.extractPlayers(xmlContent);
       
+      // Map tournament type to internal enum
+      const mappedType = this.mapTournamentType(metadata.gametype, metadata.mode);
+      
       return {
         name: metadata.name,
         id: metadata.id,
-        type: `${metadata.gametype} ${metadata.mode}`,
+        type: mappedType,
         location: `${metadata.city}, ${metadata.country}`,
         date: metadata.startdate,
         playerCount: players.length,

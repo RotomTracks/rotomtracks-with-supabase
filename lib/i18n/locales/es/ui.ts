@@ -18,6 +18,7 @@ export const ui = {
     clear: "Limpiar",
     close: "Cerrar",
     open: "Abrir",
+    copy: "Copiar",
     view: "Ver",
     download: "Descargar",
     upload: "Subir",
@@ -123,7 +124,8 @@ export const ui = {
       sent: "Mensaje enviado exitosamente",
       accountCreated: "¡Cuenta creada exitosamente! Revisa tu email para confirmar tu cuenta.",
       registrationSuccess: "¡Registro exitoso!",
-      registrationComplete: "Te has registrado correctamente en el torneo"
+      registrationComplete: "Te has registrado correctamente en el torneo",
+      copied: "¡Copiado!"
     },
     error: {
       generic: "Ocurrió un error",
@@ -141,7 +143,12 @@ export const ui = {
       registrationClosed: "Las inscripciones están cerradas para este torneo",
       onlyUpcomingTournaments: "Las inscripciones solo están disponibles para torneos próximos",
       alreadyRegistered: "Ya estás registrado en este torneo",
-      registrationError: "Error en el registro"
+      registrationNotFound: "No estás registrado en este torneo",
+      registrationError: "Error en el registro",
+      unregistrationError: "Error al desregistrarse",
+      unregistrationSuccess: "¡Desregistro exitoso!",
+      unregistrationComplete: "Te has desregistrado correctamente del torneo",
+      copyError: "Error al copiar al portapapeles"
     },
     warning: {
       unsavedChanges: "Tienes cambios sin guardar",
