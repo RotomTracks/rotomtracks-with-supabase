@@ -64,6 +64,8 @@ export function getClientOptions() {
       autoRefreshToken: true,
       detectSessionInUrl: true,
       flowType: 'pkce' as const,
+      // Configure redirect URLs for email verification
+      redirectTo: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://rotomtracks.es',
     },
     global: {
       headers: {

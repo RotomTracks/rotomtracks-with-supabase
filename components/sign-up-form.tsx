@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { validateSignUpForm, type SignUpFormData } from "@/lib/utils/validation"
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getFullUrl } from "@/lib/config/app";
 
 interface SignUpFormProps {
   className?: string;
@@ -46,6 +47,8 @@ export function SignUpForm({
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const emailCheckTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleInputChange = (field: keyof SignUpFormData, value: string | UserRole) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -58,6 +61,57 @@ export function SignUpForm({
       });
     }
   };
+
+  const checkEmailExists = async (email: string) => {
+    if (!email || !email.includes('@')) return;
+    
+    setIsCheckingEmail(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: 'dummy-password-to-check-email'
+      });
+      
+      // If no error, email exists
+      if (!error) {
+        setErrors(prev => ({
+          ...prev,
+          email: tAuth('signUp.errors.emailAlreadyExists')
+        }));
+      } else if (error.message.includes('Invalid login credentials')) {
+        // Email doesn't exist, which is what we want
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors.email;
+          return newErrors;
+        });
+      }
+    } catch (error) {
+      // Ignore errors for email checking
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  };
+
+  // Debounced email checking
+  useEffect(() => {
+    if (emailCheckTimeout.current) {
+      clearTimeout(emailCheckTimeout.current);
+    }
+    
+    if (formData.email && formData.email.includes('@')) {
+      emailCheckTimeout.current = setTimeout(() => {
+        checkEmailExists(formData.email);
+      }, 1000); // Check after 1 second of no typing
+    }
+    
+    return () => {
+      if (emailCheckTimeout.current) {
+        clearTimeout(emailCheckTimeout.current);
+      }
+    };
+  }, [formData.email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,12 +140,22 @@ export function SignUpForm({
             organization_name: formData.organizationName,
             business_email: formData.businessEmail,
             phone_number: formData.phoneNumber,
-          }
+          },
+          emailRedirectTo: getFullUrl('/auth/callback'),
         }
       });
 
       if (error) {
-        setErrors({ submit: error.message });
+        // Handle specific error cases
+        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+          setErrors({ email: tAuth('signUp.errors.emailAlreadyExists') });
+        } else if (error.message.includes('Invalid email')) {
+          setErrors({ email: tAuth('signUp.errors.invalidEmail') });
+        } else if (error.message.includes('Password should be at least')) {
+          setErrors({ password: tAuth('signUp.errors.passwordTooShort') });
+        } else {
+          setErrors({ submit: error.message });
+        }
       } else {
         // Call onSuccess if provided (for modal mode), otherwise redirect to success page
         if (onSuccess) {
@@ -117,28 +181,35 @@ export function SignUpForm({
               {tAuth('signUp.title')}
             </CardTitle>
           )}
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-sm">
             {tAuth('signUp.description')}
           </CardDescription>
         </CardHeader>
-        <CardContent className={isModal ? "p-4 pt-2" : ""}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className={isModal ? "p-2 sm:p-3 pt-1 sm:pt-2" : ""}>
+          <form onSubmit={handleSubmit} className="space-y-1.5 sm:space-y-2">
             {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email">{tAuth('signUp.emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={tAuth('signUp.emailPlaceholder')}
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className={cn(
-                  "transition-colors",
-                  errors.email && "border-red-500 focus:border-red-500"
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="email" className="text-xs sm:text-sm">{tAuth('signUp.emailLabel')}</Label>
+              <div className="relative">
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={tAuth('signUp.emailPlaceholder')}
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={cn(
+                    "transition-colors pr-8",
+                    errors.email && "border-red-500 focus:border-red-500"
+                  )}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                />
+                {isCheckingEmail && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
                 )}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-              />
+              </div>
               {errors.email && (
                 <p id="email-error" className="text-sm text-red-600" role="alert">
                   {errors.email}
@@ -147,8 +218,8 @@ export function SignUpForm({
             </div>
 
             {/* Password */}
-            <div className="space-y-2">
-              <Label htmlFor="password">{tAuth('signUp.passwordLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="password" className="text-xs sm:text-sm">{tAuth('signUp.passwordLabel')}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -184,8 +255,8 @@ export function SignUpForm({
             </div>
 
             {/* Confirm Password */}
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{tAuth('signUp.confirmPasswordLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="confirmPassword" className="text-xs sm:text-sm">{tAuth('signUp.confirmPasswordLabel')}</Label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
@@ -221,8 +292,8 @@ export function SignUpForm({
             </div>
 
             {/* First Name */}
-            <div className="space-y-2">
-              <Label htmlFor="firstName">{tAuth('signUp.firstNameLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="firstName" className="text-xs sm:text-sm">{tAuth('signUp.firstNameLabel')}</Label>
               <Input
                 id="firstName"
                 type="text"
@@ -244,8 +315,8 @@ export function SignUpForm({
             </div>
 
             {/* Last Name */}
-            <div className="space-y-2">
-              <Label htmlFor="lastName">{tAuth('signUp.lastNameLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="lastName" className="text-xs sm:text-sm">{tAuth('signUp.lastNameLabel')}</Label>
               <Input
                 id="lastName"
                 type="text"
@@ -267,8 +338,8 @@ export function SignUpForm({
             </div>
 
             {/* Player ID */}
-            <div className="space-y-2">
-              <Label htmlFor="playerId">{tAuth('signUp.playerIdLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="playerId" className="text-xs sm:text-sm">{tAuth('signUp.playerIdLabel')}</Label>
               <Input
                 id="playerId"
                 type="text"
@@ -290,8 +361,8 @@ export function SignUpForm({
             </div>
 
             {/* Birth Year */}
-            <div className="space-y-2">
-              <Label htmlFor="birthYear">{tAuth('signUp.birthYearLabel')}</Label>
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="birthYear" className="text-xs sm:text-sm">{tAuth('signUp.birthYearLabel')}</Label>
               <Input
                 id="birthYear"
                 type="text"
@@ -320,14 +391,16 @@ export function SignUpForm({
 
             <Button
               type="submit"
-              className="w-full"
-              disabled={loading}
+              className="w-full mt-2 sm:mt-4"
+              disabled={loading || isCheckingEmail || !!errors.email}
             >
-              {loading ? tAuth('signUp.loadingButton') : tAuth('signUp.submitButton')}
+              {loading ? tAuth('signUp.loadingButton') : 
+               isCheckingEmail ? tAuth('signUp.checkingEmail') : 
+               tAuth('signUp.submitButton')}
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm">
+          <div className="mt-2 sm:mt-4 text-center text-xs sm:text-sm">
             <span className="text-muted-foreground">
               {tAuth('signUp.loginLink')}{" "}
             </span>

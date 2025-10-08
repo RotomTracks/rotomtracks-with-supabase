@@ -39,7 +39,7 @@ import {
 import { useTypedTranslation } from '@/lib/i18n';
 
 interface UserTournament extends Tournament {
-  user_role: 'participant' | 'organizer';
+  user_role: 'participant' | 'organizer' | 'admin';
   registration_status?: 'registered' | 'checked_in' | 'dropped';
   registration_date?: string;
 }
@@ -244,7 +244,7 @@ export function TournamentDashboard({
     }
 
     // Tab filter
-    if (activeTab === 'organizing' && tournament.user_role !== 'organizer') {
+    if (activeTab === 'organizing' && tournament.user_role !== 'organizer' && tournament.user_role !== 'admin') {
       return false;
     }
     if (activeTab === 'participating' && tournament.user_role !== 'participant') {
@@ -255,7 +255,7 @@ export function TournamentDashboard({
   });
 
   // Computed values
-  const organizingTournaments = tournaments.filter(t => t.user_role === 'organizer');
+  const organizingTournaments = tournaments.filter(t => t.user_role === 'organizer' || t.user_role === 'admin');
   const participatingTournaments = tournaments.filter(t => t.user_role === 'participant');
   const upcomingTournaments = tournaments.filter(t => t.status === TournamentStatus.UPCOMING);
 

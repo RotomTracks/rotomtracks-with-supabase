@@ -43,23 +43,26 @@ export function AuthModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
         className={cn(
-          "sm:max-w-md w-full mx-4 p-0 gap-0",
+          "w-[95vw] max-w-md mx-auto p-0 gap-0",
           "bg-background border-0",
-          "rounded-2xl shadow-2xl",
+          "rounded-xl sm:rounded-2xl shadow-2xl",
+          "max-h-[85vh] flex flex-col",
+          "sm:w-full sm:mx-4 sm:max-h-[95vh]",
+          "top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]",
           className
         )}
         onPointerDownOutside={onClose}
         onEscapeKeyDown={onClose}
       >
-        {/* Header */}
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-2xl font-bold text-center text-foreground">
+        {/* Header - Fixed */}
+        <DialogHeader className="p-3 sm:p-6 pb-2 flex-shrink-0">
+          <DialogTitle className="text-base sm:text-xl font-bold text-center text-foreground">
             {title}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Content */}
-        <div className="px-6 pb-6 pt-0">
+        {/* Content - Scrollable */}
+        <div className="px-3 sm:px-6 pb-3 sm:pb-6 pt-0 flex-1 overflow-y-auto">
           {children}
         </div>
       </DialogContent>

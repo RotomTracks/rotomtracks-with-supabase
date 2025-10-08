@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Base URL configuration
+  basePath: '',
+  assetPrefix: '',
+  
+  // Environment variables
+  env: {
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://rotomtracks.es',
+  },
   // Optimizaciones de JavaScript para navegadores modernos
   compiler: {
     // Eliminar console.log en producción

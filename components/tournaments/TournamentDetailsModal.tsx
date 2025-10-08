@@ -47,7 +47,7 @@ import {
 
 interface TournamentDetailsModalProps {
   tournament: (TournamentWithOrganizer & {
-    user_role?: 'participant' | 'organizer';
+    user_role?: 'participant' | 'organizer' | 'admin';
     registration_status?: ParticipantStatus;
   }) | null;
   isOpen: boolean;
@@ -101,7 +101,7 @@ export function TournamentDetailsModal({
   };
 
   const getUserRoleBadge = () => {
-    if (tournament.user_role === 'organizer') {
+    if (tournament.user_role === 'organizer' || tournament.user_role === 'admin') {
       return (
         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
           <Settings className="w-3 h-3 mr-1" />

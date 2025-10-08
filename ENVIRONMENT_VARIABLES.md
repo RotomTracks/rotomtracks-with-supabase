@@ -8,6 +8,9 @@ Por razones de seguridad y siguiendo las mejores prácticas de Vercel, hemos act
 
 ### Producción (Nombres Ultra-Seguros) ✅
 ```env
+# Application Configuration
+NEXT_PUBLIC_SITE_URL=https://rotomtracks.es
+
 # Backend Service Configuration
 NEXT_PUBLIC_API_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_API_TOKEN=eyJ...
@@ -18,6 +21,9 @@ API_SECRET=eyJ...
 El código soporta múltiples nombres para facilitar la transición:
 
 ```env
+# Application Configuration
+NEXT_PUBLIC_SITE_URL=https://rotomtracks.es
+
 # Nuevos nombres (ultra-seguros - recomendado)
 NEXT_PUBLIC_API_URL=https://szedaxhmjvpbjaiodnfg.supabase.co
 NEXT_PUBLIC_API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...

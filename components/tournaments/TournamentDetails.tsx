@@ -183,7 +183,7 @@ export function TournamentDetails({
             </div>
 
             {/* Organizer actions */}
-            {userRole === 'organizer' && (
+            {(userRole === 'organizer' || userRole === 'admin') && (
               <div className="flex items-center space-x-2">
                 <Button 
                   onClick={() => setShowManagementModal(true)}
@@ -486,7 +486,7 @@ export function TournamentDetails({
                           </div>
                         </div>
                       </div>
-                      {userRole === 'organizer' && (
+                      {(userRole === 'organizer' || userRole === 'admin') && (
                         <Button size="sm" variant="outline">
                           <Download className="h-4 w-4 mr-1" />
                           Descargar
@@ -515,7 +515,7 @@ export function TournamentDetails({
       </Tabs>
 
       {/* Tournament Management Modal */}
-      {userRole === 'organizer' && showManagementModal && (
+      {(userRole === 'organizer' || userRole === 'admin') && showManagementModal && (
         <TournamentManagementModal
           isOpen={showManagementModal}
           onClose={() => setShowManagementModal(false)}

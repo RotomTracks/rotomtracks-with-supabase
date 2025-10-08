@@ -211,7 +211,7 @@ export function MyTournaments() {
             {tPages('home.myTournaments.searchTournaments')}
           </button>
           
-          {profile?.user_role === 'organizer' && (
+          {(profile?.user_role === 'organizer' || profile?.user_role === 'admin') && (
             <Button 
               onClick={() => window.location.href = '/dashboard'}
               className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"

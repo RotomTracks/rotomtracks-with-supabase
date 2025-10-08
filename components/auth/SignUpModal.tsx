@@ -18,7 +18,7 @@ export function SignUpModal({ isOpen, onClose, onSwitchToLogin }: SignUpModalPro
       isOpen={isOpen}
       onClose={onClose}
       title={tAuth('signUp.title')}
-      className="sm:max-w-2xl"
+      className="sm:max-w-lg max-w-sm"
     >
       <SignUpForm 
         onSuccess={onClose}

@@ -86,8 +86,9 @@ export function LoginForm({
         if (onSuccess) {
           onSuccess();
         } else {
-          // Redirect will be handled by the auth state change
-          window.location.href = "/dashboard";
+          // Get redirect destination from URL params or default to dashboard
+          const redirectTo = searchParams.get('redirectTo') || '/dashboard';
+          window.location.href = redirectTo;
         }
       }
     } catch (error) {

@@ -44,8 +44,16 @@ export const auth = {
     userRolePlaceholder: "Selecciona un tipo de cuenta",
     submitButton: "Crear Cuenta",
     loadingButton: "Creando cuenta...",
+    checkingEmail: "Verificando email...",
     loginLink: "¿Ya tienes cuenta?",
     loginLinkText: "Inicia sesión",
+    
+    // Error messages
+    errors: {
+      emailAlreadyExists: "Este email ya está registrado. Por favor, usa otro email o inicia sesión.",
+      invalidEmail: "Por favor, introduce un email válido.",
+      passwordTooShort: "La contraseña debe tener al menos 6 caracteres."
+    },
     
     // Simple form translations
     simpleTitle: "Registrarse",

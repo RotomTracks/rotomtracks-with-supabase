@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { UserRole, UserProfile } from '@/lib/types/tournament';
 import { User } from '@supabase/supabase-js';
@@ -26,20 +26,19 @@ export function useAuth(): UseAuthReturn {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const supabaseRef = useRef(createClient());
   
-  const supabase = createClient();
-
-  const fetchUserAndProfile = useCallback(async () => {
+  const fetchUserAndProfile = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      setUser(null);
-      setProfile(null);
-      const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+      const { data: { user: currentUser }, error: userError } = await supabaseRef.current.auth.getUser();
       
       if (userError) {
         console.warn('Auth error (non-critical):', userError);
+        setUser(null);
+        setProfile(null);
         setLoading(false);
         return;
       }
@@ -48,7 +47,7 @@ export function useAuth(): UseAuthReturn {
 
       if (currentUser) {
         try {
-          const { data: userProfile, error: profileError } = await supabase
+          const { data: userProfile, error: profileError } = await supabaseRef.current
             .from('user_profiles')
             .select('*')
             .eq('user_id', currentUser.id)
@@ -71,22 +70,23 @@ export function useAuth(): UseAuthReturn {
       setProfile(null);
       setLoading(false);
     }
-  }, [supabase]);
+  };
 
   const refreshAuth = async () => {
     await fetchUserAndProfile();
   };
 
-  const signOut = useCallback(async () => {
+  const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await supabaseRef.current.auth.signOut();
       setUser(null);
       setProfile(null);
+      setLoading(false);
     } catch (err) {
       console.error('Error signing out:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign out');
     }
-  }, [supabase]);
+  };
 
   const isAuthenticated = !!user;
   const isOrganizer = profile?.user_role === UserRole.ORGANIZER;
@@ -106,18 +106,38 @@ export function useAuth(): UseAuthReturn {
   };
 
   useEffect(() => {
-    fetchUserAndProfile();
+    let isMounted = true;
+    
+    const runAuthCheck = async () => {
+      if (!isMounted) return;
+      await fetchUserAndProfile();
+    };
+    
+    runAuthCheck();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event) => {
+    const { data: { subscription } } = supabaseRef.current.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          await fetchUserAndProfile();
+          if (isMounted) {
+            if (event === 'SIGNED_OUT') {
+              // Immediately clear state on sign out
+              setUser(null);
+              setProfile(null);
+              setLoading(false);
+            } else {
+              await fetchUserAndProfile();
+            }
+          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, [fetchUserAndProfile]);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return {
     user,

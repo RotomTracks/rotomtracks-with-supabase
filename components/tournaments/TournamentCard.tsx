@@ -44,7 +44,7 @@ import {
 
 interface TournamentCardProps {
   tournament: TournamentWithOrganizer & {
-    user_role?: 'participant' | 'organizer';
+    user_role?: 'participant' | 'organizer' | 'admin';
     registration_status?: ParticipantStatus;
   };
   viewMode?: 'grid' | 'list';
