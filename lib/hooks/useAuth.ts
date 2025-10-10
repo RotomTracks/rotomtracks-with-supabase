@@ -27,6 +27,7 @@ export function useAuth(): UseAuthReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabaseRef = useRef(createClient());
+  const isInitializedRef = useRef(false);
   
   const fetchUserAndProfile = async () => {
     try {
@@ -109,7 +110,8 @@ export function useAuth(): UseAuthReturn {
     let isMounted = true;
     
     const runAuthCheck = async () => {
-      if (!isMounted) return;
+      if (!isMounted || isInitializedRef.current) return;
+      isInitializedRef.current = true;
       await fetchUserAndProfile();
     };
     
@@ -125,6 +127,7 @@ export function useAuth(): UseAuthReturn {
               setUser(null);
               setProfile(null);
               setLoading(false);
+              isInitializedRef.current = false;
             } else {
               await fetchUserAndProfile();
             }

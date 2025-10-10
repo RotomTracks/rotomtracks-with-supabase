@@ -1,20 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { ChevronDown, User, Trophy, LogOut, Shield, Building2 } from "lucide-react";
 import Link from "next/link";
 import { useTypedTranslation } from "@/lib/i18n";
 import { Avatar } from "./ui/avatar";
-
-interface UserProfile {
-  id: string;
-  first_name?: string;
-  last_name?: string;
-  player_id?: string;
-  user_role?: string;
-}
 
 interface User {
   id: string;
@@ -31,42 +22,10 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   const menuRef = useRef<HTMLDivElement>(null);
-  const { signOut, isAdmin } = useAuth();
-  const supabase = createClient();
+  const { signOut, isAdmin, profile } = useAuth();
   const { tAuth, tUI } = useTypedTranslation();
-
-  // Obtener el perfil del usuario y estadísticas de torneos
-  useEffect(() => {
-    if (!user.id) {
-      return;
-    }
-    
-    const fetchUserData = async () => {
-      try {
-        // Fetch user profile
-        const { data: profile, error: profileError } = await supabase
-          .from("user_profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .single();
-        
-        if (profileError) {
-          console.error("Error cargando perfil:", profileError);
-        } else {
-          setUserProfile(profile);
-        }
-
-        // Stats section removed to simplify menu
-      } catch (error) {
-        console.error("Excepción cargando datos del usuario:", error);
-      }
-    };
-
-    fetchUserData();
-  }, [user.id, supabase]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -94,8 +53,8 @@ export function UserMenu({ user }: UserMenuProps) {
         aria-controls="user-menu"
       >
         <Avatar 
-          firstName={userProfile?.first_name}
-          lastName={userProfile?.last_name}
+          firstName={profile?.first_name}
+          lastName={profile?.last_name}
           email={user.email}
           size="md"
         />
@@ -115,25 +74,25 @@ export function UserMenu({ user }: UserMenuProps) {
         >
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {userProfile?.first_name && userProfile?.last_name 
-                ? `${userProfile.first_name} ${userProfile.last_name}`
+              {profile?.first_name && profile?.last_name 
+                ? `${profile.first_name} ${profile.last_name}`
                 : tUI("navigation.profile")
               }
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-              {userProfile?.player_id || tAuth("profile.noPlayerId")}
+              {profile?.player_id || tAuth("profile.noPlayerId")}
             </p>
-            {userProfile?.user_role && (
+            {profile?.user_role && (
               <div className="flex items-center gap-1 mt-1">
-                {userProfile.user_role === 'admin' ? (
+                {profile.user_role === 'admin' ? (
                   <Shield className="w-3 h-3 text-red-500" />
-                ) : userProfile.user_role === 'organizer' ? (
+                ) : profile.user_role === 'organizer' ? (
                   <Building2 className="w-3 h-3 text-blue-500" />
                 ) : (
                   <Trophy className="w-3 h-3 text-green-500" />
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                  {userProfile.user_role === 'admin' ? 'Administrador' : userProfile.user_role}
+                  {profile.user_role === 'admin' ? 'Administrador' : profile.user_role}
                 </span>
               </div>
             )}
