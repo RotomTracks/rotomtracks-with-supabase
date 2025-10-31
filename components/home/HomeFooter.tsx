@@ -39,24 +39,24 @@ export function HomeFooter({ user }: HomeFooterProps) {
             <h4 className="font-semibold mb-4 text-gray-900 dark:text-white">{tPages('home.footer.support')}</h4>
             <ul className="space-y-3 text-gray-600 dark:text-gray-400">
               <li>
-                <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <Link href="/help" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
                   {tPages('home.footer.help')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <Link href="/contact" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
                   {tPages('home.footer.contact')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <Link href="/terms" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
                   {tPages('home.footer.terms')}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <Link href="/privacy" className="hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
                   {tPages('home.footer.privacy')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

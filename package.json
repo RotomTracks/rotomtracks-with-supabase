@@ -1,6 +1,6 @@
 {
   "name": "rotomtracks",
-  "version": "0.1.3",
+  "version": "0.1.8",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -14,7 +14,9 @@
     "optimize-fonts": "node scripts/optimize-fonts.js",
     "analyze-css": "node scripts/analyze-css.js",
     "analyze-js": "node scripts/analyze-js.js",
-    "analyze-unused-js": "node scripts/analyze-unused-js.js"
+    "analyze-unused-js": "node scripts/analyze-unused-js.js",
+    "desktop:dev": "cd desktop && pnpm tauri:dev",
+    "desktop:build": "cd desktop && pnpm tauri:build"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
