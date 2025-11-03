@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
   
   // Configuración de webpack para optimizar JavaScript
   webpack: (config, { dev, isServer }) => {
+    // Excluir carpeta desktop del build de Next.js
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/desktop/**'],
+    };
+    
     // Optimizaciones para producción
     if (!dev && !isServer) {
       // Configurar browserslist para reducir polyfills
