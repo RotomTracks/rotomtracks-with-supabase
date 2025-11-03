@@ -24,10 +24,10 @@ import {
 } from 'lucide-react';
 
 // Local Components
-import { FileUpload } from './FileUpload';
-import { SmartFileUpload } from './SmartFileUpload';
-import { ProcessingStatus } from './ProcessingStatus';
-import { FileWatcher } from './FileWatcher';
+import { FileUpload } from '../utils/FileUpload';
+import { SmartFileUpload } from '../utils/SmartFileUpload';
+import { ProcessingStatus } from '../utils/ProcessingStatus';
+import { FileWatcher } from '../utils/FileWatcher';
 import { TournamentStatusManager } from './TournamentStatusManager';
 
 // Types
