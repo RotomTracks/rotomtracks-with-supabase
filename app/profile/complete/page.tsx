@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/useAuth";
-import { ProfileForm } from "@/components/profile-form";
+import { ProfileForm } from "@/components/profile/ProfileForm";
 import {
   Card,
   CardContent,

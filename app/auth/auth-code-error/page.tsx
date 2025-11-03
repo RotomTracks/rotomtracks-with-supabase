@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AlertCircle, Mail, RefreshCw } from "lucide-react";
 import { useTypedTranslation } from "@/lib/i18n";
-import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
+import { BackToHomeButton } from "@/components/auth/buttons/BackToHomeButton";
 
 export default function AuthCodeErrorPage() {
   const { tUI, tPages } = useTypedTranslation();

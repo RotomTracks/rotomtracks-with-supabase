@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { LanguageSelector } from "@/components/language-selector";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { useTypedTranslation } from "@/lib/i18n";
 
 interface DashboardHeaderProps {

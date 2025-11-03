@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { UserRole, UserProfile } from '@/lib/types/tournament';
 import { User } from '@supabase/supabase-js';
+import { logger } from '@/lib/utils/logger';
 
 interface UseAuthReturn {
   user: User | null;
@@ -37,7 +38,7 @@ export function useAuth(): UseAuthReturn {
       const { data: { user: currentUser }, error: userError } = await supabaseRef.current.auth.getUser();
       
       if (userError) {
-        console.warn('Auth error (non-critical):', userError);
+        logger.warn('Auth error (non-critical):', userError);
         setUser(null);
         setProfile(null);
         setLoading(false);
@@ -55,18 +56,18 @@ export function useAuth(): UseAuthReturn {
             .single();
           
           if (profileError && profileError.code !== 'PGRST116') {
-            console.warn('Profile error (non-critical):', profileError);
+            logger.warn('Profile error (non-critical):', profileError);
           } else {
             setProfile(userProfile || null);
           }
         } catch (profileErr) {
-          console.error('Error loading profile:', profileErr);
+          logger.error('Error loading profile:', profileErr);
         }
       }
       
       setLoading(false);
     } catch (err) {
-      console.error('Error in fetchUserAndProfile:', err);
+      logger.error('Error in fetchUserAndProfile:', err);
       setUser(null);
       setProfile(null);
       setLoading(false);
@@ -84,7 +85,7 @@ export function useAuth(): UseAuthReturn {
       setProfile(null);
       setLoading(false);
     } catch (err) {
-      console.error('Error signing out:', err);
+      logger.error('Error signing out:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign out');
     }
   };
@@ -119,7 +120,7 @@ export function useAuth(): UseAuthReturn {
 
     const { data: { subscription } } = supabaseRef.current.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email);
+        logger.info('Auth state change:', { event, userEmail: session?.user?.email });
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           if (isMounted) {
             if (event === 'SIGNED_OUT') {

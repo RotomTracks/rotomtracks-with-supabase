@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { TournamentSearch } from "@/components/tournaments/TournamentSearch";
+import { TournamentSearch } from "@/components/tournaments/components/TournamentSearch";
 // Lazy load heavy sections after first paint
 const UpcomingTournaments = dynamic(() => import('@/components/home/UpcomingTournaments').then(m => m.UpcomingTournaments), { 
   ssr: true,
@@ -14,7 +14,7 @@ const PopularTournaments = dynamic(() => import('@/components/home/PopularTourna
 });
 import { useTypedTranslation } from "@/lib/i18n";
 import Link from "next/link";
-import { useAuthModalContext } from "@/components/auth/AuthModalContext";
+import { useAuthModalContext } from "@/components/auth/context/AuthModalContext";
 import { Button } from "@/components/ui/button";
 import { Trophy, Search, Users, MapPin, X } from "lucide-react";
 

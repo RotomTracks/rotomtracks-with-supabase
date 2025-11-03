@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
-import { CreateTournamentForm } from '@/components/tournaments/CreateTournamentForm';
+import { CreateTournamentForm } from '@/components/tournaments/forms/CreateTournamentForm';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

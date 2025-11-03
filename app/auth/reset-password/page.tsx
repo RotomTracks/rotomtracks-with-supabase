@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { useTypedTranslation } from "@/lib/i18n";
-
 function ResetPasswordContent() {
-  const { tAuth, tUI } = useTypedTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);

@@ -3,8 +3,8 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
-import { AuthModalProvider } from "@/components/auth/AuthModalContext";
-import { AuthModals } from "@/components/auth/AuthModals";
+import { AuthModalProvider } from "@/components/auth/context/AuthModalContext";
+import { AuthModals } from "@/components/auth/modals/AuthModals";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 

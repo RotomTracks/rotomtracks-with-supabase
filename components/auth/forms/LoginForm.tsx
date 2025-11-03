@@ -1,0 +1,223 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/client";
+import { useTypedTranslation } from "@/lib/i18n";
+import { validateLoginForm, type LoginFormData } from "@/lib/utils/validation";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
+import { ForgotPasswordDialog } from "./ForgotPasswordDialog";
+import { useSearchParams } from "next/navigation";
+import { getAuthErrorMessage } from "@/lib/utils/auth-error-handler";
+
+interface LoginFormProps {
+  className?: string;
+  onSuccess?: () => void;
+  onSwitchToSignUp?: () => void;
+  isModal?: boolean;
+}
+
+export function LoginForm({
+  className,
+  onSuccess,
+  onSwitchToSignUp,
+  isModal = false,
+  ...props
+}: LoginFormProps & React.ComponentPropsWithoutRef<"div">) {
+  const { tAuth, tCommon, tUI } = useTypedTranslation();
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Check for error messages from URL parameters
+  useEffect(() => {
+    const urlError = searchParams.get('error');
+    const urlMessage = searchParams.get('message');
+    
+    if (urlError && urlMessage) {
+      setErrors({ url: urlMessage });
+    }
+  }, [searchParams]);
+
+  const handleInputChange = (field: keyof LoginFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // Validate form
+    const validation = validateLoginForm(formData);
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password, 
+      });
+
+      if (error) {
+        setErrors({ submit: getAuthErrorMessage(error) });
+      } else {
+        // Call onSuccess if provided (for modal mode), otherwise redirect
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Get redirect destination from URL params or default to dashboard
+          const redirectTo = searchParams.get('redirectTo') || '/dashboard';
+          window.location.href = redirectTo;
+        }
+      }
+    } catch (error) {
+      setErrors({ submit: tUI('messages.error.generic') });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={cn("w-full max-w-md mx-auto", className)} {...props}>
+      <Card className={isModal ? "border-0 shadow-none" : ""}>
+        <CardHeader className={isModal ? "space-y-1 p-4 pb-2" : "space-y-1"}>
+          {!isModal && (
+            <CardTitle className="text-2xl text-center">
+              {tAuth('login.title')}
+            </CardTitle>
+          )}
+          <CardDescription className="text-center">
+            {tAuth('login.description')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className={isModal ? "p-4 pt-2" : ""}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">{tAuth('login.emailLabel')}</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={tAuth('login.emailPlaceholder')}
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className={cn(
+                  "transition-colors",
+                  errors.email && "border-red-500 focus:border-red-500"
+                )}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "email-error" : undefined}
+              />
+              {errors.email && (
+                <p id="email-error" className="text-sm text-red-600" role="alert">
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{tAuth('login.passwordLabel')}</Label>
+                <ForgotPasswordDialog />
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={tAuth('login.passwordPlaceholder')}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={cn(
+                    "pr-10 transition-colors",
+                    errors.password && "border-red-500 focus:border-red-500"
+                  )}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? tUI('accessibility.hidePassword') : tUI('accessibility.showPassword')}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p id="password-error" className="text-sm text-red-600" role="alert">
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {errors.submit && (
+              <div className="text-sm text-red-600 text-center" role="alert">
+                {errors.submit}
+              </div>
+            )}
+
+            {errors.url && (
+              <div className="text-sm text-amber-600 text-center bg-amber-50 p-3 rounded-md border border-amber-200" role="alert">
+                {errors.url}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? tAuth('login.loadingButton') : tAuth('login.submitButton')}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm">
+            <span className="text-muted-foreground">
+              {tAuth('login.signUpLink')}{" "}
+            </span>
+            {isModal && onSwitchToSignUp ? (
+              <button
+                onClick={onSwitchToSignUp}
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('login.signUpLinkText')}
+              </button>
+            ) : (
+              <Link
+                href="/auth/sign-up"
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
+                {tAuth('login.signUpLinkText')}
+              </Link>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

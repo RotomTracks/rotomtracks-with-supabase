@@ -1,36 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { TournamentType, ErrorCodes, TournamentStatus } from '@/lib/types/tournament';
-import { z } from 'zod';
+import { TournamentType, TournamentStatus } from '@/lib/types/tournament';
 import {
   withErrorHandling,
   generateRequestId,
-  handleValidationError,
-  handleSupabaseError,
-  createErrorResponse,
-  validateAuthentication,
-  validateUserRole
+  handleSupabaseError
 } from '@/lib/utils/api-error-handler';
 import {
   createTournamentListResponse,
-  createTournamentResponse,
   validatePaginationParams,
   validateSearchParams
 } from '@/lib/utils/api-response-formatter';
-
-// Validation schema for tournament creation
-const createTournamentSchema = z.object({
-  name: z.string().min(1, 'Tournament name is required'),
-  tournament_type: z.nativeEnum(TournamentType),
-  official_tournament_id: z.string().min(1, 'Official tournament ID is required'),
-  city: z.string().min(1, 'City is required'),
-  country: z.string().min(1, 'Country is required'),
-  state: z.string().optional(),
-  start_date: z.string().datetime(),
-  end_date: z.string().datetime().optional(),
-  max_players: z.number().positive().optional(),
-  description: z.string().optional(),
-});
 
 // GET /api/tournaments - List tournaments with filtering and pagination
 export const GET = withErrorHandling(async (request: NextRequest) => {

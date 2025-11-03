@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getCurrentUserProfile } from '@/lib/auth/roles';
-import { TournamentDashboard } from '@/components/tournaments/TournamentDashboard';
+import { TournamentDashboard } from '@/components/tournaments/components/TournamentDashboard';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { getNavigationConfig } from '@/lib/navigation/config';
 

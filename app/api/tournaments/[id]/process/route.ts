@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { TDFParser } from '@/lib/utils/tdf-parser';
 import { generateHTMLReport } from '@/lib/utils/html-generator';
-import { ParticipantStatus, MatchStatus, MatchOutcome } from '@/lib/types/tournament';
 
 export async function POST(
   request: NextRequest,

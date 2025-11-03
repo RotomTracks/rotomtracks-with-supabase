@@ -1,5 +1,5 @@
 
-import { TournamentList } from '@/components/tournaments/TournamentList';
+import { TournamentList } from '@/components/tournaments/components/TournamentList';
 import { getCurrentUser } from '@/lib/auth/roles';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 import { getNavigationConfig } from '@/lib/navigation/config';

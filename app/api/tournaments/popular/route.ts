@@ -90,14 +90,10 @@ export async function GET(request: NextRequest) {
       const { searchParams } = new URL(request.url);
       
       const maxPerCategory = Math.min(parseInt(searchParams.get('limit') || '4'), 10);
-      const userCity = searchParams.get('city');
-      const userCountry = searchParams.get('country');
       
       // User location is available but not currently used in the response
-      // const userLocation = (userCity || userCountry) ? {
-      //   city: userCity || undefined,
-      //   country: userCountry || undefined
-      // } : undefined;
+      // Future implementation: const userCity = searchParams.get('city');
+      // Future implementation: const userCountry = searchParams.get('country');
 
       // Get popular tournament types with statistics
       const popularTypes = await getPopularTournamentTypes(supabase, maxPerCategory);

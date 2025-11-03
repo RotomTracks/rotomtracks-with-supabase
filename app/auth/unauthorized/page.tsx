@@ -13,8 +13,8 @@ import { useSearchParams } from "next/navigation";
 import { Shield, Building2, Trophy } from "lucide-react";
 import { Suspense } from "react";
 import { useTypedTranslation } from "@/lib/i18n";
-import { BackToHomeButton } from "@/components/auth/BackToHomeButton";
-import { GoBackButton } from "@/components/auth/GoBackButton";
+import { BackToHomeButton } from "@/components/auth/buttons/BackToHomeButton";
+import { GoBackButton } from "@/components/auth/buttons/GoBackButton";
 
 function UnauthorizedContent() {
   const searchParams = useSearchParams();

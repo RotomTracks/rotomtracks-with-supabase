@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { LanguageSelector } from "@/components/language-selector";
-import { AuthButtonClient } from "@/components/auth-button-client";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { AuthButtonClient } from "@/components/auth/buttons/AuthButtonClient";
+import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { MobileNavigation } from "./MobileNavigation";
 import { useTypedTranslation } from "@/lib/i18n";
 

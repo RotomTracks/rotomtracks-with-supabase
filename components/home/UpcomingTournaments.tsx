@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Trophy, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TournamentCard } from '@/components/tournaments/TournamentCard';
-import { TournamentDetailsModal } from '@/components/tournaments/TournamentDetailsModal';
-import { useTournamentModal } from '@/components/tournaments/useTournamentModal';
+import { TournamentCard } from '@/components/tournaments/components/TournamentCard';
+import { TournamentDetailsModal } from '@/components/tournaments/components/TournamentDetailsModal';
+import { useTournamentModal } from '@/components/tournaments/hooks/useTournamentModal';
 import { Tournament, TournamentStatus, TournamentWithOrganizer } from '@/lib/types/tournament';
 import { useTypedTranslation } from '@/lib/i18n';
 import { User } from '@supabase/supabase-js';

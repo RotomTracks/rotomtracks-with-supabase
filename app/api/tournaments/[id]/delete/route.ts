@@ -70,7 +70,6 @@ export async function DELETE(
 
     // Delete tournament (this will cascade delete participants due to foreign key constraints)
     let deleteError: any = null;
-    let deletedData: any[] = [];
     let deletionSuccessful = false;
     
     // Try to delete with regular client first
@@ -84,7 +83,6 @@ export async function DELETE(
     if (regularDeletedData && regularDeletedData.length > 0) {
       // Regular deletion was successful
       deleteError = regularDeleteError;
-      deletedData = regularDeletedData;
       deletionSuccessful = true;
     } else {
       // Regular deletion failed, try service role as fallback
@@ -124,7 +122,6 @@ export async function DELETE(
             if (serviceDeleteError) {
               deleteError = serviceDeleteError;
             } else if (serviceDeletedData && serviceDeletedData.length > 0) {
-              deletedData = serviceDeletedData;
               deletionSuccessful = true;
               deleteError = null;
             } else {
@@ -143,7 +140,6 @@ export async function DELETE(
               if (adminDeleteError) {
                 deleteError = adminDeleteError;
               } else if (adminDeletedData && adminDeletedData.length > 0) {
-                deletedData = adminDeletedData;
                 deletionSuccessful = true;
                 deleteError = null;
               } else {

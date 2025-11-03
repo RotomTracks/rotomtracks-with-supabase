@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { TournamentRegistrationPage } from '@/components/tournaments/TournamentRegistrationPage';
+import { TournamentRegistrationPage } from '@/components/tournaments/components/TournamentRegistrationPage';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

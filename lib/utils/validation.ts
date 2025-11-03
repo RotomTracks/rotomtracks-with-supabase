@@ -164,8 +164,59 @@ export function validateEmail(email: string): boolean {
 export function validatePassword(password: string): boolean {
   if (!password) return false;
   
-  // Minimum 6 characters
-  return password.length >= 6;
+  // Minimum 8 characters, at least one uppercase, lowercase, number and special character
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+}
+
+/**
+ * Validates password strength and returns detailed feedback
+ * @param password - The password to validate
+ * @returns object with validation result and feedback
+ */
+export function validatePasswordStrength(password: string): {
+  isValid: boolean;
+  score: number;
+  feedback: string[];
+} {
+  const feedback: string[] = [];
+  let score = 0;
+
+  if (password.length < 8) {
+    feedback.push('La contraseña debe tener al menos 8 caracteres');
+  } else {
+    score += 1;
+  }
+
+  if (!/[a-z]/.test(password)) {
+    feedback.push('Debe contener al menos una letra minúscula');
+  } else {
+    score += 1;
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    feedback.push('Debe contener al menos una letra mayúscula');
+  } else {
+    score += 1;
+  }
+
+  if (!/\d/.test(password)) {
+    feedback.push('Debe contener al menos un número');
+  } else {
+    score += 1;
+  }
+
+  if (!/[@$!%*?&]/.test(password)) {
+    feedback.push('Debe contener al menos un carácter especial (@$!%*?&)');
+  } else {
+    score += 1;
+  }
+
+  return {
+    isValid: score >= 4 && password.length >= 8,
+    score,
+    feedback
+  };
 }
 
 /**

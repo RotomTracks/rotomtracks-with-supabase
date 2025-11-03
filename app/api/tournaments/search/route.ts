@@ -3,19 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 import { ErrorCodes, TournamentType, TournamentStatus } from '@/lib/types/tournament';
 import {
-  withErrorHandling,
-  generateRequestId,
   handleValidationError,
   handleSupabaseError,
   createErrorResponse
 } from '@/lib/utils/api-error-handler';
 import {
-  createSearchResponse,
-  validatePaginationParams,
   validateSearchParams
 } from '@/lib/utils/api-response-formatter';
 import { 
-  validateSearchParams as validateAdvancedSearchParams, 
   validateAdvancedSearch,
   validateDateRange,
   sanitizeSearchQuery,
@@ -26,8 +21,7 @@ import {
   calculateRelevanceScore,
   buildOptimizedSearchQuery,
   formatSearchResponse,
-  logSearchAnalytics,
-  getClientIP
+  logSearchAnalytics
 } from '@/lib/utils/search';
 import { withRateLimit } from '@/lib/utils/rate-limit';
 

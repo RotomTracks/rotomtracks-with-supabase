@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.tauri.app/config/2",
+  "identifier": "com.rotomtracks.desktop",
+  "productName": "RotomTracks Desktop",
+  "build": {
+    "beforeDevCommand": "pnpm dev -- --port 5173",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "RotomTracks Desktop",
+        "width": 900,
+        "height": 600,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "icon": [
+      "icons/icon.png"
+    ]
+  }
+}
+
+
+

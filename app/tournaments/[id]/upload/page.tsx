@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { FileUploadDemo } from '@/components/tournaments/FileUploadDemo';
+import { FileUploadDemo } from '@/components/tournaments/utils/FileUploadDemo';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';

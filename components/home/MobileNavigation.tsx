@@ -4,9 +4,9 @@ import { useState } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
-import { LanguageSelector } from "@/components/language-selector";
-import { AuthButtonClient } from "@/components/auth-button-client";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { AuthButtonClient } from "@/components/auth/buttons/AuthButtonClient";
+import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { useTypedTranslation } from "@/lib/i18n";
 

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { TournamentDetails } from '@/components/tournaments/TournamentDetails';
+import { TournamentDetails } from '@/components/tournaments/components/TournamentDetails';
 import { PageNavigation } from '@/components/navigation/PageNavigation';
 
 // Forzar renderizado dinámico
