@@ -17,8 +17,7 @@ import { HeaderBar } from '../ui/components/HeaderBar';
 import { SectionCard } from '../ui/components/SectionCard';
 import { StatusPill } from '../ui/components/StatusPill';
 import { Button } from '../ui/components/Button';
-import { muted } from '../ui/typography';
-import { iconSizes, borderWidths, fontSizes, spacing } from '../theme/tokens';
+import { iconSizes, fontSizes, spacing } from '../theme/tokens';
 import { containerPadding, codeBlockMuted, contentContainer, rowBetweenCenter, textCenter, centeredFull, heroContainer, titleBlock, sectionTopRow, sectionTitleSpacer, mutedParagraph } from '../ui/styles';
 import { Text } from '../ui/components/Text';
 
