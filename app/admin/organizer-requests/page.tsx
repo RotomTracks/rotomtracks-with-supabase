@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useCallback } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminRoute } from '@/components/admin/AdminRoute';
 import { AdminOrganizerRequest, OrganizerRequestStatus } from '@/lib/types/tournament';
@@ -54,7 +54,7 @@ function AdminOrganizerRequestsContent() {
     totalPages: 0
   });
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -108,7 +108,7 @@ function AdminOrganizerRequestsContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, statusFilter, searchTerm, tAdmin]);
 
   useEffect(() => {
     fetchRequests();

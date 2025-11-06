@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminRoute } from '@/components/admin/AdminRoute';
@@ -46,7 +46,7 @@ export default function AdminOrganizerRequestDetailPage() {
     show: boolean;
   }>({ action: null, show: false });
 
-  const fetchRequest = async () => {
+  const fetchRequest = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -72,7 +72,7 @@ export default function AdminOrganizerRequestDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [requestId]);
 
   const updateRequestStatus = async (status: OrganizerRequestStatus, notes?: string) => {
     try {

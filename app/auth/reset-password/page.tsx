@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -23,7 +23,7 @@ function ResetPasswordContent() {
   const code = searchParams.get('code');
   const type = searchParams.get('type');
 
-  const handlePasswordReset = async () => {
+  const handlePasswordReset = useCallback(async () => {
     const authToken = token || code;
     
     if (!authToken) {
@@ -59,7 +59,7 @@ function ResetPasswordContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token, code, router]);
 
   useEffect(() => {
     if ((token || code) && type === 'recovery') {
