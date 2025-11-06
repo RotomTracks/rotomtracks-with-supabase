@@ -70,3 +70,6 @@ logs/
 # Project specific exclusions
 old-project/
 .kiro/
+
+# AI Assistant configuration (keep local)
+WARP.md

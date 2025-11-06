@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 import { DevToolsWrapper } from "@/components/dev/DevToolsWrapper";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
 import { AuthModalProvider } from "@/components/auth/context/AuthModalContext";
@@ -79,6 +81,8 @@ export default function RootLayout({
             </AuthModalProvider>
           </ToastProvider>
         </ThemeProvider>
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
