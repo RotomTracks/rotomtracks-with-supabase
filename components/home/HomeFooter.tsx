@@ -4,11 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTypedTranslation } from "@/lib/i18n";
 
-interface HomeFooterProps {
-  user: any;
-}
-
-export function HomeFooter({ user }: HomeFooterProps) {
+export function HomeFooter() {
   const { tPages } = useTypedTranslation();
 
   return (

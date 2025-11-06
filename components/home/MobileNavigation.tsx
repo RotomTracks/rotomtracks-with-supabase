@@ -9,14 +9,12 @@ import { AuthButtonClient } from "@/components/auth/buttons/AuthButtonClient";
 import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { useTypedTranslation } from "@/lib/i18n";
+import { useAuth } from "@/lib/hooks/useAuth";
 
-interface MobileNavigationProps {
-  user: any;
-}
-
-export function MobileNavigation({ user }: MobileNavigationProps) {
+export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { tUI } = useTypedTranslation();
+  const { user } = useAuth();
 
   return (
     <>

@@ -8,11 +8,7 @@ import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { MobileNavigation } from "./MobileNavigation";
 import { useTypedTranslation } from "@/lib/i18n";
 
-interface HomeNavigationProps {
-  user: any;
-}
-
-export function HomeNavigation({ user }: HomeNavigationProps) {
+export function HomeNavigation() {
   const { tUI } = useTypedTranslation();
   
   return (
@@ -53,7 +49,7 @@ export function HomeNavigation({ user }: HomeNavigationProps) {
 
       {/* Mobile Navigation - Only show on small screens */}
       <div className="block lg:hidden">
-        <MobileNavigation user={user} />
+        <MobileNavigation />
       </div>
     </>
   );

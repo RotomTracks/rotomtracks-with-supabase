@@ -17,10 +17,7 @@ import Link from "next/link";
 import { useAuthModalContext } from "@/components/auth/context/AuthModalContext";
 import { Button } from "@/components/ui/button";
 import { Trophy, Search, Users, MapPin, X } from "lucide-react";
-
-interface HomeContentProps {
-  user: any;
-}
+import { useAuth } from "@/lib/hooks/useAuth";
 
 interface GeolocationPosition {
   coords: {
@@ -29,7 +26,8 @@ interface GeolocationPosition {
   };
 }
 
-export function HomeContent({ user }: HomeContentProps) {
+export function HomeContent() {
+  const { user } = useAuth();
   const { tPages } = useTypedTranslation();
   const { openSignUpModal, openLoginModal } = useAuthModalContext();
   const [userLocation, setUserLocation] = useState<string | undefined>(undefined);
