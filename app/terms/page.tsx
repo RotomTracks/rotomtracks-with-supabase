@@ -1,17 +1,15 @@
 'use client';
 
-import { useAuth } from "@/lib/hooks/useAuth";
 import { HomeNavigation } from "@/components/home/HomeNavigation";
 import { HomeFooter } from "@/components/home/HomeFooter";
 import { useTypedTranslation } from "@/lib/i18n";
 
 export default function TermsPage() {
-  const { user } = useAuth();
   const { tPages } = useTypedTranslation();
 
   return (
     <main id="main-content" className="min-h-screen flex flex-col" role="main">
-      <HomeNavigation user={user} />
+      <HomeNavigation />
 
       <div className="flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
         <div className="max-w-4xl mx-auto px-5 py-12 w-full">
@@ -46,7 +44,7 @@ export default function TermsPage() {
         </div>
       </div>
 
-      <HomeFooter user={user} />
+      <HomeFooter />
     </main>
   );
 }

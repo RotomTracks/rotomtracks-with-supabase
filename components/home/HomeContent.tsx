@@ -360,7 +360,7 @@ export function HomeContent() {
             userLocation={userLocation}
             limit={6}
             onTournamentsChange={setHasUpcomingTournaments}
-            user={user}
+            user={user ?? undefined}
           />
           
           {/* Call to Action for Tournament Discovery - Only show when there are upcoming tournaments */}
