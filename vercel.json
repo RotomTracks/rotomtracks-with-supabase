@@ -1,7 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_SITE_URL": "https://rotomtracks-with-supabase.vercel.app"
   }
